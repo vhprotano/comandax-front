@@ -1,0 +1,19 @@
+<div class="fixed top-4 right-4 z-50 space-y-2 max-w-md">
+  <div
+    #notificationItem
+    *ngFor="let notification of notifications"
+    [class]="'p-4 rounded-lg text-white shadow-lg flex items-center gap-3 ' + getColor(notification.type)"
+    [style.opacity]="0"
+    [style.transform]="'translateY(-20px)'"
+  >
+    <span class="text-xl font-bold">{{ getIcon(notification.type) }}</span>
+    <span class="flex-1">{{ notification.message }}</span>
+    <button
+      (click)="close(notification.id)"
+      class="text-white hover:opacity-80 transition-opacity"
+    >
+      ✕
+    </button>
+  </div>
+</div>
+

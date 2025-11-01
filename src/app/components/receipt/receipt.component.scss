@@ -1,0 +1,22 @@
+:host {
+  display: block;
+}
+
+@media print {
+  :host {
+    display: block;
+  }
+
+  ::ng-deep {
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: white;
+    }
+  }
+}
+

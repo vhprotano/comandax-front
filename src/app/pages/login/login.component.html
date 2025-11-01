@@ -1,0 +1,94 @@
+<div class="min-h-screen bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 flex items-center justify-center p-4">
+  <!-- Decorative elements -->
+ <div class="absolute top-0 left-0 w-96 h-96 bg-white opacity-5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+   <!-- <div class="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full translate-x-1/2 translate-y-1/2"></div> -->
+
+  <div class="relative z-10 w-full max-w-md">
+    <!-- Logo and Title -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4 shadow-lg">
+        <span class="text-3xl font-bold text-primary-600">🍽️</span>
+      </div>
+      <h1 class="text-4xl font-bold text-white mb-2">ComandaX</h1>
+      <p class="text-primary-100">Sistema de Gestão de Comandas</p>
+    </div>
+
+    <!-- Role Selection -->
+    <div class="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-8 mb-6 border border-white border-opacity-20">
+      <p class="text-white text-sm font-medium mb-4">Selecione seu tipo de acesso:</p>
+      <div class="grid grid-cols-3 gap-3 mb-6">
+        <button
+          (click)="setRole('MANAGER')"
+          [class.ring-2]="selectedRole === 'MANAGER'"
+          class="p-3 rounded-lg bg-white bg-opacity-10 text-white hover:bg-opacity-20 transition-all duration-200 ring-white ring-opacity-0"
+        >
+          <div class="text-2xl mb-1">👔</div>
+          <div class="text-xs font-medium">Gerente</div>
+        </button>
+        <button
+          (click)="setRole('WAITER')"
+          [class.ring-2]="selectedRole === 'WAITER'"
+          class="p-3 rounded-lg bg-white bg-opacity-10 text-white hover:bg-opacity-20 transition-all duration-200 ring-white ring-opacity-0"
+        >
+          <div class="text-2xl mb-1">👨‍💼</div>
+          <div class="text-xs font-medium">Garçom</div>
+        </button>
+        <button
+          (click)="setRole('KITCHEN')"
+          [class.ring-2]="selectedRole === 'KITCHEN'"
+          class="p-3 rounded-lg bg-white bg-opacity-10 text-white hover:bg-opacity-20 transition-all duration-200 ring-white ring-opacity-0"
+        >
+          <div class="text-2xl mb-1">👨‍🍳</div>
+          <div class="text-xs font-medium">Cozinha</div>
+        </button>
+      </div>
+
+      <!-- Login Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <!-- Email Input -->
+        <div>
+          <label class="block text-white text-sm font-medium mb-2">Email</label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="seu@email.com"
+            class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 text-white placeholder-white placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-white focus:bg-opacity-30 transition-all"
+          />
+          <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="text-red-200 text-xs mt-1">
+            Email inválido
+          </div>
+        </div>
+
+        <!-- Password Input -->
+        <div>
+          <label class="block text-white text-sm font-medium mb-2">Senha</label>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="••••••••"
+            class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 text-white placeholder-white placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-white focus:bg-opacity-30 transition-all"
+          />
+          <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-red-200 text-xs mt-1">
+            Senha deve ter no mínimo 6 caracteres
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="error" class="bg-red-500 bg-opacity-20 border border-red-300 text-red-100 px-4 py-3 rounded-lg text-sm">
+          {{ error }}
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          [disabled]="loading || loginForm.invalid"
+          class="w-full py-3 bg-white text-primary-600 font-semibold rounded-lg hover:bg-opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          <span *ngIf="!loading">Entrar</span>
+          <span *ngIf="loading" class="animate-spin">⏳</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+

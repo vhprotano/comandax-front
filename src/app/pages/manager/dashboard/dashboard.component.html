@@ -1,0 +1,252 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  <!-- Header -->
+  <header class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center shadow-lg">
+          <span class="text-2xl">🍽️</span>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 font-display">ComandaX</h1>
+          <p class="text-xs text-gray-500 font-medium">Gestão de Comandas</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-6">
+        <div class="hidden sm:flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg">
+          <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+            {{ userName.charAt(0).toUpperCase() }}
+          </div>
+          <div class="text-right">
+            <p class="text-sm font-semibold text-gray-900">{{ userName }}</p>
+            <p class="text-xs text-gray-500">👔 Gerente</p>
+          </div>
+        </div>
+        <button
+          (click)="logout()"
+          class="btn btn-danger btn-sm"
+        >
+          🚪 Sair
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="bg-white border-b border-gray-200 sticky top-16 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex gap-1 overflow-x-auto" aria-label="Tabs">
+        <button
+          (click)="setActiveTab('overview')"
+          [class.bg-primary-50]="activeTab === 'overview'"
+          [class.text-primary-600]="activeTab === 'overview'"
+          [class.border-primary-600]="activeTab === 'overview'"
+          [class.text-gray-600]="activeTab !== 'overview'"
+          [class.border-transparent]="activeTab !== 'overview'"
+          class="py-4 px-4 border-b-2 font-medium text-sm transition-all whitespace-nowrap hover:text-primary-600"
+        >
+          📊 Visão Geral
+        </button>
+        <button
+          (click)="setActiveTab('products')"
+          [class.bg-primary-50]="activeTab === 'products'"
+          [class.text-primary-600]="activeTab === 'products'"
+          [class.border-primary-600]="activeTab === 'products'"
+          [class.text-gray-600]="activeTab !== 'products'"
+          [class.border-transparent]="activeTab !== 'products'"
+          class="py-4 px-4 border-b-2 font-medium text-sm transition-all whitespace-nowrap hover:text-primary-600"
+        >
+          🍽️ Produtos
+        </button>
+        <button
+          (click)="setActiveTab('categories')"
+          [class.bg-primary-50]="activeTab === 'categories'"
+          [class.text-primary-600]="activeTab === 'categories'"
+          [class.border-primary-600]="activeTab === 'categories'"
+          [class.text-gray-600]="activeTab !== 'categories'"
+          [class.border-transparent]="activeTab !== 'categories'"
+          class="py-4 px-4 border-b-2 font-medium text-sm transition-all whitespace-nowrap hover:text-primary-600"
+        >
+          📂 Categorias
+        </button>
+        <button
+          (click)="setActiveTab('employees')"
+          [class.bg-primary-50]="activeTab === 'employees'"
+          [class.text-primary-600]="activeTab === 'employees'"
+          [class.border-primary-600]="activeTab === 'employees'"
+          [class.text-gray-600]="activeTab !== 'employees'"
+          [class.border-transparent]="activeTab !== 'employees'"
+          class="py-4 px-4 border-b-2 font-medium text-sm transition-all whitespace-nowrap hover:text-primary-600"
+        >
+          👥 Funcionários
+        </button>
+        <button
+          (click)="setActiveTab('tables')"
+          [class.bg-primary-50]="activeTab === 'tables'"
+          [class.text-primary-600]="activeTab === 'tables'"
+          [class.border-primary-600]="activeTab === 'tables'"
+          [class.text-gray-600]="activeTab !== 'tables'"
+          [class.border-transparent]="activeTab !== 'tables'"
+          class="py-4 px-4 border-b-2 font-medium text-sm transition-all whitespace-nowrap hover:text-primary-600"
+        >
+          🪑 Mesas
+        </button>
+        <button
+          (click)="setActiveTab('orders')"
+          [class.bg-primary-50]="activeTab === 'orders'"
+          [class.text-primary-600]="activeTab === 'orders'"
+          [class.border-primary-600]="activeTab === 'orders'"
+          [class.text-gray-600]="activeTab !== 'orders'"
+          [class.border-transparent]="activeTab !== 'orders'"
+          class="py-4 px-4 border-b-2 font-medium text-sm transition-all whitespace-nowrap hover:text-primary-600"
+        >
+          📋 Pedidos
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Overview Tab -->
+    <div *ngIf="activeTab === 'overview'" class="space-y-8 animate-fade-in">
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Orders Today -->
+        <div class="card group hover:scale-105 cursor-pointer animate-scale-in" style="animation-delay: 0s">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-gray-500 text-sm font-medium">Pedidos Hoje</p>
+              <p class="text-4xl font-bold text-gray-900 mt-3">24</p>
+              <p class="text-xs text-secondary-600 font-medium mt-2">↑ 12% vs ontem</p>
+            </div>
+            <div class="w-14 h-14 bg-gradient-to-br from-primary-100 to-primary-50 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform animate-float">
+              📊
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue Today -->
+        <div class="card group hover:scale-105 cursor-pointer animate-scale-in" style="animation-delay: 0.1s">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-gray-500 text-sm font-medium">Receita Hoje</p>
+              <p class="text-4xl font-bold text-gray-900 mt-3">R$ 1.250</p>
+              <p class="text-xs text-secondary-600 font-medium mt-2">↑ 8% vs ontem</p>
+            </div>
+            <div class="w-14 h-14 bg-gradient-to-br from-secondary-100 to-secondary-50 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform animate-float">
+              💰
+            </div>
+          </div>
+        </div>
+
+        <!-- Products -->
+        <div class="card group hover:scale-105 cursor-pointer animate-scale-in" style="animation-delay: 0.2s">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-gray-500 text-sm font-medium">Produtos</p>
+              <p class="text-4xl font-bold text-gray-900 mt-3">48</p>
+              <p class="text-xs text-gray-500 font-medium mt-2">Cadastrados</p>
+            </div>
+            <div class="w-14 h-14 bg-gradient-to-br from-accent-100 to-accent-50 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform animate-float">
+              🍽️
+            </div>
+          </div>
+        </div>
+
+        <!-- Employees -->
+        <div class="card group hover:scale-105 cursor-pointer animate-scale-in" style="animation-delay: 0.3s">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-gray-500 text-sm font-medium">Funcionários</p>
+              <p class="text-4xl font-bold text-gray-900 mt-3">8</p>
+              <p class="text-xs text-gray-500 font-medium mt-2">Ativos</p>
+            </div>
+            <div class="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform animate-float">
+              👥
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="card animate-slide-up">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900 font-display">Atividade Recente</h2>
+            <p class="text-sm text-gray-500 mt-1">Últimas ações no sistema</p>
+          </div>
+          <button
+            (click)="openActivityModal()"
+            class="text-primary-600 text-sm font-medium hover:text-primary-700 transition-colors"
+          >
+            Ver tudo →
+          </button>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-secondary-50 to-transparent rounded-lg hover:from-secondary-100 transition-all group cursor-pointer">
+            <div class="w-10 h-10 bg-secondary-100 rounded-full flex items-center justify-center text-lg group-hover:scale-110 transition-transform">✅</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900">Pedido #1234 finalizado</p>
+              <p class="text-xs text-gray-500">Há 2 minutos</p>
+            </div>
+            <span class="badge badge-success whitespace-nowrap">Concluído</span>
+          </div>
+          <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-primary-50 to-transparent rounded-lg hover:from-primary-100 transition-all group cursor-pointer">
+            <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center text-lg group-hover:scale-110 transition-transform">📝</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900">Novo produto adicionado</p>
+              <p class="text-xs text-gray-500">Há 15 minutos</p>
+            </div>
+            <span class="badge badge-info whitespace-nowrap">Novo</span>
+          </div>
+          <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-accent-50 to-transparent rounded-lg hover:from-accent-100 transition-all group cursor-pointer">
+            <div class="w-10 h-10 bg-accent-100 rounded-full flex items-center justify-center text-lg group-hover:scale-110 transition-transform">👤</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900">Novo funcionário cadastrado</p>
+              <p class="text-xs text-gray-500">Há 1 hora</p>
+            </div>
+            <span class="badge badge-primary whitespace-nowrap">Cadastro</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Tab -->
+    <div *ngIf="activeTab === 'products'" class="space-y-6">
+      <app-products></app-products>
+    </div>
+
+    <!-- Categories Tab -->
+    <div *ngIf="activeTab === 'categories'" class="space-y-6">
+      <app-categories></app-categories>
+    </div>
+
+    <!-- Employees Tab -->
+    <div *ngIf="activeTab === 'employees'" class="space-y-6">
+      <app-employees></app-employees>
+    </div>
+
+    <!-- Tables Tab -->
+    <div *ngIf="activeTab === 'tables'" class="space-y-6">
+      <app-table-view></app-table-view>
+    </div>
+
+    <!-- Orders Tab -->
+    <div *ngIf="activeTab === 'orders'" class="space-y-6">
+      <app-manager-orders></app-manager-orders>
+    </div>
+  </main>
+
+  <!-- Activity History Modal -->
+  <app-modal
+    [isOpen]="showActivityModal"
+    [title]="'📊 Histórico Completo de Atividades'"
+    [confirmText]="'Fechar'"
+    (onClose)="closeActivityModal()"
+  >
+    <div class="max-h-[60vh] overflow-y-auto">
+      <app-activity-history></app-activity-history>
+    </div>
+  </app-modal>
+</div>
+
