@@ -18,7 +18,7 @@ export class CategoriesComponent implements OnInit {
   editingId: string | null = null;
   showIconPicker = false;
 
-  // Available icons
+  // Available icons (emojis são strings)
   availableIcons = [
     '🥤', '🍽️', '🍰', '🥗', '🌮', '☕',
     '🍕', '🍔', '🌭', '🥪', '🍜', '🍲',
@@ -45,8 +45,7 @@ export class CategoriesComponent implements OnInit {
   initForm(): void {
     this.categoryForm = this.fb.group({
       name: ['', [Validators.required]],
-      icon: ['', [Validators.required]],
-      color: ['#3B82F6', [Validators.required]],
+      icon: ['🍽️', [Validators.required]],
     });
   }
 
@@ -59,7 +58,7 @@ export class CategoriesComponent implements OnInit {
   openForm(): void {
     this.showForm = true;
     this.editingId = null;
-    this.categoryForm.reset({ color: '#3B82F6' });
+    this.categoryForm.reset({ icon: '🍽️' });
   }
 
   closeForm(): void {

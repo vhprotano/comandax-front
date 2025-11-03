@@ -1,72 +1,140 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
+
+declare const google: any;
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit {
-  loginForm!: FormGroup;
+export class LoginComponent implements OnInit, AfterViewInit {
   loading = false;
   error = '';
-  selectedRole: 'MANAGER' | 'WAITER' | 'KITCHEN' = 'MANAGER';
+  clientId = '';
+  tempClientId = '';
+  logoUrl = '';
 
   constructor(
-    private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
-    this.initForm();
-  }
-
-  initForm(): void {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-    });
-  }
-
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
-      this.error = 'Por favor, preencha todos os campos corretamente';
-      return;
+    // Load client_id from environment or localStorage
+    if (isPlatformBrowser(this.platformId)) {
+      // Priority: environment > localStorage
+      this.clientId = environment.googleClientId || localStorage.getItem('google_client_id') || '';
+      this.logoUrl = localStorage.getItem('app_logo_url') || '';
     }
+  }
 
+  ngAfterViewInit(): void {
+    if (this.clientId && isPlatformBrowser(this.platformId)) {
+      this.loadGoogleScript();
+    }
+  }
+
+  loadGoogleScript(): void {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      this.initializeGoogleSignIn();
+    };
+    document.head.appendChild(script);
+  }
+
+  initializeGoogleSignIn(): void {
+    if (typeof google !== 'undefined') {
+      google.accounts.id.initialize({
+        client_id: this.clientId,
+        callback: (response: any) => this.handleCredentialResponse(response),
+        auto_select: false,
+      });
+
+      google.accounts.id.renderButton(
+        document.getElementById('google-signin-button'),
+        {
+          theme: 'filled_blue',
+          size: 'large',
+          width: 350,
+          text: 'signin_with',
+          shape: 'rectangular',
+          logo_alignment: 'left',
+        }
+      );
+    }
+  }
+
+  handleCredentialResponse(response: any): void {
     this.loading = true;
     this.error = '';
 
-    const { email, password } = this.loginForm.value;
+    try {
+      console.log('Google Credential Response:', response);
+      // Decode JWT token
+      const payload = this.parseJwt(response.credential);
 
-    this.authService.login(email, password, this.selectedRole).subscribe({
-      next: (user) => {
-        this.loading = false;
-        // Redirecionar baseado no role
-        if (user.role === 'MANAGER') {
-          this.router.navigate(['/manager']);
-        } else if (user.role === 'WAITER') {
-          this.router.navigate(['/waiter']);
-        } else if (user.role === 'KITCHEN') {
-          this.router.navigate(['/kitchen']);
-        }
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error = 'Erro ao fazer login. Verifique suas credenciais.';
-        console.error(err);
-      },
-    });
+      // Create user object
+      const user = {
+        id: payload.sub,
+        email: payload.email,
+        name: payload.name,
+        picture: payload.picture,
+        role: 'MANAGER', // Default role
+      };
+
+      // Save to auth service with idToken
+      this.authService.loginWithGoogle(response.credential, user).subscribe({
+        next: () => {
+          this.loading = false;
+          this.router.navigate(['/comandas']);
+        },
+        error: (err: any) => {
+          this.loading = false;
+          this.error = 'Erro ao autenticar com Google. Tente novamente.';
+          console.error('Auth error:', err);
+        },
+      });
+    } catch (err) {
+      this.loading = false;
+      this.error = 'Erro ao processar credenciais do Google.';
+      console.error(err);
+    }
   }
 
-  setRole(role: 'MANAGER' | 'WAITER' | 'KITCHEN'): void {
-    this.selectedRole = role;
+  parseJwt(token: string): any {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  }
+
+  saveClientId(): void {
+    if (this.tempClientId.trim()) {
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('google_client_id', this.tempClientId.trim());
+        this.clientId = this.tempClientId.trim();
+        this.tempClientId = '';
+
+        // Reload to initialize Google Sign-In
+        window.location.reload();
+      }
+    }
   }
 }
 

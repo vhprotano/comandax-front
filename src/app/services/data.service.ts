@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
+import { GraphQLService } from './graphql.service';
 
 export interface Product {
   id: string;
@@ -14,8 +15,7 @@ export interface Product {
 export interface Category {
   id: string;
   name: string;
-  icon?: string;
-  color?: string;
+  icon?: string; // Formato string/html para salvar no banco
 }
 
 export interface OrderItem {
@@ -52,9 +52,8 @@ export interface Employee {
 export interface Table {
   id: string;
   number: string;
-  capacity: number;
   status: 'available' | 'occupied' | 'reserved';
-  current_order_id?: string;
+  order?: Order;
 }
 
 export interface Activity {
@@ -78,19 +77,83 @@ export class DataService {
   private tables$ = new BehaviorSubject<Table[]>([]);
   private activities$ = new BehaviorSubject<Activity[]>([]);
 
-  constructor() {
-    this.loadMockData();
+  constructor(private graphqlService: GraphQLService) {
+    // this.loadMockData();
+    this.loadDataFromBackend();
+  }
+
+  private loadDataFromBackend(): void {
+    // Load products from backend
+    this.graphqlService.getProducts().subscribe({
+      next: (products) => {
+        const mappedProducts: Product[] = products?.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          category_id: p.productCategoryId || '',
+          active: true,
+        }));
+        this.products$.next(mappedProducts);
+      },
+      error: (err) => console.error('Error loading products:', err),
+    });
+
+    // Load categories from backend
+    this.graphqlService.getProductCategories().subscribe({
+      next: (categories) => {
+        const mappedCategories: Category[] = categories?.map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          icon: c.icon || '📦',
+        }));
+        this.categories$.next(mappedCategories);
+      },
+      error: (err) => console.error('Error loading categories:', err),
+    });
+
+    // Load tables from backend
+    this.graphqlService.getTables().subscribe({
+      next: (tables) => {
+        console.log('Tables from backend:', tables);
+        const mappedTables: Table[] = tables?.map((t: any) => ({
+          id: t.id,
+          number: t.code.toString(),
+          status: t.status === 'FREE' ? 'available' : 'occupied',
+        }));
+        this.tables$.next(mappedTables);
+      },
+      error: (err) => console.error('Error loading tables:', err),
+    });
+
+    // Load customer tabs (comandas) from backend
+    this.graphqlService.getCustomerTabs().subscribe({
+      next: (tabs) => {
+        const mappedOrders: Order[] = tabs?.map((tab: any) => ({
+          id: tab.id,
+          customer_name: tab.name || 'Cliente',
+          table_number: tab.table?.code?.toString() || '',
+          status: 'open',
+          items: [],
+          created_at: new Date(),
+          updated_at: new Date(),
+          total_price: 0,
+          waiter_id: '',
+        }));
+        this.orders$.next(mappedOrders);
+      },
+      error: (err) => console.error('Error loading customer tabs:', err),
+    });
   }
 
   private loadMockData(): void {
     // Mock categories
     const mockCategories: Category[] = [
-      { id: '1', name: 'Bebidas', icon: '🥤', color: '#3B82F6' },
-      { id: '2', name: 'Pratos Principais', icon: '🍽️', color: '#EF4444' },
-      { id: '3', name: 'Sobremesas', icon: '🍰', color: '#F59E0B' },
-      { id: '4', name: 'Entradas', icon: '🥗', color: '#10B981' },
-      { id: '5', name: 'Lanches', icon: '🌮', color: '#8B5CF6' },
-      { id: '6', name: 'Café', icon: '☕', color: '#92400E' },
+      { id: '1', name: 'Bebidas', icon: '🥤' },
+      { id: '2', name: 'Pratos Principais', icon: '🍽️' },
+      { id: '3', name: 'Sobremesas', icon: '🍰' },
+      { id: '4', name: 'Entradas', icon: '🥗' },
+      { id: '5', name: 'Lanches', icon: '🌮' },
+      { id: '6', name: 'Café', icon: '☕' },
     ];
 
     // Mock products - Expandido
@@ -256,14 +319,14 @@ export class DataService {
 
     // Mock tables
     const mockTables: Table[] = [
-      { id: '1', number: '1', capacity: 2, status: 'available' },
-      { id: '2', number: '2', capacity: 2, status: 'occupied', current_order_id: 'ORD004' },
-      { id: '3', number: '3', capacity: 4, status: 'available' },
-      { id: '4', number: '4', capacity: 4, status: 'available' },
-      { id: '5', number: '5', capacity: 6, status: 'occupied', current_order_id: 'ORD003' },
-      { id: '6', number: '6', capacity: 6, status: 'available' },
-      { id: '7', number: '7', capacity: 8, status: 'available' },
-      { id: '8', number: '8', capacity: 8, status: 'available' },
+      { id: '1', number: 'Mesa 1', status: 'available' },
+      { id: '2', number: 'Mesa 2', status: 'available' },
+      { id: '3', number: 'Mesa 3', status: 'available' },
+      { id: '4', number: 'Mesa 4', status: 'available' },
+      { id: '5', number: 'Mesa 5', status: 'available' },
+      { id: '6', number: 'Mesa 6', status: 'available' },
+      { id: '7', number: 'Mesa 7', status: 'available' },
+      { id: '8', number: 'Mesa 8', status: 'available' },
     ];
 
     // Mock activities
@@ -344,9 +407,26 @@ export class DataService {
     this.products$.next([...current, product]);
   }
 
+  // Create product with GraphQL
+  createProduct(name: string, price: number): Observable<any> {
+    return this.graphqlService.createProduct(name, price).pipe(
+      tap((newProduct) => {
+        const product: Product = {
+          id: newProduct.id,
+          name: newProduct.name,
+          price: newProduct.price,
+          category_id: '',
+          active: true,
+        };
+        const current = this.products$.value;
+        this.products$.next([...current, product]);
+      })
+    );
+  }
+
   updateProduct(id: string, product: Partial<Product>): void {
     const current = this.products$.value;
-    const updated = current.map((p) => (p.id === id ? { ...p, ...product } : p));
+    const updated = current?.map((p) => (p.id === id ? { ...p, ...product } : p));
     this.products$.next(updated);
   }
 
@@ -360,9 +440,24 @@ export class DataService {
     this.categories$.next([...current, category]);
   }
 
+  // Create category with GraphQL
+  createCategory(name: string, icon?: string): Observable<any> {
+    return this.graphqlService.createProductCategory(name, icon).pipe(
+      tap((newCategory) => {
+        const category: Category = {
+          id: newCategory.id,
+          name: newCategory.name,
+          icon: newCategory.icon || '📦',
+        };
+        const current = this.categories$.value;
+        this.categories$.next([...current, category]);
+      })
+    );
+  }
+
   updateCategory(id: string, category: Partial<Category>): void {
     const current = this.categories$.value;
-    const updated = current.map((c) =>
+    const updated = current?.map((c) =>
       c.id === id ? { ...c, ...category } : c
     );
     this.categories$.next(updated);
@@ -378,9 +473,57 @@ export class DataService {
     this.orders$.next([...current, order]);
   }
 
+  // Create customer tab (comanda) with GraphQL
+  createCustomerTab(tableId: string, name?: string): Observable<any> {
+    return this.graphqlService.createCustomerTab(tableId, name).pipe(
+      tap((tab) => {
+        // Add to local state
+        const newOrder: Order = {
+          id: tab.id,
+          customer_name: tab.name || 'Cliente',
+          table_number: tab.table?.code?.toString() || '',
+          status: 'open',
+          items: [],
+          created_at: new Date(),
+          updated_at: new Date(),
+          total_price: 0,
+          waiter_id: '',
+        };
+        const current = this.orders$.value;
+        this.orders$.next([...current, newOrder]);
+      })
+    );
+  }
+
+  // Create order with products using GraphQL
+  createOrderWithProducts(tabId: string, productIds: string[]): Observable<string> {
+    return this.graphqlService.createOrder(tabId, productIds);
+  }
+
+  // Add products to existing order using GraphQL
+  addProductsToOrder(orderId: string, productIds: string[]): Observable<boolean> {
+    return this.graphqlService.addProductsToOrder(orderId, productIds);
+  }
+
+  // Close order using GraphQL
+  closeOrder(orderId: string): Observable<boolean> {
+    return this.graphqlService.closeOrder(orderId).pipe(
+      tap((success) => {
+        if (success) {
+          // Update local state
+          const current = this.orders$.value;
+          const updated = current?.map((o) =>
+            o.id === orderId ? { ...o, status: 'closed' as const } : o
+          );
+          this.orders$.next(updated);
+        }
+      })
+    );
+  }
+
   updateOrder(id: string, order: Partial<Order>): void {
     const current = this.orders$.value;
-    const updated = current.map((o) => (o.id === id ? { ...o, ...order } : o));
+    const updated = current?.map((o) => (o.id === id ? { ...o, ...order } : o));
     this.orders$.next(updated);
   }
 
@@ -396,7 +539,7 @@ export class DataService {
 
   updateEmployee(id: string, employee: Partial<Employee>): void {
     const current = this.employees$.value;
-    const updated = current.map((e) =>
+    const updated = current?.map((e) =>
       e.id === id ? { ...e, ...employee } : e
     );
     this.employees$.next(updated);
@@ -420,9 +563,24 @@ export class DataService {
     this.tables$.next([...current, table]);
   }
 
+  // Create table with GraphQL
+  createTable(): Observable<any> {
+    return this.graphqlService.createTable().pipe(
+      tap((newTable) => {
+        const table: Table = {
+          id: newTable.id,
+          number: newTable.code.toString(),
+          status: newTable.status === 'FREE' ? 'available' : 'occupied',
+        };
+        const current = this.tables$.value;
+        this.tables$.next([...current, table]);
+      })
+    );
+  }
+
   updateTable(id: string, table: Partial<Table>): void {
     const current = this.tables$.value;
-    const updated = current.map((t) => (t.id === id ? { ...t, ...table } : t));
+    const updated = current?.map((t) => (t.id === id ? { ...t, ...table } : t));
     this.tables$.next(updated);
   }
 

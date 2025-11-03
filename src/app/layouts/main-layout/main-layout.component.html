@@ -1,0 +1,131 @@
+<div class="main-layout">
+  <!-- Mobile Header -->
+  <header class="mobile-header md:hidden">
+    <button class="menu-toggle" (click)="openOffcanvas(offcanvasMenu)">
+      <span class="hamburger-icon">☰</span>
+    </button>
+    <h1 class="app-title">ComandaX</h1>
+    <button class="logout-btn fs-6" (click)="logout()">
+      <span>Sair</span>
+    </button>
+  </header>
+
+  <!-- Desktop Sidebar -->
+  <aside class="sidebar hidden md:flex" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-header">
+      <!-- <button class="sidebar-toggle" (click)="toggleSidebar()" title="Expandir/Recolher Menu">
+        <lucide-angular *ngIf="!sidebarCollapsed" [img]="ChevronLeft" [size]="20" [strokeWidth]="2"></lucide-angular>
+        <lucide-angular *ngIf="sidebarCollapsed" [img]="ChevronRight" [size]="20" [strokeWidth]="2"></lucide-angular>
+      </button> -->
+      <div class="logo-container" *ngIf="!sidebarCollapsed">
+        <!-- <div class="logo-icon">🍽️</div>
+        <div class="logo-text">
+          <h1 class="sidebar-title">ComandaX</h1>
+          <p class="sidebar-subtitle">Sistema Unificado</p>
+        </div> -->
+        <img src="assets/logo/transparente.png" alt="ComandaX Logo" class="logo-image" />
+      </div>
+      <!-- <div class="logo-icon-only" *ngIf="sidebarCollapsed">
+        🍽️
+      </div> -->
+    </div>
+
+    <nav class="sidebar-nav">
+      <ng-container *ngFor="let item of menuItems">
+        <!-- Separator -->
+        <div *ngIf="item.id === 'separator'" class="menu-separator"></div>
+
+        <!-- Menu Item with Children -->
+        <div *ngIf="item.id !== 'separator' && item.children" class="menu-group">
+          <button class="menu-item" (click)="toggleMenu(item.id)" [class.expanded]="isMenuExpanded(item.id)"
+            [title]="sidebarCollapsed ? item.label : ''">
+            <span class="menu-icon">{{ item.icon }}</span>
+            <span class="menu-label" *ngIf="!sidebarCollapsed">{{ item.label }}</span>
+            <lucide-angular *ngIf="isMenuExpanded(item.id)" [img]="ChevronLeft" [size]="20"
+              [strokeWidth]="2"></lucide-angular>
+            <lucide-angular *ngIf="!isMenuExpanded(item.id)" [img]="ChevronRight" [size]="20"
+              [strokeWidth]="2"></lucide-angular>
+          </button>
+
+          <div class="submenu" *ngIf="isMenuExpanded(item.id) && !sidebarCollapsed">
+            <button *ngFor="let child of item.children" class="submenu-item" [class.active]="isActiveRoute(child.route)"
+              (click)="navigate(child.route!)">
+              <span class="menu-icon">{{ child.icon }}</span>
+              <span class="menu-label">{{ child.label }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Simple Menu Item -->
+        <button *ngIf="item.id !== 'separator' && !item.children" class="menu-item"
+          [class.active]="isActiveRoute(item.route)" [class.disabled]="item.disabled"
+          [title]="item.tooltip || (sidebarCollapsed ? item.label : '')"
+          (click)="!item.disabled && navigate(item.route!)">
+          <span class="menu-icon">{{ item.icon }}</span>
+          <span class="menu-label" *ngIf="!sidebarCollapsed">{{ item.label }}</span>
+          <span *ngIf="item.disabled && !sidebarCollapsed" class="badge-soon">Em Breve</span>
+        </button>
+      </ng-container>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-button" (click)="logout()">
+        <span class="menu-icon">🚪</span>
+        <span class="menu-label">Sair</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" [class.sidebar-collapsed]="sidebarCollapsed">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<!-- Mobile Offcanvas Menu -->
+<ng-template #offcanvasMenu let-offcanvas>
+  <div class="offcanvas-header">
+    <h2 class="offcanvas-title">ComandaX</h2>
+    <button type="button" class="close-btn" (click)="offcanvas.dismiss()">
+      ✕
+    </button>
+  </div>
+
+  <div class="offcanvas-body">
+    <nav class="mobile-nav">
+      <ng-container *ngFor="let item of menuItems">
+        <!-- Separator -->
+        <div *ngIf="item.id === 'separator'" class="menu-separator"></div>
+
+        <!-- Menu Item with Children -->
+        <div *ngIf="item.id !== 'separator' && item.children" class="menu-group">
+          <button class="menu-item" (click)="toggleMenu(item.id)" [class.expanded]="isMenuExpanded(item.id)">
+            <span class="menu-icon">{{ item.icon }}</span>
+            <span class="menu-label">{{ item.label }}</span>
+            <lucide-angular *ngIf="isMenuExpanded(item.id)" [img]="ChevronLeft" [size]="20"
+              [strokeWidth]="2"></lucide-angular>
+            <lucide-angular *ngIf="!isMenuExpanded(item.id)" [img]="ChevronRight" [size]="20"
+              [strokeWidth]="2"></lucide-angular>
+          </button>
+
+          <div class="submenu" *ngIf="isMenuExpanded(item.id)">
+            <button *ngFor="let child of item.children" class="submenu-item" [class.active]="isActiveRoute(child.route)"
+              (click)="navigate(child.route!)">
+              <span class="menu-icon">{{ child.icon }}</span>
+              <span class="menu-label">{{ child.label }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Simple Menu Item -->
+        <button *ngIf="item.id !== 'separator' && !item.children" class="menu-item"
+          [class.active]="isActiveRoute(item.route)" [class.disabled]="item.disabled" [title]="item.tooltip || ''"
+          (click)="!item.disabled && navigate(item.route!)">
+          <span class="menu-icon">{{ item.icon }}</span>
+          <span class="menu-label">{{ item.label }}</span>
+          <span *ngIf="item.disabled" class="badge-soon">Em Breve</span>
+        </button>
+      </ng-container>
+    </nav>
+  </div>
+</ng-template>

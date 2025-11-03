@@ -1,0 +1,239 @@
+<div class="nova-comanda-container">
+  <!-- Header -->
+  <div class="page-header">
+    <button class="back-btn" (click)="cancel()">
+      <span class="back-icon">←</span>
+    </button>
+    <h1 class="page-title">{{ getPageTitle() }}</h1>
+    <div class="total-display">
+      <span class="total-label">Total:</span>
+      <span class="total-value">R$ {{ total.toFixed(2) }}</span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    <!-- Left Column: Products -->
+    <div class="products-section">
+      <!-- Order Info Form -->
+      <form [formGroup]="orderForm" class="order-info-card">
+        <div class="form-group">
+          <label class="form-label">Nome do Cliente</label>
+          <input
+            type="text"
+            formControlName="customer_name"
+            class="form-input"
+            placeholder="Digite o nome do cliente"
+          />
+        </div>
+
+        <!-- Table Selection (only for Nova Comanda) -->
+        <div *ngIf="!isClosedOrder" class="form-group">
+          <label class="form-label">Mesa (Opcional)</label>
+          
+          <div *ngIf="!selectedTable" class="table-select-trigger">
+            <button
+              type="button"
+              class="select-table-btn"
+              (click)="showTableSelection = true"
+            >
+              <span class="btn-icon">🪑</span>
+              <span>Selecionar Mesa</span>
+            </button>
+          </div>
+
+          <div *ngIf="selectedTable" class="selected-table-display">
+            <div class="selected-table-info">
+              <span class="table-icon">🪑</span>
+              <span class="table-number">{{ selectedTable.number }}</span>
+            </div>
+            <button
+              type="button"
+              class="remove-table-btn"
+              (click)="removeTable()"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Categories Tabs with Horizontal Scroll -->
+      <div class="categories-tabs-wrapper">
+        <button
+          class="category-scroll-btn category-scroll-left"
+          (click)="scrollCategories('left')"
+          [disabled]="!canScrollLeft"
+        >
+          ‹
+        </button>
+
+        <div class="categories-tabs-container" #categoriesContainer>
+          <div class="categories-tabs">
+            <button
+              class="category-tab"
+              [class.active]="selectedCategory === ''"
+              (click)="selectedCategory = ''"
+            >
+              <span class="tab-icon">🍽️</span>
+              <span class="tab-label">Todos</span>
+            </button>
+            <button
+              *ngFor="let category of categories"
+              class="category-tab"
+              [class.active]="selectedCategory === category.id"
+              (click)="selectedCategory = category.id"
+            >
+              <span class="tab-icon" [innerHTML]="category.icon"></span>
+              <span class="tab-label">{{ category.name }}</span>
+            </button>
+          </div>
+        </div>
+
+        <button
+          class="category-scroll-btn category-scroll-right"
+          (click)="scrollCategories('right')"
+          [disabled]="!canScrollRight"
+        >
+          ›
+        </button>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid">
+        <div
+          *ngFor="let product of getFilteredProducts()"
+          [attr.data-product-id]="product.id"
+          (click)="addToCart(product)"
+          class="product-card"
+        >
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-price">R$ {{ product.price.toFixed(2) }}</p>
+        </div>
+
+        <div *ngIf="getFilteredProducts().length === 0" class="empty-products">
+          <div class="empty-icon">🔍</div>
+          <p class="empty-text">Nenhum produto encontrado</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Cart (Desktop Only) -->
+    <div class="cart-section cart-desktop-only">
+      <div class="cart-container">
+        <h2 class="cart-title">Carrinho</h2>
+
+        <div *ngIf="cartItems.length === 0" class="empty-cart">
+          <div class="empty-cart-icon">🛒</div>
+          <p class="empty-cart-text">Carrinho vazio</p>
+        </div>
+
+        <div *ngIf="cartItems.length > 0" class="cart-items">
+          <div *ngFor="let item of cartItems" class="cart-item">
+            <div class="item-info">
+              <p class="item-name">{{ item.product_name }}</p>
+              <p class="item-price">R$ {{ item.unit_price.toFixed(2) }}</p>
+            </div>
+            <div class="item-controls">
+              <button class="qty-btn" (click)="decreaseQuantity(item)">−</button>
+              <span class="qty-display">{{ item.quantity }}</span>
+              <button class="qty-btn" (click)="increaseQuantity(item)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="cartItems.length > 0" class="cart-footer">
+          <div class="cart-total">
+            <span class="total-label">Total:</span>
+            <span class="total-value">R$ {{ total.toFixed(2) }}</span>
+          </div>
+          <button class="submit-btn" (click)="submitOrder()">
+            {{ isClosedOrder ? 'Criar Pedido' : 'Criar Comanda' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Fixed Bottom (Mobile Only) -->
+  <div *ngIf="cartItems.length > 0" class="cart-fixed-bottom-mobile" (click)="openCartOffcanvas()">
+    <div class="cart-summary">
+      <div class="cart-icon">🛒</div>
+      <div class="cart-info">
+        <span class="cart-items-count">{{ cartItems.length }} {{ cartItems.length === 1 ? 'item' : 'itens' }}</span>
+        <span class="cart-total-mobile">R$ {{ total.toFixed(2) }}</span>
+      </div>
+    </div>
+    <div class="cart-action">
+      <span class="action-text">Ver Carrinho</span>
+      <span class="action-icon">▲</span>
+    </div>
+  </div>
+</div>
+
+<!-- Table Selection Modal -->
+<div *ngIf="showTableSelection" class="modal-overlay" (click)="showTableSelection = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">Selecionar Mesa</h2>
+      <button class="modal-close" (click)="showTableSelection = false">✕</button>
+    </div>
+
+    <div class="tables-grid">
+      <div
+        *ngFor="let table of tables"
+        (click)="selectTable(table)"
+        class="table-card"
+      >
+        <div class="table-icon">🪑</div>
+        <div class="table-number">{{ table.number }}</div>
+        <div class="table-status">Disponível</div>
+      </div>
+
+      <div *ngIf="tables.length === 0" class="empty-tables">
+        <p>Nenhuma mesa disponível</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cart Offcanvas Template (Mobile) -->
+<ng-template #cartOffcanvas let-offcanvas>
+  <div class="offcanvas-header">
+    <h2 class="offcanvas-title">Carrinho</h2>
+    <button type="button" class="btn-close" (click)="closeCartOffcanvas()"></button>
+  </div>
+  <div class="offcanvas-body offcanvas-cart-body">
+    <div *ngIf="cartItems.length === 0" class="empty-cart-offcanvas">
+      <div class="empty-cart-icon">🛒</div>
+      <p class="empty-cart-text">Carrinho vazio</p>
+    </div>
+
+    <div *ngIf="cartItems.length > 0" class="cart-items-offcanvas">
+      <div *ngFor="let item of cartItems" class="cart-item-offcanvas">
+        <div class="item-info">
+          <p class="item-name">{{ item.product_name }}</p>
+          <p class="item-price">R$ {{ item.unit_price.toFixed(2) }}</p>
+        </div>
+        <div class="item-controls">
+          <button class="qty-btn" (click)="decreaseQuantity(item)">−</button>
+          <span class="qty-display">{{ item.quantity }}</span>
+          <button class="qty-btn" (click)="increaseQuantity(item)">+</button>
+        </div>
+        <div class="item-total">
+          R$ {{ (item.quantity * item.unit_price).toFixed(2) }}
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="cartItems.length > 0" class="cart-footer-offcanvas">
+      <div class="cart-total-offcanvas">
+        <span class="total-label">Total:</span>
+        <span class="total-value">R$ {{ total.toFixed(2) }}</span>
+      </div>
+      <button class="submit-btn-offcanvas" (click)="submitOrder()">
+        {{ isClosedOrder ? 'Criar Pedido' : 'Criar Comanda' }}
+      </button>
+    </div>
+  </div>
+</ng-template>

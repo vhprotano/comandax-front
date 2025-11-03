@@ -120,7 +120,7 @@ import { NotificationService } from '../../../services/notification.service';
               >
                 <option value="">Selecione uma mesa</option>
                 <option *ngFor="let table of availableTables" [value]="table.id">
-                  Mesa {{ table.number }} ({{ table.capacity }} lugares)
+                  Mesa {{ table.number }}
                 </option>
               </select>
             </div>
@@ -360,7 +360,7 @@ export class ManagerOrdersComponent implements OnInit {
     };
 
     this.dataService.createOrder(newOrder);
-    this.dataService.updateTable(this.selectedTableId, { status: 'occupied', current_order_id: newOrder.id });
+    this.dataService.updateTable(this.selectedTableId, { status: 'occupied' });
     this.notificationService.success('Pedido criado com sucesso!');
     this.closeOrderForm();
   }
@@ -384,7 +384,7 @@ export class ManagerOrdersComponent implements OnInit {
     if (order) {
       const table = this.availableTables.find((t) => t.number === order.table_number.replace('Mesa ', ''));
       if (table) {
-        this.dataService.updateTable(table.id, { status: 'available', current_order_id: undefined });
+        this.dataService.updateTable(table.id, { status: 'available' });
       }
     }
     this.notificationService.success('Pedido fechado!');

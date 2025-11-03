@@ -86,16 +86,16 @@
     <div class="bg-gray-50 border-t border-gray-200 p-4 space-y-2">
       <button
         (click)="onFinalize()"
-        class="w-full px-4 py-3 bg-success-600 text-white rounded-lg hover:bg-success-700 transition-colors font-bold text-sm"
+        class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold text-sm"
       >
         ✅ Finalizar Comanda
       </button>
       <div class="flex gap-2">
         <button
-          (click)="onPrint()"
+          (click)="onSendEmail()"
           class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium text-sm"
         >
-          🖨️ Imprimir
+          📧 Enviar por E-mail
         </button>
         <button
           (click)="onClose()"

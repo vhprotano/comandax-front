@@ -1,29 +1,25 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { map, tap } from 'rxjs/operators';
+import { GraphQLService } from './graphql.service';
 
 export interface User {
   id: string;
   email: string;
   name: string;
   role: 'MANAGER' | 'WAITER' | 'KITCHEN';
-  establishment_id: string;
+  establishment_id?: string;
+  picture?: string;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private supabase: SupabaseClient;
   private currentUser$ = new BehaviorSubject<User | null>(null);
   private isAuthenticated$ = new BehaviorSubject<boolean>(false);
 
-  constructor() {
-    // Configurar Supabase - você precisa adicionar suas credenciais
-    this.supabase = createClient(
-      'https://your-project.supabase.co',
-      'your-anon-key'
-    );
+  constructor(private graphqlService: GraphQLService) {
     this.checkAuth();
   }
 
@@ -54,8 +50,32 @@ export class AuthService {
     });
   }
 
+  loginWithGoogle(idToken: string, googleUser: any): Observable<User> {
+    return this.graphqlService.authenticateWithGoogle(idToken).pipe(
+      map((authResult) => {
+        const user: User = {
+          id: googleUser.id,
+          email: authResult.email,
+          name: googleUser.name,
+          role: authResult.role as 'MANAGER' | 'WAITER' | 'KITCHEN',
+          picture: googleUser.picture,
+        };
+
+        // Save JWT token
+        localStorage.setItem('jwt_token', authResult.jwtToken);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        this.currentUser$.next(user);
+        this.isAuthenticated$.next(true);
+
+        return user;
+      })
+    );
+  }
+
   logout(): void {
     localStorage.removeItem('user');
+    localStorage.removeItem('jwt_token');
     this.currentUser$.next(null);
     this.isAuthenticated$.next(false);
   }

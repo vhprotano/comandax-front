@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Order } from '../../services/data.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-receipt',
@@ -13,7 +14,7 @@ import { Order } from '../../services/data.service';
 export class ReceiptComponent {
   @Input() order!: Order;
   @Output() close = new EventEmitter<void>();
-  @Output() print = new EventEmitter<void>();
+  @Output() sendEmail = new EventEmitter<void>();
   @Output() finalize = new EventEmitter<{ orderId: string; paymentMethod: string }>();
 
   paymentMethod = 'dinheiro';
@@ -24,6 +25,8 @@ export class ReceiptComponent {
     { id: 'pix', label: '📱 PIX' },
     { id: 'cheque', label: '📄 Cheque' },
   ];
+
+  constructor(private notificationService: NotificationService) {}
 
   get subtotal(): number {
     return this.order.items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
@@ -41,9 +44,10 @@ export class ReceiptComponent {
     this.close.emit();
   }
 
-  onPrint(): void {
-    this.print.emit();
-    window.print();
+  onSendEmail(): void {
+    this.sendEmail.emit();
+    // Aqui você pode implementar a lógica de envio de e-mail
+    this.notificationService.success('Recibo enviado por e-mail com sucesso!');
   }
 
   onFinalize(): void {

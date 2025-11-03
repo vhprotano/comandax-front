@@ -38,15 +38,61 @@
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
-          <select
-            formControlName="category_id"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="">Selecione uma categoria</option>
-            <option *ngFor="let category of categories" [value]="category.id">
-              {{ category.icon }} {{ category.name }}
-            </option>
-          </select>
+          <div class="relative">
+            <input
+              type="text"
+              [(ngModel)]="categorySearch"
+              [ngModelOptions]="{standalone: true}"
+              (focus)="showCategoryDropdown = true"
+              (input)="filterCategories()"
+              placeholder="Buscar ou criar categoria..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+
+            <!-- Dropdown -->
+            <div
+              *ngIf="showCategoryDropdown"
+              class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+            >
+              <button
+                type="button"
+                *ngFor="let category of filteredCategories"
+                (click)="selectCategory(category)"
+                class="w-full px-3 py-2 text-left hover:bg-gray-100 transition-colors flex items-center gap-2"
+              >
+                <span [innerHTML]="category.icon"></span>
+                <span>{{ category.name }}</span>
+              </button>
+
+              <!-- Opção de criar nova categoria -->
+              <button
+                type="button"
+                *ngIf="shouldShowCreateOption()"
+                (click)="createNewCategory()"
+                class="w-full px-3 py-2 text-left hover:bg-primary-50 transition-colors text-primary-600 font-medium border-t border-gray-200"
+              >
+                <lucide-angular [img]="Plus"></lucide-angular> Adicionar Categoria "{{ categorySearch }}"
+              </button>
+
+              <div *ngIf="filteredCategories.length === 0 && !shouldShowCreateOption()" class="px-3 py-2 text-gray-500 text-sm">
+                Nenhuma categoria encontrada
+              </div>
+            </div>
+          </div>
+
+          <!-- Selected Category Display -->
+          <div *ngIf="selectedCategoryName" class="mt-2 px-3 py-2 bg-primary-50 rounded-lg flex items-center justify-between">
+            <span class="text-sm text-primary-700">
+              <span [innerHTML]="selectedCategoryIcon"></span> {{ selectedCategoryName }}
+            </span>
+            <button
+              type="button"
+              (click)="clearCategory()"
+              class="text-primary-600 hover:text-primary-700"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         <div class="flex gap-2 pt-4">

@@ -9,11 +9,12 @@ import { RealtimeService } from '../../../services/realtime.service';
 import { ReceiptComponent } from '../../../components/receipt/receipt.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { LucideAngularModule, Plus } from 'lucide-angular';
 
 @Component({
   selector: 'app-waiter-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ReceiptComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, ReceiptComponent, LucideAngularModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
@@ -24,6 +25,8 @@ export class WaiterDashboardComponent implements OnInit, OnDestroy {
   closedOrders: Order[] = [];
   selectedOrderForReceipt: Order | null = null;
   private destroy$ = new Subject<void>();
+
+  readonly Plus = Plus;
 
   constructor(
     private authService: AuthService,
@@ -115,7 +118,7 @@ export class WaiterDashboardComponent implements OnInit, OnDestroy {
       this.dataService.getTables().subscribe((tables) => {
         const table = tables.find((t) => t.number === tableNumber);
         if (table) {
-          this.dataService.updateTable(table.id, { status: 'available', current_order_id: undefined });
+          this.dataService.updateTable(table.id, { status: 'available' });
         }
       });
     }

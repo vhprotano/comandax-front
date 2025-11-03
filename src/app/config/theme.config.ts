@@ -12,7 +12,7 @@ export const THEME_CONFIG = {
       300: '#93c5fd',
       400: '#60a5fa',
       500: '#3b82f6',
-      600: '#2563eb',
+      600: '#1d2d44',
       700: '#1d4ed8',
       800: '#1e40af',
       900: '#1e3a8a',
@@ -116,7 +116,7 @@ export const THEME_CONFIG = {
 export const RESTAURANT_THEMES = {
   modern: {
     name: 'Moderno',
-    primary: '#2563eb',
+    primary: '#1d2d44',
     secondary: '#16a34a',
     accent: '#ea580c',
   },

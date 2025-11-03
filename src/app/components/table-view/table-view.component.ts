@@ -1,41 +1,49 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DataService, Order } from '../../services/data.service';
-
-export interface Table {
-  id: string;
-  number: number;
-  capacity: number;
-  status: 'available' | 'occupied' | 'reserved';
-  order?: Order;
-}
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { DataService, Order, Table } from '../../services/data.service';
+import { NotificationService } from '../../services/notification.service';
+import { LucideAngularModule, Plus } from 'lucide-angular';
 
 @Component({
   selector: 'app-table-view',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './table-view.component.html',
   styleUrls: ['./table-view.component.scss'],
 })
 export class TableViewComponent implements OnInit {
   tables: Table[] = [];
   orders: Order[] = [];
+  showAddForm = false;
+  tableForm!: FormGroup;
+  readonly Plus = Plus;
 
-  constructor(private dataService: DataService) {}
+  constructor(
+    private dataService: DataService,
+    private notificationService: NotificationService,
+    private router: Router,
+    private fb: FormBuilder
+  ) {}
 
   ngOnInit(): void {
-    this.initializeTables();
+    this.initForm();
+    this.loadTables();
     this.loadOrders();
   }
 
-  private initializeTables(): void {
-    // Criar 12 mesas (4x3 layout)
-    this.tables = Array.from({ length: 12 }, (_, i) => ({
-      id: `table-${i + 1}`,
-      number: i + 1,
-      capacity: i % 3 === 0 ? 2 : i % 3 === 1 ? 4 : 6,
-      status: 'available',
-    }));
+  initForm(): void {
+    this.tableForm = this.fb.group({
+      number: ['', [Validators.required]],
+    });
+  }
+
+  loadTables(): void {
+    this.dataService.getTables().subscribe((tables) => {
+      this.tables = tables;
+      this.updateTableStatus();
+    });
   }
 
   private loadOrders(): void {
@@ -47,9 +55,9 @@ export class TableViewComponent implements OnInit {
 
   private updateTableStatus(): void {
     this.tables.forEach((table) => {
-      const order = this.orders.find((o) => o.table_number === `Mesa ${table.number}`);
+      const order = this.orders.find((o) => o.table_number === table.number && o.status === 'open');
       if (order) {
-        table.status = order.status === 'closed' ? 'available' : 'occupied';
+        table.status = 'occupied';
         table.order = order;
       } else {
         table.status = 'available';
@@ -58,10 +66,51 @@ export class TableViewComponent implements OnInit {
     });
   }
 
-  getTableIcon(capacity: number): string {
-    if (capacity <= 2) return '🪑';
-    if (capacity <= 4) return '🪑🪑';
-    return '🪑🪑🪑';
+  openAddTableForm(): void {
+    this.showAddForm = true;
+    this.tableForm.reset();
+  }
+
+  closeAddForm(): void {
+    this.showAddForm = false;
+    this.tableForm.reset();
+  }
+
+  onSubmit(): void {
+    if (this.tableForm.invalid) {
+      this.notificationService.error('Por favor, preencha o número da mesa');
+      return;
+    }
+
+    const newTable: Table = {
+      id: `table-${Date.now()}`,
+      number: this.tableForm.value.number,
+      status: 'available',
+    };
+
+    this.dataService.addTable(newTable);
+    this.notificationService.success('Mesa adicionada com sucesso!');
+    this.closeAddForm();
+    this.loadTables();
+  }
+
+  deleteTable(tableId: string, event: Event): void {
+    event.stopPropagation(); // Prevenir click no card
+
+    if (confirm('Tem certeza que deseja remover esta mesa?')) {
+      this.dataService.deleteTable(tableId);
+      this.notificationService.success('Mesa removida com sucesso!');
+      this.loadTables();
+    }
+  }
+
+  handleTableClick(table: Table): void {
+    if (table.status === 'occupied' && table.order) {
+      // Navegar para a comanda
+      this.router.navigate(['/dashboard'], {
+        queryParams: { orderId: table.order.id }
+      });
+    }
   }
 
   getStatusColor(status: string): string {

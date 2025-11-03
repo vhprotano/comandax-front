@@ -81,7 +81,7 @@ export class RealtimeService {
 
     // Manter apenas as últimas 20 notificações
     const updatedNotifications = [newNotification, ...notifications].slice(0, 20);
-    this.notifications$.next(updatedNotifications);
+    // this.notifications$.next(updatedNotifications);
   }
 
   private simulateKitchenUpdate(): void {

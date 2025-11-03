@@ -150,7 +150,7 @@ export class OrderFormComponent implements OnInit {
     if (this.orderType === 'table' && this.useTableSelection) {
       const selectedTable = this.tables.find((t) => t.number === this.orderForm.value.table_number);
       if (selectedTable) {
-        this.dataService.updateTable(selectedTable.id, { status: 'occupied', current_order_id: newOrder.id });
+        this.dataService.updateTable(selectedTable.id, { status: 'occupied' });
       }
     }
 
