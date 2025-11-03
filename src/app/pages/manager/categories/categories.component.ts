@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DataService, Category } from '../../../services/data.service';
+import { Category } from '../../../models';
+import { CategoriesService } from '../../../services/categories.service';
 import { NotificationService } from '../../../services/notification.service';
 
 @Component({
@@ -33,7 +34,7 @@ export class CategoriesComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private dataService: DataService,
+    private categoriesService: CategoriesService,
     private notificationService: NotificationService
   ) {}
 
@@ -50,7 +51,7 @@ export class CategoriesComponent implements OnInit {
   }
 
   loadCategories(): void {
-    this.dataService.getCategories().subscribe((categories) => {
+    this.categoriesService.getCategories().subscribe((categories) => {
       this.categories = categories;
     });
   }
@@ -76,14 +77,14 @@ export class CategoriesComponent implements OnInit {
     const formValue = this.categoryForm.value;
 
     if (this.editingId) {
-      this.dataService.updateCategory(this.editingId, formValue);
+      this.categoriesService.updateCategory(this.editingId, formValue);
       this.notificationService.success('Categoria atualizada com sucesso!');
     } else {
       const newCategory: Category = {
         id: Date.now().toString(),
         ...formValue,
       };
-      this.dataService.addCategory(newCategory);
+      this.categoriesService.addCategory(newCategory);
       this.notificationService.success('Categoria criada com sucesso!');
     }
 
@@ -98,7 +99,7 @@ export class CategoriesComponent implements OnInit {
 
   deleteCategory(id: string): void {
     if (confirm('Tem certeza que deseja deletar esta categoria?')) {
-      this.dataService.deleteCategory(id);
+      this.categoriesService.deleteCategory(id);
       this.notificationService.success('Categoria deletada com sucesso!');
     }
   }

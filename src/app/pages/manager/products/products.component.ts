@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DataService, Product, Category } from '../../../services/data.service';
+import { Product, Category } from '../../../models';
+import { ProductsService } from '../../../services/products.service';
+import { CategoriesService } from '../../../services/categories.service';
 import { NotificationService } from '../../../services/notification.service';
 import { LucideAngularModule, Plus } from 'lucide-angular';
 
@@ -31,7 +33,8 @@ export class ProductsComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private dataService: DataService,
+    private productsService: ProductsService,
+    private categoriesService: CategoriesService,
     private notificationService: NotificationService
   ) { }
 
@@ -50,13 +53,13 @@ export class ProductsComponent implements OnInit {
   }
 
   loadProducts(): void {
-    this.dataService.getProducts().subscribe((products) => {
+    this.productsService.getProducts().subscribe((products) => {
       this.products = products;
     });
   }
 
   loadCategories(): void {
-    this.dataService.getCategories().subscribe((categories) => {
+    this.categoriesService.getCategories().subscribe((categories) => {
       this.categories = categories;
       this.filteredCategories = categories;
     });
@@ -142,21 +145,18 @@ export class ProductsComponent implements OnInit {
         icon: '🍽️',
       };
 
-      this.dataService.addCategory(newCategory);
+      this.categoriesService.addCategory(newCategory);
       formValue = { ...formValue, category_id: newCategory.id };
       this.pendingNewCategory = null;
     }
 
     if (this.editingId) {
-      this.dataService.updateProduct(this.editingId, formValue);
+      this.productsService.updateProduct(this.editingId, formValue);
       this.notificationService.success('Produto atualizado com sucesso!');
     } else {
-      const newProduct: Product = {
-        id: Date.now().toString(),
-        ...formValue,
-        active: true,
-      };
-      this.dataService.addProduct(newProduct);
+      this.productsService.addProduct(formValue?.name, formValue?.price).subscribe(() => {
+        this.loadProducts();
+      });
       this.notificationService.success('Produto criado com sucesso!');
     }
 
@@ -180,7 +180,7 @@ export class ProductsComponent implements OnInit {
 
   deleteProduct(id: string): void {
     if (confirm('Tem certeza que deseja deletar este produto?')) {
-      this.dataService.deleteProduct(id);
+      this.productsService.deleteProduct(id);
       this.notificationService.success('Produto deletado com sucesso!');
     }
   }

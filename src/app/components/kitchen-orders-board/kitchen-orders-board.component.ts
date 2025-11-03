@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Order } from '../../models';
 import { RealtimeService } from '../../services/realtime.service';
-import { DataService, Order } from '../../services/data.service';
+import { OrdersService } from '../../services/orders.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -67,12 +68,12 @@ export class KitchenOrdersBoardComponent implements OnInit, OnDestroy {
 
   constructor(
     private realtimeService: RealtimeService,
-    private dataService: DataService
+    private ordersService: OrdersService
   ) {}
 
   ngOnInit(): void {
     // Carregar pedidos iniciais
-    this.dataService
+    this.ordersService
       .getOrders()
       .pipe(takeUntil(this.destroy$))
       .subscribe((orders) => {
@@ -90,7 +91,7 @@ export class KitchenOrdersBoardComponent implements OnInit, OnDestroy {
   }
 
   markAsReady(orderId: string): void {
-    this.dataService.updateOrder(orderId, { status: 'completed' });
+    this.ordersService.updateOrder(orderId, { status: 'completed' });
     this.realtimeService.simulateOrderReady(orderId);
     this.updatePendingOrders();
   }
@@ -101,7 +102,7 @@ export class KitchenOrdersBoardComponent implements OnInit, OnDestroy {
   }
 
   private updatePendingOrders(): void {
-    this.dataService.getOrders().subscribe((orders) => {
+    this.ordersService.getOrders().subscribe((orders) => {
       this.pendingOrders = orders.filter((o) => o.status === 'sent');
     });
   }

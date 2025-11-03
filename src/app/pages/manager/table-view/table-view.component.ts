@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DataService, Order, Table } from '../../services/data.service';
-import { NotificationService } from '../../services/notification.service';
+import { Order, Table } from '../../../models';
+import { TablesService } from '../../../services/tables.service';
+import { OrdersService } from '../../../services/orders.service';
+import { NotificationService } from '../../../services/notification.service';
 import { LucideAngularModule, Plus } from 'lucide-angular';
 
 @Component({
@@ -21,7 +23,8 @@ export class TableViewComponent implements OnInit {
   readonly Plus = Plus;
 
   constructor(
-    private dataService: DataService,
+    private tablesService: TablesService,
+    private ordersService: OrdersService,
     private notificationService: NotificationService,
     private router: Router,
     private fb: FormBuilder
@@ -40,14 +43,14 @@ export class TableViewComponent implements OnInit {
   }
 
   loadTables(): void {
-    this.dataService.getTables().subscribe((tables) => {
+    this.tablesService.getTables().subscribe((tables) => {
       this.tables = tables;
       this.updateTableStatus();
     });
   }
 
   private loadOrders(): void {
-    this.dataService.getOrders().subscribe((orders) => {
+    this.ordersService.getOrders().subscribe((orders) => {
       this.orders = orders;
       this.updateTableStatus();
     });
@@ -55,12 +58,12 @@ export class TableViewComponent implements OnInit {
 
   private updateTableStatus(): void {
     this.tables.forEach((table) => {
-      const order = this.orders.find((o) => o.table_number === table.number && o.status === 'open');
+      const order = this.orders?.find((o) => o.table_number === table.number && o.status === 'open');
       if (order) {
-        table.status = 'occupied';
+        table.status = 'BUSY';
         table.order = order;
       } else {
-        table.status = 'available';
+        table.status = 'FREE';
         table.order = undefined;
       }
     });
@@ -85,27 +88,26 @@ export class TableViewComponent implements OnInit {
     const newTable: Table = {
       id: `table-${Date.now()}`,
       number: this.tableForm.value.number,
-      status: 'available',
+      status: 'FREE',
     };
 
-    this.dataService.addTable(newTable);
+    this.tablesService.addTable(newTable).subscribe(() => this.loadTables());
     this.notificationService.success('Mesa adicionada com sucesso!');
     this.closeAddForm();
-    this.loadTables();
   }
 
   deleteTable(tableId: string, event: Event): void {
     event.stopPropagation(); // Prevenir click no card
 
     if (confirm('Tem certeza que deseja remover esta mesa?')) {
-      this.dataService.deleteTable(tableId);
+      this.tablesService.deleteTable(tableId);
       this.notificationService.success('Mesa removida com sucesso!');
       this.loadTables();
     }
   }
 
   handleTableClick(table: Table): void {
-    if (table.status === 'occupied' && table.order) {
+    if (table.status === 'BUSY' && table.order) {
       // Navegar para a comanda
       this.router.navigate(['/dashboard'], {
         queryParams: { orderId: table.order.id }
@@ -115,9 +117,9 @@ export class TableViewComponent implements OnInit {
 
   getStatusColor(status: string): string {
     switch (status) {
-      case 'available':
+      case 'FREE':
         return 'bg-green-100 border-green-300';
-      case 'occupied':
+      case 'BUSY':
         return 'bg-red-100 border-red-300';
       case 'reserved':
         return 'bg-yellow-100 border-yellow-300';
@@ -128,9 +130,9 @@ export class TableViewComponent implements OnInit {
 
   getStatusLabel(status: string): string {
     switch (status) {
-      case 'available':
+      case 'FREE':
         return 'Disponível';
-      case 'occupied':
+      case 'BUSY':
         return 'Ocupada';
       case 'reserved':
         return 'Reservada';

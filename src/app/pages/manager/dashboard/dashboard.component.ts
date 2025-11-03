@@ -6,11 +6,11 @@ import { AuthService } from '../../../services/auth.service';
 import { ProductsComponent } from '../products/products.component';
 import { CategoriesComponent } from '../categories/categories.component';
 import { EmployeesComponent } from '../employees/employees.component';
-import { TableViewComponent } from '../../../components/table-view/table-view.component';
 import { OrderHistoryComponent } from '../../../components/order-history/order-history.component';
 import { ActivityHistoryComponent } from '../../../components/activity-history/activity-history.component';
 import { ModalComponent } from '../../../components/modal/modal.component';
 import { ManagerOrdersComponent } from '../manager-orders/manager-orders.component';
+import { TableViewComponent } from '../table-view/table-view.component';
 
 @Component({
   selector: 'app-manager-dashboard',
@@ -23,7 +23,7 @@ import { ManagerOrdersComponent } from '../manager-orders/manager-orders.compone
     CategoriesComponent,
     EmployeesComponent,
     TableViewComponent,
-    OrderHistoryComponent,
+    // OrderHistoryComponent,
     ActivityHistoryComponent,
     ModalComponent,
     ManagerOrdersComponent,

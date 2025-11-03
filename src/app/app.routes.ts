@@ -55,7 +55,7 @@ export const routes: Routes = [
       {
         path: 'mesas',
         loadComponent: () =>
-          import('./components/table-view/table-view.component').then((m) => m.TableViewComponent),
+          import('./pages/manager/table-view/table-view.component').then((m) => m.TableViewComponent),
       },
       {
         path: 'dashboard',

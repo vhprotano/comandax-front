@@ -3,7 +3,10 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { NgbOffcanvas, NgbOffcanvasModule } from '@ng-bootstrap/ng-bootstrap';
-import { DataService, Order, Product, Category } from '../../../services/data.service';
+import { Order, Product, Category } from '../../../models';
+import { OrdersService } from '../../../services/orders.service';
+import { ProductsService } from '../../../services/products.service';
+import { CategoriesService } from '../../../services/categories.service';
 import { NotificationService } from '../../../services/notification.service';
 import { ReceiptComponent } from '../../../components/receipt/receipt.component';
 import { LucideAngularModule, Plus } from 'lucide-angular';
@@ -52,7 +55,9 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   constructor(
     private router: Router,
     private fb: FormBuilder,
-    private dataService: DataService,
+    private ordersService: OrdersService,
+    private productsService: ProductsService,
+    private categoriesService: CategoriesService,
     private notificationService: NotificationService,
     private offcanvasService: NgbOffcanvas
   ) {}
@@ -69,20 +74,20 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   }
 
   loadOrders(): void {
-    this.dataService.getOrders().subscribe((orders) => {
+    this.ordersService.getOrders().subscribe((orders) => {
       this.orders = orders.filter((o) => o.status === 'open');
       this.closedOrders = orders.filter((o) => o.status === 'closed');
     });
   }
 
   loadProducts(): void {
-    this.dataService.getProducts().subscribe((products) => {
+    this.productsService.getProducts().subscribe((products) => {
       this.products = products.filter((p) => p.active);
     });
   }
 
   loadCategories(): void {
-    this.dataService.getCategories().subscribe((categories) => {
+    this.categoriesService.getCategories().subscribe((categories) => {
       this.categories = categories;
       // Check scroll buttons after categories load
       setTimeout(() => {
@@ -223,7 +228,7 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.dataService.updateOrder(this.selectedOrder.id, {
+    this.ordersService.updateOrder(this.selectedOrder.id, {
       items: [...this.selectedOrder.items, ...this.cartItems],
       total_price: this.selectedOrder.total_price + this.cartTotal,
     });
@@ -246,7 +251,7 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
 
   // Finalizar Comanda (chamado pelo Receipt component)
   finalizeOrder(event: { orderId: string; paymentMethod: string }): void {
-    this.dataService.closeOrder(event.orderId).subscribe({
+    this.ordersService.closeOrder(event.orderId).subscribe({
       next: (success) => {
         if (success) {
           this.notificationService.success('Comanda fechada com sucesso!');

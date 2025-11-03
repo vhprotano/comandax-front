@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DataService, Employee } from '../../../services/data.service';
+import { Employee } from '../../../models';
+import { EmployeesService } from '../../../services/employees.service';
 import { NotificationService } from '../../../services/notification.service';
 
 @Component({
@@ -25,7 +26,7 @@ export class EmployeesComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private dataService: DataService,
+    private employeesService: EmployeesService,
     private notificationService: NotificationService
   ) {}
 
@@ -44,7 +45,7 @@ export class EmployeesComponent implements OnInit {
   }
 
   loadEmployees(): void {
-    this.dataService.getEmployees().subscribe((employees) => {
+    this.employeesService.getEmployees().subscribe((employees) => {
       this.employees = employees;
     });
   }
@@ -70,7 +71,7 @@ export class EmployeesComponent implements OnInit {
     const formValue = this.employeeForm.value;
 
     if (this.editingId) {
-      this.dataService.updateEmployee(this.editingId, formValue);
+      this.employeesService.updateEmployee(this.editingId, formValue);
       this.notificationService.success('Funcionário atualizado com sucesso!');
     } else {
       const newEmployee: Employee = {
@@ -79,7 +80,7 @@ export class EmployeesComponent implements OnInit {
         active: true,
         created_at: new Date(),
       };
-      this.dataService.addEmployee(newEmployee);
+      this.employeesService.addEmployee(newEmployee);
       this.notificationService.success('Funcionário criado com sucesso!');
     }
 
@@ -94,7 +95,7 @@ export class EmployeesComponent implements OnInit {
 
   deleteEmployee(id: string): void {
     if (confirm('Tem certeza que deseja deletar este funcionário?')) {
-      this.dataService.deleteEmployee(id);
+      this.employeesService.deleteEmployee(id);
       this.notificationService.success('Funcionário deletado com sucesso!');
     }
   }
@@ -105,7 +106,7 @@ export class EmployeesComponent implements OnInit {
   }
 
   toggleActive(employee: Employee): void {
-    this.dataService.updateEmployee(employee.id, { active: !employee.active });
+    this.employeesService.updateEmployee(employee.id, { active: !employee.active });
     const status = employee.active ? 'desativado' : 'ativado';
     this.notificationService.success(`Funcionário ${status} com sucesso!`);
   }

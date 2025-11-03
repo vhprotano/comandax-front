@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Order } from '../../../models';
 import { AuthService } from '../../../services/auth.service';
-import { DataService, Order } from '../../../services/data.service';
+import { OrdersService } from '../../../services/orders.service';
 import { NotificationService } from '../../../services/notification.service';
 
 @Component({
@@ -23,7 +24,7 @@ export class KitchenDashboardComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private dataService: DataService,
+    private ordersService: OrdersService,
     private notificationService: NotificationService
   ) {}
 
@@ -36,7 +37,7 @@ export class KitchenDashboardComponent implements OnInit {
   }
 
   loadOrders(): void {
-    this.dataService.getOrders().subscribe((orders) => {
+    this.ordersService.getOrders().subscribe((orders) => {
       this.pendingOrders = orders.filter((o) => o.status === 'sent');
       this.completedOrders = orders.filter((o) => o.status === 'completed');
       this.historyOrders = orders.filter((o) => o.status === 'closed');
@@ -53,7 +54,7 @@ export class KitchenDashboardComponent implements OnInit {
   }
 
   markAsReady(id: string): void {
-    this.dataService.updateOrder(id, { status: 'completed' });
+    this.ordersService.updateOrder(id, { status: 'completed' });
     this.notificationService.success('Pedido marcado como pronto!');
     this.playNotificationSound();
     this.loadOrders();

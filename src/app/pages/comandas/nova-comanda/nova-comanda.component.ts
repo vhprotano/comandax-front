@@ -3,7 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NgbOffcanvas, NgbOffcanvasModule } from '@ng-bootstrap/ng-bootstrap';
-import { DataService, Order, Product, Category, Table, OrderItem } from '../../../services/data.service';
+import { Order, Product, Category, Table, OrderItem } from '../../../models';
+import { OrdersService } from '../../../services/orders.service';
+import { ProductsService } from '../../../services/products.service';
+import { CategoriesService } from '../../../services/categories.service';
+import { TablesService } from '../../../services/tables.service';
 import { NotificationService } from '../../../services/notification.service';
 
 @Component({
@@ -13,7 +17,7 @@ import { NotificationService } from '../../../services/notification.service';
   templateUrl: './nova-comanda.component.html',
   styleUrls: ['./nova-comanda.component.scss'],
 })
-export class NovaComandaComponent implements OnInit, AfterViewInit {
+export class NovaComandaComponent implements OnInit {
   @ViewChild('cartOffcanvas') cartOffcanvas!: TemplateRef<any>;
   @ViewChild('categoriesContainer') categoriesContainer!: ElementRef;
 
@@ -31,16 +35,19 @@ export class NovaComandaComponent implements OnInit, AfterViewInit {
 
   // Scroll controls
   canScrollLeft = false;
-  canScrollRight = false;
+  canScrollRight = true;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private dataService: DataService,
+    private ordersService: OrdersService,
+    private productsService: ProductsService,
+    private categoriesService: CategoriesService,
+    private tablesService: TablesService,
     private notificationService: NotificationService,
     private offcanvasService: NgbOffcanvas
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Check if it's a closed order (Novo Pedido)
@@ -57,20 +64,16 @@ export class NovaComandaComponent implements OnInit, AfterViewInit {
   }
 
   loadData(): void {
-    this.dataService.getProducts().subscribe((products) => {
-      this.products = products.filter((p) => p.active);
+    this.productsService.getProducts().subscribe((products) => {
+      this.products = products?.filter((p) => p.active);
     });
 
-    this.dataService.getCategories().subscribe((categories) => {
+    this.categoriesService.getCategories().subscribe((categories) => {
       this.categories = categories;
-      // Check scroll buttons after categories load
-      setTimeout(() => {
-        this.checkScrollButtons();
-      }, 100);
     });
 
-    this.dataService.getTables().subscribe((tables) => {
-      this.tables = tables.filter((t) => t.status === 'available');
+    this.tablesService.getTables().subscribe((tables) => {
+      this.tables = tables?.filter((t) => t.status === 'FREE');
     });
   }
 
@@ -78,7 +81,7 @@ export class NovaComandaComponent implements OnInit, AfterViewInit {
     if (!this.selectedCategory) {
       return this.products;
     }
-    return this.products.filter((p) => p.category_id === this.selectedCategory);
+    return this.products?.filter((p) => p.category_id === this.selectedCategory);
   }
 
   selectTable(table: Table): void {
@@ -150,7 +153,7 @@ export class NovaComandaComponent implements OnInit, AfterViewInit {
   }
 
   removeFromCart(itemId: string): void {
-    this.cartItems = this.cartItems.filter((item) => item.id !== itemId);
+    this.cartItems = this.cartItems?.filter((item) => item.id !== itemId);
     this.calculateTotal();
     this.triggerCartAnimation();
   }
@@ -184,7 +187,7 @@ export class NovaComandaComponent implements OnInit, AfterViewInit {
     }
 
     const formValue = this.orderForm.value;
-    const tableNumber = this.selectedTable ? this.selectedTable.number : '';
+    const tableNumber = this.selectedTable ? this.selectedTable.number : 0;
 
     const newOrder: Order = {
       id: `ORD${Date.now()}`,
@@ -198,7 +201,7 @@ export class NovaComandaComponent implements OnInit, AfterViewInit {
       waiter_id: '1',
     };
 
-    this.dataService.createOrder(newOrder);
+    this.ordersService.createOrder(newOrder);
     const message = this.isClosedOrder ? 'Pedido criado e fechado com sucesso!' : 'Comanda criada com sucesso!';
     this.notificationService.success(message);
 
@@ -216,13 +219,6 @@ export class NovaComandaComponent implements OnInit, AfterViewInit {
     return this.isClosedOrder ? 'Novo Pedido' : 'Nova Comanda';
   }
 
-  ngAfterViewInit(): void {
-    // Check scroll state after view init
-    setTimeout(() => {
-      this.checkScrollButtons();
-    }, 100);
-  }
-
   scrollCategories(direction: 'left' | 'right'): void {
     const container = this.categoriesContainer?.nativeElement;
     if (!container) return;
@@ -237,18 +233,8 @@ export class NovaComandaComponent implements OnInit, AfterViewInit {
       behavior: 'smooth'
     });
 
-    // Update button states after scroll
-    setTimeout(() => {
-      this.checkScrollButtons();
-    }, 300);
   }
 
-  checkScrollButtons(): void {
-    const container = this.categoriesContainer?.nativeElement;
-    if (!container) return;
 
-    this.canScrollLeft = container.scrollLeft > 0;
-    this.canScrollRight = container.scrollLeft < (container.scrollWidth - container.clientWidth - 1);
-  }
 }
 

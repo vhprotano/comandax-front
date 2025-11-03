@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Product, Category, Order, Employee } from './data.service';
+import { Product, Category, Order, Employee } from '../models';
 
 export interface SearchFilters {
   query: string;

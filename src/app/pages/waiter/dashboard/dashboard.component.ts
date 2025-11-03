@@ -2,8 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Order } from '../../../models';
 import { AuthService } from '../../../services/auth.service';
-import { DataService, Order } from '../../../services/data.service';
+import { OrdersService } from '../../../services/orders.service';
 import { NotificationService } from '../../../services/notification.service';
 import { RealtimeService } from '../../../services/realtime.service';
 import { ReceiptComponent } from '../../../components/receipt/receipt.component';
@@ -31,7 +32,7 @@ export class WaiterDashboardComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private dataService: DataService,
+    private ordersService: OrdersService,
     private notificationService: NotificationService,
     private realtimeService: RealtimeService
   ) {}
@@ -66,7 +67,7 @@ export class WaiterDashboardComponent implements OnInit, OnDestroy {
   }
 
   loadOrders(): void {
-    this.dataService.getOrders().subscribe((orders) => {
+    this.ordersService.getOrders().subscribe((orders) => {
       // Separar pedidos abertos e fechados
       this.orders = orders.filter((o) => o.status !== 'closed');
       this.closedOrders = orders.filter((o) => o.status === 'closed');
@@ -118,7 +119,7 @@ export class WaiterDashboardComponent implements OnInit, OnDestroy {
       this.dataService.getTables().subscribe((tables) => {
         const table = tables.find((t) => t.number === tableNumber);
         if (table) {
-          this.dataService.updateTable(table.id, { status: 'available' });
+          this.dataService.updateTable(table.id, { status: 'FREE' });
         }
       });
     }

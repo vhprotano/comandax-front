@@ -1,0 +1,137 @@
+import { Injectable } from '@angular/core';
+import { Apollo, gql } from 'apollo-angular';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+import { Product } from '../models';
+
+// ==================== GRAPHQL QUERIES ====================
+
+const GET_PRODUCTS = gql`
+  query GetProducts {
+    products {
+      id
+      name
+      price
+      code
+      needPreparation
+      productCategoryId
+      productCategory {
+        id
+        name
+        icon
+      }
+    }
+  }
+`;
+
+const CREATE_PRODUCT = gql`
+  mutation CreateProduct($name: String!, $price: Decimal!) {
+    createProduct(name: $name, price: $price) {
+      id
+      name
+      price
+      code
+    }
+  }
+`;
+
+// ==================== SERVICE ====================
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ProductsService {
+  private products$ = new BehaviorSubject<Product[]>([]);
+
+  constructor(private apollo: Apollo) {
+    this.loadProducts();
+  }
+
+  
+
+  getProducts(): Observable<Product[]> {
+    return this.products$.asObservable();
+  }
+
+  createProduct(name: string, price: number): Observable<any> {
+    return this.apollo
+      .mutate({
+        mutation: CREATE_PRODUCT,
+        variables: { name, price },
+      })
+      .pipe(
+        map((result: any) => result.data?.createProduct),
+        tap((newProduct) => {
+          const product: Product = {
+            id: newProduct.id,
+            name: newProduct.name,
+            price: newProduct.price,
+            category_id: '',
+            active: true,
+          };
+          const current = this.products$.value;
+          this.products$.next([...current, product]);
+        })
+      );
+  }
+
+  // addProduct(product: Product): void {
+  //   const current = this.products$.value;
+  //   this.products$.next([...current, product]);
+  // }
+
+  updateProduct(id: string, product: Partial<Product>): void {
+    const current = this.products$.value;
+    const updated = current?.map((p) => (p.id === id ? { ...p, ...product } : p));
+    this.products$.next(updated);
+  }
+
+  deleteProduct(id: string): void {
+    const current = this.products$.value;
+    this.products$.next(current.filter((p) => p.id !== id));
+  }
+
+  private loadProducts(): void {
+    this.apollo
+      .watchQuery<any>({
+        query: GET_PRODUCTS,
+      })
+      .valueChanges.pipe(
+        map((result) => result.data?.products)
+      )
+      .subscribe({
+        next: (products) => {
+          const mappedProducts: Product[] = products?.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            category_id: p.productCategoryId || '',
+            active: true,
+          }));
+          this.products$.next(mappedProducts);
+        },
+        error: (err) => console.error('Error loading products:', err),
+      });
+  }
+
+  addProduct(name: string, price: number): Observable<any> {
+    return this.apollo.mutate({
+      mutation: CREATE_PRODUCT,
+      variables: { name, price },
+    }).pipe(
+      map((result: any) => result.data?.createProduct),
+      tap((newProduct) => {
+        const product: Product = {
+          id: newProduct.id,
+          name: newProduct.name,
+          price: newProduct.price,
+          category_id: '',
+          active: true,
+        };
+        const current = this.products$.value;
+        this.products$.next([...current, product]);
+      })
+    );
+  }
+}
+

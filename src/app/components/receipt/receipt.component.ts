@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Order } from '../../services/data.service';
 import { NotificationService } from '../../services/notification.service';
+import { Order } from 'src/app/models';
 
 @Component({
   selector: 'app-receipt',

@@ -5,14 +5,18 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../../services/auth.service';
-import { DataService, Order, Product, Category, Table, OrderItem } from '../../../services/data.service';
 import { NotificationService } from '../../../services/notification.service';
 import { RealtimeService } from '../../../services/realtime.service';
 import { ProductsComponent } from '../../manager/products/products.component';
 import { CategoriesComponent } from '../../manager/categories/categories.component';
-import { TableViewComponent } from '../../../components/table-view/table-view.component';
+import { TableViewComponent } from '../../manager/table-view/table-view.component';
 import { ReceiptComponent } from '../../../components/receipt/receipt.component';
 import { LucideAngularModule, Plus } from 'lucide-angular';
+import { Category, Order, OrderItem, Product, Table } from 'src/app/models';
+import { OrdersService } from 'src/app/services/orders.service';
+import { ProductsService } from 'src/app/services/products.service';
+import { CategoriesService } from 'src/app/services/categories.service';
+import { TablesService } from 'src/app/services/tables.service';
 
 @Component({
   selector: 'app-unified-dashboard',
@@ -69,9 +73,12 @@ export class UnifiedDashboardComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private dataService: DataService,
     private notificationService: NotificationService,
-    private realtimeService: RealtimeService
+    private realtimeService: RealtimeService,
+    private ordersService: OrdersService,
+    private productsService: ProductsService,
+    private categoriesService: CategoriesService,
+    private tablesService: TablesService
   ) {}
 
   ngOnInit(): void {
@@ -137,7 +144,7 @@ export class UnifiedDashboardComponent implements OnInit, OnDestroy {
 
   // Data Loading
   loadOrders(): void {
-    this.dataService.getOrders().subscribe((orders) => {
+    this.ordersService.getOrders().subscribe((orders) => {
       // Filtrar apenas status 'open' e 'closed'
       this.orders = orders.filter((o) => o.status === 'open');
       this.closedOrders = orders.filter((o) => o.status === 'closed');
@@ -145,7 +152,7 @@ export class UnifiedDashboardComponent implements OnInit, OnDestroy {
   }
 
   loadProducts(): void {
-    this.dataService.getProducts().subscribe((products) => {
+    this.productsService.getProducts().subscribe((products) => {
       this.products = products;
       if (products.length > 0 && !this.selectedCategory) {
         this.selectedCategory = products[0].category_id;
@@ -154,14 +161,14 @@ export class UnifiedDashboardComponent implements OnInit, OnDestroy {
   }
 
   loadCategories(): void {
-    this.dataService.getCategories().subscribe((categories) => {
+    this.categoriesService.getCategories().subscribe((categories) => {
       this.categories = categories;
     });
   }
 
   loadTables(): void {
-    this.dataService.getTables().subscribe((tables) => {
-      this.tables = tables.filter((t) => t.status === 'available');
+    this.tablesService.getTables().subscribe((tables) => {
+      this.tables = tables.filter((t) => t.status === 'FREE');
     });
   }
 
@@ -217,7 +224,7 @@ export class UnifiedDashboardComponent implements OnInit, OnDestroy {
 
   // Cart Management
   getAvailableTables(): Table[] {
-    return this.tables.filter((t) => t.status === 'available');
+    return this.tables.filter((t) => t.status === 'FREE');
   }
 
   getFilteredProducts(): Product[] {
@@ -326,7 +333,7 @@ export class UnifiedDashboardComponent implements OnInit, OnDestroy {
       waiter_id: '1',
     };
 
-    this.dataService.createOrder(newOrder);
+    this.ordersService.createOrder(newOrder);
     const message = this.activeSection === 'novo-pedido' ? 'Pedido criado e fechado com sucesso!' : 'Comanda criada com sucesso!';
     this.notificationService.success(message);
     this.backToComandasList();
@@ -346,7 +353,7 @@ export class UnifiedDashboardComponent implements OnInit, OnDestroy {
     const updatedItems = [...this.selectedOrder.items, ...this.cartItems];
     const updatedTotal = updatedItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
 
-    this.dataService.updateOrder(this.selectedOrder.id, {
+    this.ordersService.updateOrder(this.selectedOrder.id, {
       items: updatedItems,
       total_price: updatedTotal,
       updated_at: new Date(),
@@ -362,7 +369,7 @@ export class UnifiedDashboardComponent implements OnInit, OnDestroy {
   }
 
   finalizeOrder(event: { orderId: string; paymentMethod: string }): void {
-    this.dataService.updateOrder(event.orderId, { status: 'closed' });
+    this.ordersService.updateOrder(event.orderId, { status: 'closed' });
     this.notificationService.success('Comanda fechada com sucesso!');
     this.closeReceipt();
     this.loadOrders();

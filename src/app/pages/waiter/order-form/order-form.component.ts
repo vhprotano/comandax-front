@@ -57,7 +57,7 @@ export class OrderFormComponent implements OnInit {
     });
 
     this.dataService.getTables().subscribe((tables) => {
-      this.tables = tables.filter((t) => t.status === 'available');
+      this.tables = tables.filter((t) => t.status === 'FREE');
       this.useTableSelection = this.tables.length > 0;
     });
   }

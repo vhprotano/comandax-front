@@ -1,16 +1,20 @@
 import { Injectable } from '@angular/core';
+import { Apollo, gql } from 'apollo-angular';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { GraphQLService } from './graphql.service';
+import { map } from 'rxjs/operators';
+import { User } from '../models';
 
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'MANAGER' | 'WAITER' | 'KITCHEN';
-  establishment_id?: string;
-  picture?: string;
-}
+// ==================== GRAPHQL MUTATIONS ====================
+
+const AUTHENTICATE_WITH_GOOGLE = gql`
+  mutation AuthenticateWithGoogle($idToken: String!) {
+    authenticateWithGoogle(idToken: $idToken) {
+      jwtToken
+      email
+      role
+    }
+  }
+`;
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +23,7 @@ export class AuthService {
   private currentUser$ = new BehaviorSubject<User | null>(null);
   private isAuthenticated$ = new BehaviorSubject<boolean>(false);
 
-  constructor(private graphqlService: GraphQLService) {
+  constructor(private apollo: Apollo) {
     this.checkAuth();
   }
 
@@ -51,26 +55,32 @@ export class AuthService {
   }
 
   loginWithGoogle(idToken: string, googleUser: any): Observable<User> {
-    return this.graphqlService.authenticateWithGoogle(idToken).pipe(
-      map((authResult) => {
-        const user: User = {
-          id: googleUser.id,
-          email: authResult.email,
-          name: googleUser.name,
-          role: authResult.role as 'MANAGER' | 'WAITER' | 'KITCHEN',
-          picture: googleUser.picture,
-        };
-
-        // Save JWT token
-        localStorage.setItem('jwt_token', authResult.jwtToken);
-        localStorage.setItem('user', JSON.stringify(user));
-
-        this.currentUser$.next(user);
-        this.isAuthenticated$.next(true);
-
-        return user;
+    return this.apollo
+      .mutate({
+        mutation: AUTHENTICATE_WITH_GOOGLE,
+        variables: { idToken },
       })
-    );
+      .pipe(
+        map((result: any) => result.data?.authenticateWithGoogle),
+        map((authResult) => {
+          const user: User = {
+            id: googleUser.id,
+            email: authResult.email,
+            name: googleUser.name,
+            role: authResult.role as 'MANAGER' | 'WAITER' | 'KITCHEN',
+            picture: googleUser.picture,
+          };
+
+          // Save JWT token
+          localStorage.setItem('jwt_token', authResult.jwtToken);
+          localStorage.setItem('user', JSON.stringify(user));
+
+          this.currentUser$.next(user);
+          this.isAuthenticated$.next(true);
+
+          return user;
+        })
+      );
   }
 
   logout(): void {

@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DataService, Order } from '../../services/data.service';
+import { Order } from '../../models';
+import { OrdersService } from '../../services/orders.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -115,10 +116,10 @@ export class StatisticsDashboardComponent implements OnInit, OnDestroy {
   dailyRevenue: any = {};
   private destroy$ = new Subject<void>();
 
-  constructor(private dataService: DataService) {}
+  constructor(private ordersService: OrdersService) {}
 
   ngOnInit(): void {
-    this.dataService
+    this.ordersService
       .getOrders()
       .pipe(takeUntil(this.destroy$))
       .subscribe((orders) => {

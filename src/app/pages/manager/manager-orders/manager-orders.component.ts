@@ -276,7 +276,7 @@ export class ManagerOrdersComponent implements OnInit {
 
   loadTables(): void {
     this.dataService.getTables().subscribe((tables) => {
-      this.availableTables = tables.filter((t) => t.status === 'available');
+      this.availableTables = tables.filter((t) => t.status === 'FREE');
     });
   }
 
@@ -384,7 +384,7 @@ export class ManagerOrdersComponent implements OnInit {
     if (order) {
       const table = this.availableTables.find((t) => t.number === order.table_number.replace('Mesa ', ''));
       if (table) {
-        this.dataService.updateTable(table.id, { status: 'available' });
+        this.dataService.updateTable(table.id, { status: 'FREE' });
       }
     }
     this.notificationService.success('Pedido fechado!');

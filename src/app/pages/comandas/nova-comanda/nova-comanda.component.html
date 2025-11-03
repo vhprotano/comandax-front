@@ -63,13 +63,12 @@
         <button
           class="category-scroll-btn category-scroll-left"
           (click)="scrollCategories('left')"
-          [disabled]="!canScrollLeft"
         >
           ‹
         </button>
 
-        <div class="categories-tabs-container" #categoriesContainer>
-          <div class="categories-tabs">
+        <div class="categories-tabs-container">
+          <div class="categories-tabs" #categoriesContainer>
             <button
               class="category-tab"
               [class.active]="selectedCategory === ''"
@@ -93,7 +92,6 @@
         <button
           class="category-scroll-btn category-scroll-right"
           (click)="scrollCategories('right')"
-          [disabled]="!canScrollRight"
         >
           ›
         </button>
@@ -111,7 +109,7 @@
           <p class="product-price">R$ {{ product.price.toFixed(2) }}</p>
         </div>
 
-        <div *ngIf="getFilteredProducts().length === 0" class="empty-products">
+        <div *ngIf="getFilteredProducts()?.length === 0" class="empty-products">
           <div class="empty-icon">🔍</div>
           <p class="empty-text">Nenhum produto encontrado</p>
         </div>
@@ -123,12 +121,12 @@
       <div class="cart-container">
         <h2 class="cart-title">Carrinho</h2>
 
-        <div *ngIf="cartItems.length === 0" class="empty-cart">
+        <div *ngIf="cartItems?.length === 0" class="empty-cart">
           <div class="empty-cart-icon">🛒</div>
           <p class="empty-cart-text">Carrinho vazio</p>
         </div>
 
-        <div *ngIf="cartItems.length > 0" class="cart-items">
+        <div *ngIf="cartItems && cartItems.length > 0" class="cart-items">
           <div *ngFor="let item of cartItems" class="cart-item">
             <div class="item-info">
               <p class="item-name">{{ item.product_name }}</p>
@@ -142,7 +140,7 @@
           </div>
         </div>
 
-        <div *ngIf="cartItems.length > 0" class="cart-footer">
+        <div *ngIf="cartItems && cartItems.length > 0" class="cart-footer">
           <div class="cart-total">
             <span class="total-label">Total:</span>
             <span class="total-value">R$ {{ total.toFixed(2) }}</span>
@@ -156,11 +154,11 @@
   </div>
 
   <!-- Cart Fixed Bottom (Mobile Only) -->
-  <div *ngIf="cartItems.length > 0" class="cart-fixed-bottom-mobile" (click)="openCartOffcanvas()">
+  <div *ngIf="cartItems && cartItems.length > 0" class="cart-fixed-bottom-mobile" (click)="openCartOffcanvas()">
     <div class="cart-summary">
       <div class="cart-icon">🛒</div>
       <div class="cart-info">
-        <span class="cart-items-count">{{ cartItems.length }} {{ cartItems.length === 1 ? 'item' : 'itens' }}</span>
+        <span class="cart-items-count">{{ cartItems?.length }} {{ cartItems?.length === 1 ? 'item' : 'itens' }}</span>
         <span class="cart-total-mobile">R$ {{ total.toFixed(2) }}</span>
       </div>
     </div>
@@ -190,7 +188,7 @@
         <div class="table-status">Disponível</div>
       </div>
 
-      <div *ngIf="tables.length === 0" class="empty-tables">
+      <div *ngIf="tables?.length === 0" class="empty-tables">
         <p>Nenhuma mesa disponível</p>
       </div>
     </div>
@@ -204,12 +202,12 @@
     <button type="button" class="btn-close" (click)="closeCartOffcanvas()"></button>
   </div>
   <div class="offcanvas-body offcanvas-cart-body">
-    <div *ngIf="cartItems.length === 0" class="empty-cart-offcanvas">
+    <div *ngIf="cartItems?.length === 0" class="empty-cart-offcanvas">
       <div class="empty-cart-icon">🛒</div>
       <p class="empty-cart-text">Carrinho vazio</p>
     </div>
 
-    <div *ngIf="cartItems.length > 0" class="cart-items-offcanvas">
+    <div *ngIf="cartItems && cartItems.length > 0" class="cart-items-offcanvas">
       <div *ngFor="let item of cartItems" class="cart-item-offcanvas">
         <div class="item-info">
           <p class="item-name">{{ item.product_name }}</p>
@@ -226,7 +224,7 @@
       </div>
     </div>
 
-    <div *ngIf="cartItems.length > 0" class="cart-footer-offcanvas">
+    <div *ngIf="cartItems && cartItems.length > 0" class="cart-footer-offcanvas">
       <div class="cart-total-offcanvas">
         <span class="total-label">Total:</span>
         <span class="total-value">R$ {{ total.toFixed(2) }}</span>

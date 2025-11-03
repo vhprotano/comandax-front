@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DataService, Activity } from '../../services/data.service';
+import { Activity } from '../../models';
+import { ActivitiesService } from '../../services/activities.service';
 import { PaginationService } from '../../services/pagination.service';
 
 @Component({
@@ -155,12 +156,12 @@ export class ActivityHistoryComponent implements OnInit {
   Math = Math;
 
   constructor(
-    private dataService: DataService,
+    private activitiesService: ActivitiesService,
     private paginationService: PaginationService
   ) {}
 
   ngOnInit(): void {
-    this.dataService.getActivities().subscribe((activities) => {
+    this.activitiesService.getActivities().subscribe((activities) => {
       this.activities = activities;
       this.filterActivities();
     });
