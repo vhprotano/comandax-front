@@ -77,18 +77,28 @@ export class CategoriesComponent implements OnInit {
     const formValue = this.categoryForm.value;
 
     if (this.editingId) {
-      this.categoriesService.updateCategory(this.editingId, formValue);
-      this.notificationService.success('Categoria atualizada com sucesso!');
+      this.categoriesService.updateCategory(this.editingId, formValue).subscribe({
+        next: () => {
+          this.notificationService.success('Categoria atualizada com sucesso!');
+          this.closeForm();
+        },
+        error: (err) => {
+          console.error('Error updating category:', err);
+          this.notificationService.error('Erro ao atualizar categoria');
+        }
+      });
     } else {
-      const newCategory: Category = {
-        id: Date.now().toString(),
-        ...formValue,
-      };
-      this.categoriesService.addCategory(newCategory);
-      this.notificationService.success('Categoria criada com sucesso!');
+      this.categoriesService.createCategory(formValue.name, formValue.icon).subscribe({
+        next: () => {
+          this.notificationService.success('Categoria criada com sucesso!');
+          this.closeForm();
+        },
+        error: (err) => {
+          console.error('Error creating category:', err);
+          this.notificationService.error('Erro ao criar categoria');
+        }
+      });
     }
-
-    this.closeForm();
   }
 
   editCategory(category: Category): void {
@@ -99,8 +109,15 @@ export class CategoriesComponent implements OnInit {
 
   deleteCategory(id: string): void {
     if (confirm('Tem certeza que deseja deletar esta categoria?')) {
-      this.categoriesService.deleteCategory(id);
-      this.notificationService.success('Categoria deletada com sucesso!');
+      this.categoriesService.deleteCategory(id).subscribe({
+        next: () => {
+          this.notificationService.success('Categoria deletada com sucesso!');
+        },
+        error: (err) => {
+          console.error('Error deleting category:', err);
+          this.notificationService.error('Erro ao deletar categoria');
+        }
+      });
     }
   }
 

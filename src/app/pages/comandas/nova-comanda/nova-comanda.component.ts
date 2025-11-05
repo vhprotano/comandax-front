@@ -73,7 +73,9 @@ export class NovaComandaComponent implements OnInit {
     });
 
     this.tablesService.getTables().subscribe((tables) => {
+      console.log('Loaded tables:', tables);
       this.tables = tables?.filter((t) => t.status === 'FREE');
+      console.log('Available tables:', this.tables);
     });
   }
 
@@ -81,7 +83,8 @@ export class NovaComandaComponent implements OnInit {
     if (!this.selectedCategory) {
       return this.products;
     }
-    return this.products?.filter((p) => p.category_id === this.selectedCategory);
+    const normalize = (id?: string) => (id || '').replace(/-/g, '').toLowerCase();
+    return this.products.filter(p => normalize(p.category_id) === normalize(this.selectedCategory));
   }
 
   selectTable(table: Table): void {
@@ -187,7 +190,7 @@ export class NovaComandaComponent implements OnInit {
     }
 
     const formValue = this.orderForm.value;
-    const tableNumber = this.selectedTable ? this.selectedTable.number : 0;
+    const tableNumber = this.selectedTable ? this.selectedTable.id : null;
 
     const newOrder: Order = {
       id: `ORD${Date.now()}`,
@@ -200,15 +203,21 @@ export class NovaComandaComponent implements OnInit {
       total_price: this.total,
       waiter_id: '1',
     };
+    this.ordersService.createCustomerTab(tableNumber as any, newOrder.customer_name).subscribe(data => {
+      if (data && data.id) {
+        this.ordersService.createOrderWithProducts(data.id, this.cartItems.map(item => item.id)).subscribe(data => {
+          const message = this.isClosedOrder ? 'Pedido criado e fechado com sucesso!' : 'Comanda criada com sucesso!';
+          this.notificationService.success(message);
 
-    this.ordersService.createOrder(newOrder);
-    const message = this.isClosedOrder ? 'Pedido criado e fechado com sucesso!' : 'Comanda criada com sucesso!';
-    this.notificationService.success(message);
+          // Close offcanvas if open
+          this.offcanvasService.dismiss();
 
-    // Close offcanvas if open
-    this.offcanvasService.dismiss();
+          this.router.navigate(['/comandas']);
+        });
+      }
+    });
 
-    this.router.navigate(['/comandas']);
+
   }
 
   cancel(): void {

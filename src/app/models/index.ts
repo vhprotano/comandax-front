@@ -29,7 +29,7 @@ export interface OrderItem {
 export interface Order {
   id: string;
   customer_name: string;
-  table_number: number;
+  table_number?: any;
   status: 'open' | 'sent' | 'completed' | 'closed' | 'scheduled';
   items: OrderItem[];
   created_at: Date;

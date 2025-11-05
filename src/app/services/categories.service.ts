@@ -26,6 +26,18 @@ const CREATE_PRODUCT_CATEGORY = gql`
   }
 `;
 
+const UPDATE_PRODUCT_CATEGORY = gql`
+  mutation UpdateProductCategory($id: UUID!, $name: String, $icon: String) {
+    updateProductCategory(id: $id, name: $name, icon: $icon)
+  }
+`;
+
+const DELETE_PRODUCT_CATEGORY = gql`
+  mutation DeleteProductCategory($id: UUID!) {
+    deleteProductCategory(id: $id)
+  }
+`;
+
 // ==================== SERVICE ====================
 
 @Injectable({
@@ -69,15 +81,43 @@ export class CategoriesService {
     this.categories$.next([...current, category]);
   }
 
-  updateCategory(id: string, category: Partial<Category>): void {
-    const current = this.categories$.value;
-    const updated = current?.map((c) => (c.id === id ? { ...c, ...category } : c));
-    this.categories$.next(updated);
+  updateCategory(id: string, updates: Partial<Category>): Observable<any> {
+    return this.apollo
+      .mutate({
+        mutation: UPDATE_PRODUCT_CATEGORY,
+        variables: {
+          id,
+          name: updates.name,
+          icon: updates.icon
+        },
+      })
+      .pipe(
+        map((result: any) => result.data?.updateProductCategory),
+        tap((success) => {
+          if (success) {
+            const current = this.categories$.value;
+            const updated = current?.map((c) => (c.id === id ? { ...c, ...updates } : c));
+            this.categories$.next(updated);
+          }
+        })
+      );
   }
 
-  deleteCategory(id: string): void {
-    const current = this.categories$.value;
-    this.categories$.next(current.filter((c) => c.id !== id));
+  deleteCategory(id: string): Observable<any> {
+    return this.apollo
+      .mutate({
+        mutation: DELETE_PRODUCT_CATEGORY,
+        variables: { id },
+      })
+      .pipe(
+        map((result: any) => result.data?.deleteProductCategory),
+        tap((success) => {
+          if (success) {
+            const current = this.categories$.value;
+            this.categories$.next(current.filter((c) => c.id !== id));
+          }
+        })
+      );
   }
 
   

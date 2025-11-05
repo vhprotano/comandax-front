@@ -66,9 +66,20 @@ const CREATE_CUSTOMER_TAB = gql`
   }
 `;
 
+
 const CREATE_ORDER = gql`
-  mutation CreateOrder($command: CreateOrderCommandInput!) {
-    createOrder(command: $command)
+  mutation CreateOrder($customerTabId: UUID, $products: [CreateOrderProductInput!]!) {
+    createOrder(customerTabId: $customerTabId, products: $products) {
+      id
+      code
+      status
+      customerTabId
+      products {
+        productId
+        quantity
+        totalPrice
+      }
+    }
   }
 `;
 
@@ -84,6 +95,7 @@ const CLOSE_ORDER = gql`
   }
 `;
 
+
 // ==================== SERVICE ====================
 
 @Injectable({
@@ -96,7 +108,7 @@ export class OrdersService {
     this.loadOrders();
   }
 
-  
+
 
   getOrders(): Observable<Order[]> {
     return this.orders$.asObservable();
@@ -194,9 +206,19 @@ export class OrdersService {
       );
   }
 
-  createOrder(order: Order): void {
-    const current = this.orders$.value;
-    this.orders$.next([...current, order]);
+  createOrder(order: Order) {
+    return this.apollo
+      .mutate({
+        mutation: CREATE_ORDER,
+        variables: {
+          tableId: order.id,
+          name: order.customer_name,
+        },
+      }).pipe(
+        map((result: any) => {
+          return result.data?.createOrder;
+        })
+      );
   }
 
   updateOrder(id: string, order: Partial<Order>): void {
@@ -210,7 +232,7 @@ export class OrdersService {
     this.orders$.next(current.filter((o) => o.id !== id));
   }
 
-  
+
 
   private loadOrders(): void {
     this.apollo

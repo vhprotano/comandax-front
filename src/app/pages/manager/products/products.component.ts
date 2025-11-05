@@ -66,7 +66,13 @@ export class ProductsComponent implements OnInit {
   }
 
   getCategoryName(categoryId: string): string {
-    const category = this.categories.find((c) => c.id === categoryId);
+    console.log('Getting name for category ID:', categoryId);
+    console.log('Categories:', this.categories);
+    // Normaliza os IDs (remove hifens e compara em lowercase) para
+    // lidar com formatos diferentes (ex: "2455e6c1-..." vs "2455e6c14311...")
+    const normalize = (id?: string) => (id || '').replace(/-/g, '').toLowerCase();
+    const category = this.categories.find((c) => normalize(c.id) === normalize(categoryId));
+
     return category ? category.name : 'Sem categoria';
   }
 
@@ -139,29 +145,53 @@ export class ProductsComponent implements OnInit {
 
     // Se há uma categoria pendente, criar agora
     if (this.pendingNewCategory && formValue.category_id === 'PENDING_NEW_CATEGORY') {
-      const newCategory: Category = {
-        id: Date.now().toString(),
-        name: this.pendingNewCategory,
-        icon: '🍽️',
-      };
-
-      this.categoriesService.addCategory(newCategory);
-      formValue = { ...formValue, category_id: newCategory.id };
-      this.pendingNewCategory = null;
-    }
-
-    if (this.editingId) {
-      this.productsService.updateProduct(this.editingId, formValue);
-      this.notificationService.success('Produto atualizado com sucesso!');
-    } else {
-      this.productsService.addProduct(formValue?.name, formValue?.price).subscribe(() => {
-        this.loadProducts();
+      this.categoriesService.createCategory(this.pendingNewCategory, '🍽️').subscribe({
+        next: (newCategory) => {
+          formValue = { ...formValue, category_id: newCategory.id };
+          this.pendingNewCategory = null;
+          this.submitProductWithFormValue(formValue);
+        },
+        error: (err) => {
+          console.error('Error creating category:', err);
+          this.notificationService.error('Erro ao criar categoria');
+        }
       });
-      this.notificationService.success('Produto criado com sucesso!');
+      return;
     }
 
-    this.closeForm();
-    this.loadCategories(); // Recarregar categorias para mostrar a nova
+    this.submitProductWithFormValue(formValue);
+  }
+
+  private submitProductWithFormValue(formValue: any): void {
+    if (this.editingId) {
+      this.productsService.updateProduct(this.editingId, {
+        name: formValue.name,
+        price: formValue.price,
+        productCategoryId: formValue.category_id
+      }).subscribe({
+        next: () => {
+          this.notificationService.success('Produto atualizado com sucesso!');
+          this.loadProducts();
+          this.closeForm();
+        },
+        error: (err) => {
+          console.error('Error updating product:', err);
+          this.notificationService.error('Erro ao atualizar produto');
+        }
+      });
+    } else {
+      this.productsService.createProduct(formValue?.name, formValue?.price).subscribe({
+        next: () => {
+          this.notificationService.success('Produto criado com sucesso!');
+          this.loadProducts();
+          this.closeForm();
+        },
+        error: (err) => {
+          console.error('Error creating product:', err);
+          this.notificationService.error('Erro ao criar produto');
+        }
+      });
+    }
   }
 
   editProduct(product: Product): void {
@@ -169,7 +199,9 @@ export class ProductsComponent implements OnInit {
     this.productForm.patchValue(product);
 
     // Set selected category display
-    const category = this.categories.find((c) => c.id === product.category_id);
+    // Normaliza antes de comparar para cobrir ids com/sem hifens
+    const normalize = (id?: string) => (id || '').replace(/-/g, '').toLowerCase();
+    const category = this.categories.find((c) => normalize(c.id) === normalize(product.category_id));
     if (category) {
       this.selectedCategoryName = category.name;
       this.selectedCategoryIcon = category.icon || '🍽️';

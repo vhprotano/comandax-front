@@ -35,6 +35,24 @@ const CREATE_PRODUCT = gql`
   }
 `;
 
+const UPDATE_PRODUCT = gql`
+  mutation UpdateProduct(
+    $id: UUID!
+    $name: String
+    $price: Decimal
+    $needPreparation: Boolean
+    $productCategoryId: UUID
+  ) {
+    updateProduct(
+      id: $id
+      name: $name
+      price: $price
+      needPreparation: $needPreparation
+      productCategoryId: $productCategoryId
+    )
+  }
+`;
+
 // ==================== SERVICE ====================
 
 @Injectable({
@@ -75,15 +93,45 @@ export class ProductsService {
       );
   }
 
-  // addProduct(product: Product): void {
-  //   const current = this.products$.value;
-  //   this.products$.next([...current, product]);
-  // }
-
-  updateProduct(id: string, product: Partial<Product>): void {
-    const current = this.products$.value;
-    const updated = current?.map((p) => (p.id === id ? { ...p, ...product } : p));
-    this.products$.next(updated);
+  updateProduct(
+    id: string,
+    updates: {
+      name?: string;
+      price?: number;
+      needPreparation?: boolean;
+      productCategoryId?: string;
+    }
+  ): Observable<any> {
+    return this.apollo
+      .mutate({
+        mutation: UPDATE_PRODUCT,
+        variables: {
+          id,
+          name: updates.name,
+          price: updates.price,
+          needPreparation: updates.needPreparation,
+          productCategoryId: updates.productCategoryId,
+        },
+      })
+      .pipe(
+        map((result: any) => result.data?.updateProduct),
+        tap((success) => {
+          if (success) {
+            const current = this.products$.value;
+            const updated = current?.map((p) =>
+              p.id === id
+                ? {
+                    ...p,
+                    name: updates.name ?? p.name,
+                    price: updates.price ?? p.price,
+                    category_id: updates.productCategoryId ?? p.category_id,
+                  }
+                : p
+            );
+            this.products$.next(updated);
+          }
+        })
+      );
   }
 
   deleteProduct(id: string): void {
@@ -112,26 +160,6 @@ export class ProductsService {
         },
         error: (err) => console.error('Error loading products:', err),
       });
-  }
-
-  addProduct(name: string, price: number): Observable<any> {
-    return this.apollo.mutate({
-      mutation: CREATE_PRODUCT,
-      variables: { name, price },
-    }).pipe(
-      map((result: any) => result.data?.createProduct),
-      tap((newProduct) => {
-        const product: Product = {
-          id: newProduct.id,
-          name: newProduct.name,
-          price: newProduct.price,
-          category_id: '',
-          active: true,
-        };
-        const current = this.products$.value;
-        this.products$.next([...current, product]);
-      })
-    );
   }
 }
 

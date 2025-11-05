@@ -125,7 +125,7 @@ export class TablesService {
           const mappedTables: Table[] = tables?.map((t: any) => ({
             id: t.id,
             number: t.code.toString(),
-            status: t.status === 'FREE',
+            status: t.status,
           }));
           this.tables$.next(mappedTables);
         },
