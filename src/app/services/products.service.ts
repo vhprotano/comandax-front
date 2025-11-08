@@ -25,12 +25,12 @@ const GET_PRODUCTS = gql`
 `;
 
 const CREATE_PRODUCT = gql`
-  mutation CreateProduct($name: String!, $price: Decimal!) {
-    createProduct(name: $name, price: $price) {
+  mutation CreateProduct($name: String!, $price: Decimal!, $productCategoryId: UUID) {
+    createProduct(name: $name, price: $price, productCategoryId: $productCategoryId) {
       id
       name
       price
-      code
+      productCategoryId
     }
   }
 `;
@@ -53,6 +53,12 @@ const UPDATE_PRODUCT = gql`
   }
 `;
 
+const DELETE_PRODUCT = gql`
+  mutation DeleteProduct($id: UUID!) {
+    deleteProduct(id: $id)
+  }
+`;
+
 // ==================== SERVICE ====================
 
 @Injectable({
@@ -65,17 +71,17 @@ export class ProductsService {
     this.loadProducts();
   }
 
-  
+
 
   getProducts(): Observable<Product[]> {
     return this.products$.asObservable();
   }
 
-  createProduct(name: string, price: number): Observable<any> {
+  createProduct(name: string, price: number, productCategoryId: string): Observable<any> {
     return this.apollo
       .mutate({
         mutation: CREATE_PRODUCT,
-        variables: { name, price },
+        variables: { name, price, productCategoryId },
       })
       .pipe(
         map((result: any) => result.data?.createProduct),
@@ -84,7 +90,7 @@ export class ProductsService {
             id: newProduct.id,
             name: newProduct.name,
             price: newProduct.price,
-            category_id: '',
+            category_id: newProduct.productCategoryId,
             active: true,
           };
           const current = this.products$.value;
@@ -121,11 +127,11 @@ export class ProductsService {
             const updated = current?.map((p) =>
               p.id === id
                 ? {
-                    ...p,
-                    name: updates.name ?? p.name,
-                    price: updates.price ?? p.price,
-                    category_id: updates.productCategoryId ?? p.category_id,
-                  }
+                  ...p,
+                  name: updates.name ?? p.name,
+                  price: updates.price ?? p.price,
+                  category_id: updates.productCategoryId ?? p.category_id,
+                }
                 : p
             );
             this.products$.next(updated);
@@ -135,8 +141,18 @@ export class ProductsService {
   }
 
   deleteProduct(id: string): void {
-    const current = this.products$.value;
-    this.products$.next(current.filter((p) => p.id !== id));
+    this.apollo
+      .mutate({
+        mutation: DELETE_PRODUCT,
+        variables: { id },
+      })
+      .subscribe({
+        next: (result: any) => {
+          const current = this.products$.value;
+          this.products$.next(current.filter((p) => p.id !== id));
+        },
+        error: (err) => console.error('Error deleting product:', err),
+      });
   }
 
   private loadProducts(): void {

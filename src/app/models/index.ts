@@ -16,6 +16,15 @@ export interface Category {
 }
 
 // ==================== ORDER MODELS ====================
+export interface Order {
+  id: string;
+  status: 'OPEN' | 'CLOSED';
+  tab_id: string;
+  products: OrderItem[];
+  created_at: Date;
+  updated_at: Date;
+  total_price: number;
+}
 
 export interface OrderItem {
   id: string;
@@ -23,19 +32,19 @@ export interface OrderItem {
   product_name: string;
   quantity: number;
   unit_price: number;
-  status: 'pending' | 'ready';
+  status: 'CREATED' | 'IN_PREPARATION' | 'CLOSED';
 }
 
-export interface Order {
+export interface Tab {
   id: string;
   customer_name: string;
   table_number?: any;
-  status: 'open' | 'sent' | 'completed' | 'closed' | 'scheduled';
-  items: OrderItem[];
+  status: 'CREATED' | 'CLOSED';
+  orders: Order[];
   created_at: Date;
   updated_at: Date;
   total_price: number;
-  waiter_id: string;
+  waiter_id?: string;
 }
 
 // ==================== EMPLOYEE MODELS ====================
@@ -54,9 +63,9 @@ export interface Employee {
 
 export interface Table {
   id: string;
-  number: number;
+  number: string;
   status: 'FREE' | 'BUSY';
-  order?: Order;
+  tab?: Tab;
 }
 
 // ==================== ACTIVITY MODELS ====================

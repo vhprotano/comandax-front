@@ -66,8 +66,6 @@ export class ProductsComponent implements OnInit {
   }
 
   getCategoryName(categoryId: string): string {
-    console.log('Getting name for category ID:', categoryId);
-    console.log('Categories:', this.categories);
     // Normaliza os IDs (remove hifens e compara em lowercase) para
     // lidar com formatos diferentes (ex: "2455e6c1-..." vs "2455e6c14311...")
     const normalize = (id?: string) => (id || '').replace(/-/g, '').toLowerCase();
@@ -180,7 +178,7 @@ export class ProductsComponent implements OnInit {
         }
       });
     } else {
-      this.productsService.createProduct(formValue?.name, formValue?.price).subscribe({
+      this.productsService.createProduct(formValue?.name, formValue?.price, formValue?.category_id).subscribe({
         next: () => {
           this.notificationService.success('Produto criado com sucesso!');
           this.loadProducts();

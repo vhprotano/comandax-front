@@ -10,7 +10,7 @@ const GET_TABLES = gql`
   query GetTables {
     tables {
       id
-      code
+      number
       status
     }
   }
@@ -20,11 +20,27 @@ const CREATE_TABLE = gql`
   mutation CreateTable {
     createTable {
       id
-      code
+      number
       status
     }
   }
 `;
+
+const DELETE_TABLE = gql`
+    mutation DeleteTable($id: UUID!) {
+      deleteTable(id: $id)
+    }
+  `;
+
+  const UPDATE_TABLE = gql`
+    mutation UpdateTable($id: UUID!, $number: Int!) {
+      updateTable(id: $id, number: $number) {
+        id
+        number
+        status
+      }
+    }
+  `;
 
 // ==================== SERVICE ====================
 
@@ -60,7 +76,7 @@ export class TablesService {
         tap((newTable) => {
           const table: Table = {
             id: newTable.id,
-            number: newTable.code.toString(),
+            number: newTable?.number?.toString() || '',
             status: newTable.status,
           };
           const current = this.tables$.value;
@@ -74,7 +90,7 @@ export class TablesService {
       .mutate({
         mutation: CREATE_TABLE,
         variables: {
-          code: table.number,
+          number: table.number,
           status: table.status,
         },
       })
@@ -83,7 +99,7 @@ export class TablesService {
         tap((newTable) => {
           const addedTable: Table = {
             id: newTable.id,
-            number: newTable.code.toString(),
+            number: newTable?.number?.toString() || '',
             status: newTable.status,
           };
           const current = this.tables$.value;
@@ -93,14 +109,49 @@ export class TablesService {
   }
 
   updateTable(id: string, table: Partial<Table>): void {
-    const current = this.tables$.value;
-    const updated = current?.map((t) => (t.id === id ? { ...t, ...table } : t));
-    this.tables$.next(updated);
+    this.apollo
+      .mutate({
+        mutation: UPDATE_TABLE,
+        variables: {
+          id,
+          number: parseInt(table.number + '' || '0', 10),
+        },
+      })
+      .pipe(
+        map((result: any) => result.data?.updateTable),
+        tap((updatedTable) => {
+          const current = this.tables$.value;
+          const index = current.findIndex((t) => t.id === id);
+          if (index !== -1) {
+            const updated: Table = {
+              id: updatedTable.id,
+              number: updatedTable?.number?.toString() || '',
+              status: updatedTable.status,
+            };
+            current[index] = updated;
+            this.tables$.next([...current]);
+          }
+        })
+      )
   }
 
-  deleteTable(id: string): void {
-    const current = this.tables$.value;
-    this.tables$.next(current.filter((t) => t.id !== id));
+
+
+  deleteTable(id: string): Observable<boolean> {
+    return this.apollo
+      .mutate({
+        mutation: DELETE_TABLE,
+        variables: { id },
+      })
+      .pipe(
+        map((result: any) => result.data?.deleteTable),
+        tap((deleted: boolean) => {
+          if (deleted) {
+            const current = this.tables$.value;
+            this.tables$.next(current.filter((t) => t.id !== id));
+          }
+        })
+      );
   }
 
 
@@ -113,7 +164,6 @@ export class TablesService {
       })
       .valueChanges.pipe(
         map((result: any) => {
-          console.log('GraphQL getTables result:', result);
           if (result.errors) {
             console.error('GraphQL errors:', result.errors);
           }
@@ -124,7 +174,7 @@ export class TablesService {
         next: (tables) => {
           const mappedTables: Table[] = tables?.map((t: any) => ({
             id: t.id,
-            number: t.code.toString(),
+            number: t.number?.toString() || '',
             status: t.status,
           }));
           this.tables$.next(mappedTables);

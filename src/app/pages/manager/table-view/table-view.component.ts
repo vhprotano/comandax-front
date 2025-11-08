@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Order, Table } from '../../../models';
+import { Tab, Table } from '../../../models';
 import { TablesService } from '../../../services/tables.service';
 import { OrdersService } from '../../../services/orders.service';
 import { NotificationService } from '../../../services/notification.service';
@@ -17,7 +17,7 @@ import { LucideAngularModule, Plus } from 'lucide-angular';
 })
 export class TableViewComponent implements OnInit {
   tables: Table[] = [];
-  orders: Order[] = [];
+  tabs: Tab[] = [];
   showAddForm = false;
   tableForm!: FormGroup;
   readonly Plus = Plus;
@@ -28,7 +28,7 @@ export class TableViewComponent implements OnInit {
     private notificationService: NotificationService,
     private router: Router,
     private fb: FormBuilder
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -50,21 +50,21 @@ export class TableViewComponent implements OnInit {
   }
 
   private loadOrders(): void {
-    this.ordersService.getOrders().subscribe((orders) => {
-      this.orders = orders;
+    this.ordersService.getTabs().subscribe((tabs) => {
+      this.tabs = tabs;
       this.updateTableStatus();
     });
   }
 
   private updateTableStatus(): void {
     this.tables.forEach((table) => {
-      const order = this.orders?.find((o) => o.table_number === table.number && o.status === 'open');
-      if (order) {
+      const tab = this.tabs?.find((o) => o.table_number === table.number && o.status === 'CREATED');
+      if (tab) {
         table.status = 'BUSY';
-        table.order = order;
+        table.tab = tab;
       } else {
         table.status = 'FREE';
-        table.order = undefined;
+        table.tab = undefined;
       }
     });
   }
@@ -100,17 +100,25 @@ export class TableViewComponent implements OnInit {
     event.stopPropagation(); // Prevenir click no card
 
     if (confirm('Tem certeza que deseja remover esta mesa?')) {
-      this.tablesService.deleteTable(tableId);
-      this.notificationService.success('Mesa removida com sucesso!');
-      this.loadTables();
+      this.tablesService.deleteTable(tableId).subscribe({
+        next: () => {
+          this.notificationService.success('Mesa removida com sucesso!');
+          this.loadTables();
+        },
+        error: (err) => {
+          console.error('Erro ao remover mesa:', err);
+          this.notificationService.error('Erro ao remover mesa. Tente novamente.');
+        }
+      });
+
     }
   }
 
   handleTableClick(table: Table): void {
-    if (table.status === 'BUSY' && table.order) {
+    if (table.status === 'BUSY' && table.tab) {
       // Navegar para a comanda
       this.router.navigate(['/dashboard'], {
-        queryParams: { orderId: table.order.id }
+        queryParams: { orderId: table.tab.id }
       });
     }
   }

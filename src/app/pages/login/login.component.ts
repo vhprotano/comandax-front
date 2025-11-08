@@ -80,7 +80,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
     this.error = '';
 
     try {
-      console.log('Google Credential Response:', response);
       // Decode JWT token
       const payload = this.parseJwt(response.credential);
 

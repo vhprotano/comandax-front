@@ -51,9 +51,9 @@
       </div>
 
       <!-- Order Info (se ocupada) -->
-      <div *ngIf="table.status === 'BUSY' && table.order" class="bg-white bg-opacity-50 rounded p-2 text-sm">
+      <div *ngIf="table.status === 'BUSY' && table.tab" class="bg-white bg-opacity-50 rounded p-2 text-sm">
         <p class="text-gray-700 truncate">
-          <span class="font-semibold">Cliente:</span> {{ table.order.customer_name || 'Sem nome' }}
+          <span class="font-semibold">Cliente:</span> {{ table.tab.customer_name || 'Sem nome' }}
         </p>
         <p class="text-primary-600 font-semibold mt-1">
           Clique para ver comanda
@@ -65,13 +65,6 @@
   <!-- Empty State -->
   <div *ngIf="tables.length === 0" class="text-center py-12 bg-gray-50 rounded-lg">
     <p class="text-gray-600 text-lg mb-4">Nenhuma mesa configurada</p>
-    <button
-      (click)="openAddTableForm()"
-      class="px-4 py-2 bg-primary-600 flex gap-2 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
-    >
-      <lucide-angular [img]="Plus"></lucide-angular> Adicionar Primeira Mesa
-    </button>
-  </div>
 </div>
 
 <!-- Add Table Modal -->

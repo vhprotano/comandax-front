@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NotificationService } from '../../services/notification.service';
-import { Order } from 'src/app/models';
+import { Tab } from 'src/app/models';
 
 @Component({
   selector: 'app-receipt',
@@ -12,7 +12,7 @@ import { Order } from 'src/app/models';
   styleUrls: ['./receipt.component.scss'],
 })
 export class ReceiptComponent {
-  @Input() order!: Order;
+  @Input() tab!: Tab;
   @Output() close = new EventEmitter<void>();
   @Output() sendEmail = new EventEmitter<void>();
   @Output() finalize = new EventEmitter<{ orderId: string; paymentMethod: string }>();
@@ -29,7 +29,7 @@ export class ReceiptComponent {
   constructor(private notificationService: NotificationService) {}
 
   get subtotal(): number {
-    return this.order.items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
+    return this.tab?.orders?.map(order => order.products.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)).reduce((sum, item) => sum + item, 0);
   }
 
   get tax(): number {
@@ -51,7 +51,7 @@ export class ReceiptComponent {
   }
 
   onFinalize(): void {
-    this.finalize.emit({ orderId: this.order.id, paymentMethod: this.paymentMethod });
+    this.finalize.emit({ orderId: this.tab.id, paymentMethod: this.paymentMethod });
   }
 }
 

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NgbOffcanvas, NgbOffcanvasModule } from '@ng-bootstrap/ng-bootstrap';
-import { Order, Product, Category, Table, OrderItem } from '../../../models';
+import { Tab, Product, Category, Table, OrderItem } from '../../../models';
 import { OrdersService } from '../../../services/orders.service';
 import { ProductsService } from '../../../services/products.service';
 import { CategoriesService } from '../../../services/categories.service';
@@ -83,6 +83,9 @@ export class NovaComandaComponent implements OnInit {
     if (!this.selectedCategory) {
       return this.products;
     }
+    if (!this.products) {
+      return [];
+    }
     const normalize = (id?: string) => (id || '').replace(/-/g, '').toLowerCase();
     return this.products.filter(p => normalize(p.category_id) === normalize(this.selectedCategory));
   }
@@ -109,7 +112,7 @@ export class NovaComandaComponent implements OnInit {
         product_name: product.name,
         quantity: 1,
         unit_price: product.price,
-        status: 'pending',
+        status: 'CREATED',
       };
       this.cartItems.push(newItem);
       this.triggerCartAnimation();
@@ -192,20 +195,9 @@ export class NovaComandaComponent implements OnInit {
     const formValue = this.orderForm.value;
     const tableNumber = this.selectedTable ? this.selectedTable.id : null;
 
-    const newOrder: Order = {
-      id: `ORD${Date.now()}`,
-      customer_name: formValue.customer_name,
-      table_number: tableNumber,
-      status: this.isClosedOrder ? 'closed' : 'open',
-      items: this.cartItems,
-      created_at: new Date(),
-      updated_at: new Date(),
-      total_price: this.total,
-      waiter_id: '1',
-    };
-    this.ordersService.createCustomerTab(tableNumber as any, newOrder.customer_name).subscribe(data => {
+    this.ordersService.createCustomerTab(tableNumber as any, formValue.customer_name).subscribe(data => {
       if (data && data.id) {
-        this.ordersService.createOrderWithProducts(data.id, this.cartItems.map(item => item.id)).subscribe(data => {
+        this.ordersService.createOrderWithProducts(data.id, this.cartItems.map(item => ({ productId: item.id, quantity: item.quantity }))).subscribe(data => {
           const message = this.isClosedOrder ? 'Pedido criado e fechado com sucesso!' : 'Comanda criada com sucesso!';
           this.notificationService.success(message);
 

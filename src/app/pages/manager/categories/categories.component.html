@@ -107,7 +107,7 @@
     </div>
   </div>
 
-  <div *ngIf="categories.length === 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+  <div *ngIf="!categories || categories.length === 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
     <p class="text-gray-600 text-lg">Nenhuma categoria cadastrada</p>
   </div>
 </div>

@@ -50,7 +50,7 @@ export class CategoriesService {
     this.loadCategories();
   }
 
-  
+
 
   getCategories(): Observable<Category[]> {
     return this.categories$.asObservable();
@@ -74,11 +74,6 @@ export class CategoriesService {
           this.categories$.next([...current, category]);
         })
       );
-  }
-
-  addCategory(category: Category): void {
-    const current = this.categories$.value;
-    this.categories$.next([...current, category]);
   }
 
   updateCategory(id: string, updates: Partial<Category>): Observable<any> {
@@ -115,12 +110,14 @@ export class CategoriesService {
           if (success) {
             const current = this.categories$.value;
             this.categories$.next(current.filter((c) => c.id !== id));
+          } else {
+            throw new Error('Failed to delete category');
           }
         })
       );
   }
 
-  
+
 
   private loadCategories(): void {
     this.apollo

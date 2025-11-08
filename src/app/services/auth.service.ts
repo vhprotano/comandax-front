@@ -35,24 +35,6 @@ export class AuthService {
     }
   }
 
-  login(email: string, password: string, role: 'MANAGER' | 'WAITER' | 'KITCHEN' = 'MANAGER'): Observable<User> {
-    return new Observable((observer) => {
-      // Implementar login com Supabase
-      // Por enquanto, simulando login
-      const mockUser: User = {
-        id: '1',
-        email,
-        name: 'User',
-        role: role,
-        establishment_id: '1',
-      };
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      this.currentUser$.next(mockUser);
-      this.isAuthenticated$.next(true);
-      observer.next(mockUser);
-      observer.complete();
-    });
-  }
 
   loginWithGoogle(idToken: string, googleUser: any): Observable<User> {
     return this.apollo

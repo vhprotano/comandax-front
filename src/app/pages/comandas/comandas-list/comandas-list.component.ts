@@ -2,8 +2,8 @@ import { Component, OnInit, TemplateRef, ViewChild, ElementRef, AfterViewInit } 
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { NgbOffcanvas, NgbOffcanvasModule } from '@ng-bootstrap/ng-bootstrap';
-import { Order, Product, Category } from '../../../models';
+import { NgbOffcanvas, NgbOffcanvasModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { Tab, Product, Category } from '../../../models';
 import { OrdersService } from '../../../services/orders.service';
 import { ProductsService } from '../../../services/products.service';
 import { CategoriesService } from '../../../services/categories.service';
@@ -14,21 +14,21 @@ import { LucideAngularModule, Plus } from 'lucide-angular';
 @Component({
   selector: 'app-comandas-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ReceiptComponent, NgbOffcanvasModule, LucideAngularModule],
+  imports: [CommonModule, ReactiveFormsModule, ReceiptComponent, NgbOffcanvasModule, LucideAngularModule, NgbTooltipModule],
   templateUrl: './comandas-list.component.html',
   styleUrls: ['./comandas-list.component.scss'],
 })
 export class ComandasListComponent implements OnInit, AfterViewInit {
-  orders: Order[] = [];
-  closedOrders: Order[] = [];
-  showClosedOrders = false;
+  openedTabs: Tab[] = [];
+  closedTabs: Tab[] = [];
+  showClosedTabs = false;
   maxItemsToShow = 3; // Limite de itens a mostrar
 
   // FAB Menu
   fabExpanded = false;
 
   // Detalhes da comanda
-  selectedOrder: Order | null = null;
+  selectedTab: Tab | null = null;
 
   // Adicionar itens
   showAddItemsModal = false;
@@ -40,7 +40,7 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   cartTotal = 0;
 
   // Recibo
-  selectedOrderForReceipt: Order | null = null;
+  selectedTabForReceipt: Tab | null = null;
 
   // Scroll controls for mobile categories
   canScrollLeftMobile = false;
@@ -51,6 +51,7 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   @ViewChild('categoriesContainerMobile') categoriesContainerMobile!: ElementRef;
 
   readonly Plus = Plus;
+  isLoadingTabs = false;
 
   constructor(
     private router: Router,
@@ -60,29 +61,34 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     private categoriesService: CategoriesService,
     private notificationService: NotificationService,
     private offcanvasService: NgbOffcanvas
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.loadOrders();
+    this.loadTabs();
     this.loadProducts();
     this.loadCategories();
     this.initAddItemsForm();
+
+    this.ordersService.loading$.subscribe((loading) => {
+      this.isLoadingTabs = loading;
+    });
   }
 
   initAddItemsForm(): void {
     this.addItemsForm = this.fb.group({});
   }
 
-  loadOrders(): void {
-    this.ordersService.getOrders().subscribe((orders) => {
-      this.orders = orders.filter((o) => o.status === 'open');
-      this.closedOrders = orders.filter((o) => o.status === 'closed');
+  loadTabs(): void {
+    this.ordersService.getTabs().subscribe((tabs) => {
+      console.log('Loaded tabs:', tabs);
+      this.openedTabs = tabs;
+      // this.closedOrders = orders?.filter((o) => o.status === 'CLOSED');
     });
   }
 
   loadProducts(): void {
     this.productsService.getProducts().subscribe((products) => {
-      this.products = products.filter((p) => p.active);
+      this.products = products?.filter((p) => p.active);
     });
   }
 
@@ -96,20 +102,20 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  getDisplayItems(order: Order): any[] {
-    return order.items.slice(0, this.maxItemsToShow);
+  getDisplayItems(tab: Tab): any[] {
+    return tab.orders.map((order) => order?.products).flat().slice(0, this.maxItemsToShow);
   }
 
-  hasMoreItems(order: Order): boolean {
-    return order.items.length > this.maxItemsToShow;
+  hasMoreItems(tab: Tab): boolean {
+    return tab.orders.map((order) => order?.products).flat()?.length > this.maxItemsToShow;
   }
 
-  getRemainingItemsCount(order: Order): number {
-    return order.items.length - this.maxItemsToShow;
+  getRemainingItemsCount(tab: Tab): number {
+    return tab.orders.map((order) => order?.products).flat()?.length - this.maxItemsToShow;
   }
 
-  openOrder(order: Order): void {
-    this.selectedOrder = order;
+  openTab(tab: Tab): void {
+    this.selectedTab = tab;
 
     // Use offcanvas em mobile/tablet, modal em desktop
     if (window.innerWidth < 1024) {
@@ -121,7 +127,7 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   }
 
   closeOrderDetail(): void {
-    this.selectedOrder = null;
+    this.selectedTab = null;
     this.offcanvasService.dismiss();
   }
 
@@ -140,9 +146,9 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   }
 
   // Adicionar Itens
-  openAddItemsModal(order: Order, event: Event): void {
+  openAddItemsModal(tab: Tab, event: Event): void {
     event.stopPropagation();
-    this.selectedOrder = order;
+    this.selectedTab = tab;
     this.showAddItemsModal = true;
     this.cartItems = [];
     this.cartTotal = 0;
@@ -161,6 +167,7 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   }
 
   closeAddItemsModal(): void {
+    this.selectedTab = null;
     this.showAddItemsModal = false;
     this.cartItems = [];
     this.cartTotal = 0;
@@ -171,7 +178,11 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     if (!this.selectedCategory) {
       return this.products;
     }
-    return this.products.filter((p) => p.category_id === this.selectedCategory);
+    if (!this.products) {
+      return [];
+    }
+    const normalize = (id?: string) => (id || '').replace(/-/g, '').toLowerCase();
+    return this.products.filter(p => normalize(p.category_id) === normalize(this.selectedCategory));
   }
 
   addToCart(product: Product): void {
@@ -201,7 +212,7 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     if (item.quantity > 1) {
       item.quantity--;
     } else {
-      this.cartItems = this.cartItems.filter((i) => i !== item);
+      this.cartItems = this.cartItems?.filter((i) => i !== item);
     }
     this.updateCartTotal();
   }
@@ -224,29 +235,34 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   }
 
   submitAddItems(): void {
-    if (!this.selectedOrder || this.cartItems.length === 0) {
+    if (!this.selectedTab || this.cartItems.length === 0) {
       return;
     }
 
-    this.ordersService.updateOrder(this.selectedOrder.id, {
-      items: [...this.selectedOrder.items, ...this.cartItems],
-      total_price: this.selectedOrder.total_price + this.cartTotal,
+    this.ordersService.createOrderWithProducts(this.selectedTab.id, this.cartItems?.map(item => ({ productId: item.product_id, quantity: item.quantity }))).subscribe({
+      next: (orderId) => {
+        this.loadTabs();
+      },
+      error: (err) => {
+        console.error('Error adding items to order:', err);
+        this.notificationService.error('Erro ao adicionar itens à comanda');
+      }
     });
 
     this.notificationService.success('Itens adicionados com sucesso!');
-    this.loadOrders();
+    this.loadTabs();
     this.closeAddItemsModal();
   }
 
   // Fechar Comanda
-  closeOrderAction(order: Order, event: Event): void {
+  closeTabAction(tab: Tab, event: Event): void {
     event.stopPropagation();
-    this.selectedOrderForReceipt = order;
+    this.selectedTabForReceipt = tab;
   }
 
   onReceiptClose(): void {
-    this.selectedOrderForReceipt = null;
-    this.loadOrders();
+    this.selectedTabForReceipt = null;
+    this.loadTabs();
   }
 
   // Finalizar Comanda (chamado pelo Receipt component)
@@ -255,8 +271,8 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
       next: (success) => {
         if (success) {
           this.notificationService.success('Comanda fechada com sucesso!');
-          this.selectedOrderForReceipt = null;
-          this.loadOrders();
+          this.selectedTabForReceipt = null;
+          this.loadTabs();
         } else {
           this.notificationService.error('Erro ao fechar comanda');
         }

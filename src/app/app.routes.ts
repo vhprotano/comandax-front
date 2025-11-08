@@ -64,49 +64,6 @@ export const routes: Routes = [
       },
     ],
   },
-  // {
-  //   path: 'new-order',
-  //   component: NewOrderComponent,
-  //   canActivate: [authGuard],
-  //   data: { isClosedOrder: false },
-  // },
-  // {
-  //   path: 'new-closed-order',
-  //   component: NewOrderComponent,
-  //   canActivate: [authGuard],
-  //   data: { isClosedOrder: true },
-  // },
-  // Rotas antigas mantidas para compatibilidade
-  // {
-  //   path: 'manager',
-  //   component: ManagerDashboardComponent,
-  //   canActivate: [authGuard, roleGuard],
-  //   data: { roles: ['MANAGER'] },
-  // },
-  // {
-  //   path: 'waiter',
-  //   component: WaiterDashboardComponent,
-  //   canActivate: [authGuard, roleGuard],
-  //   data: { roles: ['WAITER'] },
-  // },
-  // {
-  //   path: 'waiter/new',
-  //   component: OrderFormComponent,
-  //   canActivate: [authGuard, roleGuard],
-  //   data: { roles: ['WAITER'] },
-  // },
-  // {
-  //   path: 'waiter/edit/:id',
-  //   component: OrderFormComponent,
-  //   canActivate: [authGuard, roleGuard],
-  //   data: { roles: ['WAITER'] },
-  // },
-  // {
-  //   path: 'kitchen',
-  //   component: KitchenDashboardComponent,
-  //   canActivate: [authGuard, roleGuard],
-  //   data: { roles: ['KITCHEN'] },
-  // },
   {
     path: '**',
     redirectTo: '/login',

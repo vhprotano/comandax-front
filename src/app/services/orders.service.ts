@@ -2,45 +2,45 @@ import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { Order } from '../models';
+import { Tab } from '../models';
 
 // ==================== GRAPHQL QUERIES ====================
 
 const GET_CUSTOMER_TABS = gql`
   query GetCustomerTabs {
-    customerTabs {
+  customerTabs {
+    name
+    id
+    status
+  }
+}
+`;
+
+const GET_ORDERS = gql`
+  query getOrders {
+    orders {
       id
-      name
-      table {
-        id
-        code
-        status
+      status
+      customerTabId
+      products {
+        productId
+        quantity
+        totalPrice
+        product {
+          id
+          name
+          price
+        }
       }
     }
   }
 `;
 
-const GET_ORDERS = gql`
-  query GetOrders {
-    orders {
-      id
-      code
-      status
-      products {
-        productName
-        unitPrice
-        quantity
-        totalPrice
-      }
-    }
-  }
-`;
 
 const GET_ORDER_BY_ID = gql`
   query GetOrderById($id: UUID!) {
     orderById(id: $id) {
       id
-      code
       status
       products {
         productName
@@ -59,7 +59,7 @@ const CREATE_CUSTOMER_TAB = gql`
       name
       table {
         id
-        code
+        number
         status
       }
     }
@@ -71,13 +71,17 @@ const CREATE_ORDER = gql`
   mutation CreateOrder($customerTabId: UUID, $products: [CreateOrderProductInput!]!) {
     createOrder(customerTabId: $customerTabId, products: $products) {
       id
-      code
       status
       customerTabId
       products {
         productId
         quantity
         totalPrice
+        product {
+          id
+          name
+          price
+        }
       }
     }
   }
@@ -102,19 +106,21 @@ const CLOSE_ORDER = gql`
   providedIn: 'root',
 })
 export class OrdersService {
-  private orders$ = new BehaviorSubject<Order[]>([]);
+  private orders$ = new BehaviorSubject<Tab[]>([]);
+  private isLoadingTabs = new BehaviorSubject<boolean>(false);
+  public loading$ = this.isLoadingTabs.asObservable();
 
   constructor(private apollo: Apollo) {
-    this.loadOrders();
+    this.loadTabs();
   }
 
 
 
-  getOrders(): Observable<Order[]> {
+  getTabs(): Observable<Tab[]> {
     return this.orders$.asObservable();
   }
 
-  getOrderById(id: string): Observable<any> {
+  getTabById(id: string): Observable<any> {
     return this.apollo
       .watchQuery<any>({
         query: GET_ORDER_BY_ID,
@@ -137,45 +143,48 @@ export class OrdersService {
       .pipe(
         map((result: any) => result.data?.createCustomerTab),
         tap((tab) => {
-          const newOrder: Order = {
+          const newTab: Tab = {
             id: tab.id,
             customer_name: tab.name || 'Cliente',
-            table_number: tab.table?.code?.toString() || '',
-            status: 'open',
-            items: [],
+            table_number: tab.table?.number?.toString() || '',
+            status: 'CREATED',
+            orders: tab?.orders || [],
             created_at: new Date(),
             updated_at: new Date(),
             total_price: 0,
             waiter_id: '',
           };
           const current = this.orders$.value;
-          this.orders$.next([...current, newOrder]);
+          this.orders$.next([...current, newTab]);
         })
       );
   }
 
-  createOrderWithProducts(tabId: string, productIds: string[]): Observable<string> {
+  createOrderWithProducts(tabId: string, products: { productId: string, quantity: number }[]): Observable<string> {
     return this.apollo
       .mutate({
         mutation: CREATE_ORDER,
         variables: {
-          command: {
-            tabId,
-            productIds,
-          },
+          customerTabId: tabId,
+          products,
         },
       })
-      .pipe(map((result: any) => result.data?.createOrder));
+      .pipe(
+        map((result: any) => result.data?.createOrder),
+        tap((order) => {
+          this.loadTabs();
+        })
+      );
   }
 
-  addProductsToOrder(orderId: string, productIds: string[]): Observable<boolean> {
+  addProductsToTab(tabId: string, products: { id: string, quantity: number }[]): Observable<boolean> {
     return this.apollo
       .mutate({
         mutation: ADD_PRODUCTS_TO_ORDER,
         variables: {
           command: {
-            orderId,
-            productIds,
+            tabId,
+            products,
           },
         },
       })
@@ -198,7 +207,7 @@ export class OrdersService {
           if (success) {
             const current = this.orders$.value;
             const updated = current?.map((o) =>
-              o.id === orderId ? { ...o, status: 'closed' as const } : o
+              o.id === orderId ? { ...o, status: 'CLOSED' as const } : o
             );
             this.orders$.next(updated);
           }
@@ -206,13 +215,13 @@ export class OrdersService {
       );
   }
 
-  createOrder(order: Order) {
+  createOrder(tab: Tab) {
     return this.apollo
       .mutate({
         mutation: CREATE_ORDER,
         variables: {
-          tableId: order.id,
-          name: order.customer_name,
+          tableId: tab.id,
+          name: tab.customer_name,
         },
       }).pipe(
         map((result: any) => {
@@ -221,9 +230,9 @@ export class OrdersService {
       );
   }
 
-  updateOrder(id: string, order: Partial<Order>): void {
+  updateOrder(id: string, tab: Partial<Tab>): void {
     const current = this.orders$.value;
-    const updated = current?.map((o) => (o.id === id ? { ...o, ...order } : o));
+    const updated = current?.map((o) => (o.id === id ? { ...o, ...tab } : o));
     this.orders$.next(updated);
   }
 
@@ -232,33 +241,101 @@ export class OrdersService {
     this.orders$.next(current.filter((o) => o.id !== id));
   }
 
-
-
-  private loadOrders(): void {
+  private loadTabs(): void {
+    this.isLoadingTabs.next(true);
     this.apollo
       .watchQuery<any>({
         query: GET_CUSTOMER_TABS,
       })
       .valueChanges.pipe(
-        map((result) => result.data?.customerTabs)
+        map((result) => result)
       )
       .subscribe({
-        next: (tabs) => {
-          const mappedOrders: Order[] = tabs?.map((tab: any) => ({
-            id: tab.id,
-            customer_name: tab.name || 'Cliente',
-            table_number: tab.table?.code?.toString() || '',
-            status: 'open',
-            items: [],
-            created_at: new Date(),
-            updated_at: new Date(),
-            total_price: 0,
-            waiter_id: '',
-          }));
-          this.orders$.next(mappedOrders);
+        next: (result) => {
+          if (result.data?.customerTabs) {
+            const tabs = result.data?.customerTabs;
+            this.loadOrders().subscribe({
+              next: (orders) => {
+                const closedOrders = tabs?.filter((o: any) => o.status === 'CLOSED');
+                if (tabs?.length === 0) {
+                  this.orders$.next([]);
+                } else {
+
+                  const mappedTabs: Tab[] = tabs?.filter((tab: any) => tab.status === 'OPEN').map((tab: any) => {
+                    const normalize = (id?: string) => (id || '').replace(/-/g, '').toLowerCase();
+                    const tabOrders = orders?.filter((o: any) => normalize(o?.customerTabId) === normalize(tab?.id));
+                    // First, group products by their ID across all orders
+                    const groupedProducts = tabOrders?.reduce((acc: any[], order: any) => {
+                      order.products?.forEach((p: any) => {
+                        const existingProduct = acc.find(item => item.productId === p.productId);
+                        if (existingProduct) {
+                          existingProduct.quantity += p.quantity;
+                          existingProduct.totalPrice += p.totalPrice;
+                        } else {
+                          acc.push({ ...p });
+                        }
+                      });
+                      return acc;
+                    }, []) || [];
+                    const ordersData = this.mapOrders(tabOrders);
+                    return {
+                      id: tab.id,
+                      customer_name: tab.name || 'Cliente',
+                      table_number: tab.table?.number?.toString() || '',
+                      status: tab?.status,
+                      orders: ordersData.orders,
+                      created_at: new Date(),
+                      updated_at: new Date(),
+                      total_price: ordersData.total_price,
+                    }
+                  });
+                  this.orders$.next(mappedTabs);
+                }
+                this.isLoadingTabs.next(false);
+              },
+              error: (err) => console.error('Error loading orders:', err),
+            });
+          }
         },
         error: (err) => console.error('Error loading customer tabs:', err),
       });
+  }
+
+  private loadOrders() {
+    return this.apollo
+      .watchQuery<any>({
+        query: GET_ORDERS,
+      })
+      .valueChanges.pipe(
+        map((result) => result.data?.orders)
+      )
+  }
+
+  private mapOrders(orders: any[]) {
+    const groupedProducts = orders?.reduce((acc: any[], order: any) => {
+      order.products?.forEach((p: any) => {
+        const existingProduct = acc.find(item => item.productId === p.productId);
+        if (existingProduct) {
+          existingProduct.quantity += p.quantity;
+          existingProduct.totalPrice += p.totalPrice;
+        } else {
+          acc.push({ ...p });
+        }
+      });
+      return acc;
+    }, []) || [];
+    return {
+      orders: [{
+        products: groupedProducts.map((p: any) => ({
+          product_id: p.productId,
+          product_name: p.product?.name,
+          quantity: p.quantity,
+          totalPrice: p.totalPrice,
+          unit_price: p.product?.price,
+          status: 'pending' as const,
+        }))
+      }], total_price: groupedProducts.reduce((sum: number, p: any) => sum + p.totalPrice, 0)
+    }
   }
 }
 
