@@ -58,7 +58,7 @@ export class TableViewComponent implements OnInit {
 
   private updateTableStatus(): void {
     this.tables.forEach((table) => {
-      const tab = this.tabs?.find((o) => o.table_number === table.number && o.status === 'CREATED');
+      const tab = this.tabs?.find((o) => o.table_number === table.number && o.status === 'OPEN');
       if (tab) {
         table.status = 'BUSY';
         table.tab = tab;

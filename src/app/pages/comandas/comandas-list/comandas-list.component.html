@@ -165,9 +165,9 @@
         </div>
         <div class="info-row">
           <span class="info-label">Status:</span>
-          <span class="status-badge" [class.status-open]="selectedTab.status === 'CREATED'"
+          <span class="status-badge" [class.status-open]="selectedTab.status === 'OPEN'"
             [class.status-closed]="selectedTab.status === 'CLOSED'">
-            {{ selectedTab.status === 'CREATED' ? 'Aberta' : 'Fechada' }}
+            {{ selectedTab.status === 'OPEN' ? 'Aberta' : 'Fechada' }}
           </span>
         </div>
       </div>
@@ -175,12 +175,12 @@
       <div class="items-section">
         <h3 class="section-title">Itens</h3>
         <div class="items-table">
-          <div *ngFor="let order of selectedTab.orders" class="table-row">
-            <ng-container *ngFor="let item of order.products">
+          <div *ngFor="let order of selectedTab.orders">
+            <div *ngFor="let item of order.products" class="table-row">
               <span class="item-qty">{{ item?.quantity }}x</span>
               <span class="item-name">{{ item?.product_name }}</span>
               <span class="item-price">R$ {{ ((item?.quantity || 0) * (item?.unit_price || 0)).toFixed(2) }}</span>
-            </ng-container>
+            </div>
           </div>
         </div>
       </div>
@@ -191,7 +191,7 @@
       </div>
     </div>
 
-    <div class="modal-footer" *ngIf="selectedTab.status === 'CREATED'">
+    <div class="modal-footer" *ngIf="selectedTab.status === 'OPEN'">
       <button class="btn btn-secondary" (click)="$event.stopPropagation(); openAddItemsModal(selectedTab, $event)">
         <lucide-angular [img]="Plus"></lucide-angular> Adicionar Itens
       </button>
@@ -216,9 +216,9 @@
       </div>
       <div class="info-row">
         <span class="info-label">Status:</span>
-        <span class="status-badge" [class.status-open]="selectedTab.status === 'CREATED'"
+        <span class="status-badge" [class.status-open]="selectedTab.status === 'OPEN'"
           [class.status-closed]="selectedTab.status === 'CLOSED'">
-          {{ selectedTab.status === 'CREATED' ? 'Aberta' : 'Fechada' }}
+          {{ selectedTab.status === 'OPEN' ? 'Aberta' : 'Fechada' }}
         </span>
       </div>
     </div>
@@ -226,12 +226,12 @@
     <div class="items-section" *ngIf="selectedTab">
       <h3 class="section-title">Itens</h3>
       <div class="items-table">
-        <div *ngFor="let order of selectedTab.orders" class="table-row">
-          <ng-container *ngFor="let item of order.products">
+        <div *ngFor="let order of selectedTab.orders">
+          <div *ngFor="let item of order.products" class="table-row">
             <span class="item-qty">{{ item?.quantity }}x</span>
             <span class="item-name">{{ item?.product_name }}</span>
             <span class="item-price">R$ {{ ((item?.quantity || 0) * (item?.unit_price || 0)).toFixed(2) }}</span>
-          </ng-container>
+          </div>
         </div>
       </div>
     </div>
@@ -241,7 +241,7 @@
       <span class="total-value">R$ {{ selectedTab.total_price.toFixed(2) }}</span>
     </div>
 
-    <div class="offcanvas-actions" *ngIf="selectedTab && selectedTab.status === 'CREATED'">
+    <div class="offcanvas-actions" *ngIf="selectedTab && selectedTab.status === 'OPEN'">
       <button class="btn btn-secondary btn-block"
         (click)="$event.stopPropagation(); openAddItemsModal(selectedTab, $event)">
         <lucide-angular [img]="Plus"></lucide-angular> Adicionar Itens
@@ -336,10 +336,6 @@
   <div class="offcanvas-body offcanvas-add-items">
     <!-- Categories with Navigation -->
     <div class="categories-wrapper-mobile">
-      <button class="category-scroll-btn-mobile category-scroll-left-mobile" (click)="scrollCategoriesMobile('left')"
-        [disabled]="!canScrollLeftMobile">
-        ‹
-      </button>
 
       <div class="categories-filter-mobile" #categoriesContainerMobile>
         <button (click)="selectedCategory = ''" [class.active]="selectedCategory === ''" class="category-btn">
@@ -352,10 +348,6 @@
         </button>
       </div>
 
-      <button class="category-scroll-btn-mobile category-scroll-right-mobile" (click)="scrollCategoriesMobile('right')"
-        [disabled]="!canScrollRightMobile">
-        ›
-      </button>
     </div>
 
     <!-- Products Grid -->

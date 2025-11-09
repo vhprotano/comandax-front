@@ -12,6 +12,10 @@ const GET_CUSTOMER_TABS = gql`
     name
     id
     status
+    table {
+      id
+      number
+    }
   }
 }
 `;
@@ -87,9 +91,22 @@ const CREATE_ORDER = gql`
   }
 `;
 
-const ADD_PRODUCTS_TO_ORDER = gql`
-  mutation AddProductsToOrder($command: AddProductsToOrderCommandInput!) {
-    addProductsToOrder(command: $command)
+const CREATE_ORDER_WITHOUT_CUSTOMER_TAB = gql`
+  mutation CreateOrder($products: [CreateOrderProductInput!]!) {
+    createOrder(products: $products) {
+      id
+      status
+      products {
+        productId
+        quantity
+        totalPrice
+        product {
+          id
+          name
+          price
+        }
+      }
+    }
   }
 `;
 
@@ -114,19 +131,8 @@ export class OrdersService {
     this.loadTabs();
   }
 
-
-
   getTabs(): Observable<Tab[]> {
     return this.orders$.asObservable();
-  }
-
-  getTabById(id: string): Observable<any> {
-    return this.apollo
-      .watchQuery<any>({
-        query: GET_ORDER_BY_ID,
-        variables: { id },
-      })
-      .valueChanges.pipe(map((result) => result.data?.orderById));
   }
 
   createCustomerTab(tableId: string, name?: string): Observable<any> {
@@ -147,12 +153,11 @@ export class OrdersService {
             id: tab.id,
             customer_name: tab.name || 'Cliente',
             table_number: tab.table?.number?.toString() || '',
-            status: 'CREATED',
+            status: 'OPEN',
             orders: tab?.orders || [],
             created_at: new Date(),
             updated_at: new Date(),
-            total_price: 0,
-            waiter_id: '',
+            total_price: 0
           };
           const current = this.orders$.value;
           this.orders$.next([...current, newTab]);
@@ -160,35 +165,37 @@ export class OrdersService {
       );
   }
 
-  createOrderWithProducts(tabId: string, products: { productId: string, quantity: number }[]): Observable<string> {
-    return this.apollo
-      .mutate({
-        mutation: CREATE_ORDER,
-        variables: {
-          customerTabId: tabId,
-          products,
-        },
-      })
-      .pipe(
-        map((result: any) => result.data?.createOrder),
-        tap((order) => {
-          this.loadTabs();
-        })
-      );
-  }
-
-  addProductsToTab(tabId: string, products: { id: string, quantity: number }[]): Observable<boolean> {
-    return this.apollo
-      .mutate({
-        mutation: ADD_PRODUCTS_TO_ORDER,
-        variables: {
-          command: {
-            tabId,
+  createOrderWithProducts(tabId: string | null, products: { productId: string, quantity: number }[], isClosedOrder: boolean = false): Observable<any> {
+    if (!isClosedOrder) {
+      return this.apollo
+        .mutate({
+          mutation: CREATE_ORDER,
+          variables: {
+            customerTabId: tabId,
             products,
           },
-        },
-      })
-      .pipe(map((result: any) => result.data?.addProductsToOrder));
+        })
+        .pipe(
+          map((result: any) => result.data?.createOrder),
+          tap((order) => {
+            this.loadTabs();
+          })
+        );
+    } else {
+      return this.apollo
+        .mutate({
+          mutation: CREATE_ORDER_WITHOUT_CUSTOMER_TAB,
+          variables: {
+            products,
+          },
+        })
+        .pipe(
+          map((result: any) => result.data?.createOrder),
+          tap((order) => {
+            this.loadTabs();
+          })
+        );
+    }
   }
 
   closeOrder(orderId: string): Observable<boolean> {
@@ -213,32 +220,6 @@ export class OrdersService {
           }
         })
       );
-  }
-
-  createOrder(tab: Tab) {
-    return this.apollo
-      .mutate({
-        mutation: CREATE_ORDER,
-        variables: {
-          tableId: tab.id,
-          name: tab.customer_name,
-        },
-      }).pipe(
-        map((result: any) => {
-          return result.data?.createOrder;
-        })
-      );
-  }
-
-  updateOrder(id: string, tab: Partial<Tab>): void {
-    const current = this.orders$.value;
-    const updated = current?.map((o) => (o.id === id ? { ...o, ...tab } : o));
-    this.orders$.next(updated);
-  }
-
-  deleteOrder(id: string): void {
-    const current = this.orders$.value;
-    this.orders$.next(current.filter((o) => o.id !== id));
   }
 
   private loadTabs(): void {

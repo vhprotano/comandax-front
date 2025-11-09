@@ -87,7 +87,7 @@ export class NovaComandaComponent implements OnInit {
       return [];
     }
     const normalize = (id?: string) => (id || '').replace(/-/g, '').toLowerCase();
-    return this.products.filter(p => normalize(p.category_id) === normalize(this.selectedCategory));
+    return this.products.filter(p => normalize(p.category_id) === normalize(this.selectedCategory)) || [];
   }
 
   selectTable(table: Table): void {
@@ -107,7 +107,7 @@ export class NovaComandaComponent implements OnInit {
       this.triggerCartAnimation();
     } else {
       const newItem: OrderItem = {
-        id: `ITEM${Date.now()}${Math.random()}`,
+        id: product.id,
         product_id: product.id,
         product_name: product.name,
         quantity: 1,
@@ -195,19 +195,35 @@ export class NovaComandaComponent implements OnInit {
     const formValue = this.orderForm.value;
     const tableNumber = this.selectedTable ? this.selectedTable.id : null;
 
-    this.ordersService.createCustomerTab(tableNumber as any, formValue.customer_name).subscribe(data => {
-      if (data && data.id) {
-        this.ordersService.createOrderWithProducts(data.id, this.cartItems.map(item => ({ productId: item.id, quantity: item.quantity }))).subscribe(data => {
-          const message = this.isClosedOrder ? 'Pedido criado e fechado com sucesso!' : 'Comanda criada com sucesso!';
-          this.notificationService.success(message);
+    if (!this.isClosedOrder) {
+      this.ordersService.createCustomerTab(tableNumber as any, formValue.customer_name).subscribe(data => {
+        if (data && data.id) {
+          this.ordersService.createOrderWithProducts(data.id, this.cartItems.map(item => ({ productId: item.product_id, quantity: item.quantity }))).subscribe(data => {
+            const message = this.isClosedOrder ? 'Pedido criado e fechado com sucesso!' : 'Comanda criada com sucesso!';
+            this.notificationService.success(message);
 
-          // Close offcanvas if open
-          this.offcanvasService.dismiss();
+            // Close offcanvas if open
+            this.offcanvasService.dismiss();
 
-          this.router.navigate(['/comandas']);
-        });
-      }
-    });
+            this.router.navigate(['/comandas']);
+          });
+        }
+      });
+    } else {
+      this.ordersService.createOrderWithProducts(null, this.cartItems.map(item => ({ productId: item.product_id, quantity: item.quantity }))).subscribe(data => {
+        if (data && data.id) {
+          this.ordersService.closeOrder(data.id).subscribe(() => {
+            const message = this.isClosedOrder ? 'Pedido criado e fechado com sucesso!' : 'Comanda criada com sucesso!';
+            this.notificationService.success(message);
+
+            // Close offcanvas if open
+            this.offcanvasService.dismiss();
+
+            this.router.navigate(['/comandas']);
+          });
+        }
+      });
+    }
 
 
   }

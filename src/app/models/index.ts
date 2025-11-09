@@ -39,7 +39,7 @@ export interface Tab {
   id: string;
   customer_name: string;
   table_number?: any;
-  status: 'CREATED' | 'CLOSED';
+  status: 'OPEN' | 'CLOSED';
   orders: Order[];
   created_at: Date;
   updated_at: Date;

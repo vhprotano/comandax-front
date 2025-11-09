@@ -37,7 +37,7 @@ export class ReceiptComponent {
   }
 
   get total(): number {
-    return this.subtotal + this.tax;
+    return this.subtotal;
   }
 
   onClose(): void {

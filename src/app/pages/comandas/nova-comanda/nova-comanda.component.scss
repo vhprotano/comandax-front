@@ -118,7 +118,6 @@
   max-width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
-  padding-bottom: 90px;
 
   @media (min-width: 768px) {
     display: grid;
@@ -128,6 +127,10 @@
     @media (min-width: 1024px) {
       grid-template-columns: 1fr 400px;
     }
+  }
+
+  @media (max-width: 767px) {
+    padding-bottom: 9rem; // Space for fixed bottom cart
   }
 }
 
