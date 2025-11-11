@@ -7,6 +7,7 @@ import { TablesService } from '../../../services/tables.service';
 import { OrdersService } from '../../../services/orders.service';
 import { NotificationService } from '../../../services/notification.service';
 import { LucideAngularModule, Plus } from 'lucide-angular';
+import Swal from 'sweetalert2'
 
 @Component({
   selector: 'app-table-view',
@@ -98,20 +99,28 @@ export class TableViewComponent implements OnInit {
 
   deleteTable(tableId: string, event: Event): void {
     event.stopPropagation(); // Prevenir click no card
-
-    if (confirm('Tem certeza que deseja remover esta mesa?')) {
-      this.tablesService.deleteTable(tableId).subscribe({
-        next: () => {
-          this.notificationService.success('Mesa removida com sucesso!');
-          this.loadTables();
-        },
-        error: (err) => {
-          console.error('Erro ao remover mesa:', err);
-          this.notificationService.error('Erro ao remover mesa. Tente novamente.');
-        }
-      });
-
-    }
+    Swal.fire({
+      title: 'Tem certeza que deseja remover esta mesa?',
+      text: 'Esta ação não pode ser desfeita.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#1d2d44',
+      confirmButtonText: 'Sim, remover',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.tablesService.deleteTable(tableId).subscribe({
+          next: () => {
+            this.notificationService.success('Mesa removida com sucesso!');
+            this.loadTables();
+          },
+          error: (err) => {
+            console.error('Erro ao remover mesa:', err);
+            this.notificationService.error('Erro ao remover mesa. Tente novamente.');
+          }
+        });
+      }
+    });
   }
 
   handleTableClick(table: Table): void {

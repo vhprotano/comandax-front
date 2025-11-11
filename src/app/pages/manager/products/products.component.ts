@@ -6,6 +6,7 @@ import { ProductsService } from '../../../services/products.service';
 import { CategoriesService } from '../../../services/categories.service';
 import { NotificationService } from '../../../services/notification.service';
 import { LucideAngularModule, Plus } from 'lucide-angular';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-products',
@@ -209,10 +210,20 @@ export class ProductsComponent implements OnInit {
   }
 
   deleteProduct(id: string): void {
-    if (confirm('Tem certeza que deseja deletar este produto?')) {
-      this.productsService.deleteProduct(id);
-      this.notificationService.success('Produto deletado com sucesso!');
-    }
+    Swal.fire({
+      title: 'Tem certeza que deseja deletar este produto?',
+      text: 'Esta ação não pode ser desfeita.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#1d2d44',
+      confirmButtonText: 'Sim, remover',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.productsService.deleteProduct(id);
+        this.notificationService.success('Produto deletado com sucesso!');
+      }
+    });
   }
 }
 

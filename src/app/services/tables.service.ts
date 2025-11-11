@@ -17,8 +17,8 @@ const GET_TABLES = gql`
 `;
 
 const CREATE_TABLE = gql`
-  mutation CreateTable {
-    createTable {
+  mutation CreateTable($number: Int!) {
+    createTable(number: $number) {
       id
       number
       status
@@ -90,8 +90,7 @@ export class TablesService {
       .mutate({
         mutation: CREATE_TABLE,
         variables: {
-          number: table.number,
-          status: table.status,
+          number: table.number
         },
       })
       .pipe(

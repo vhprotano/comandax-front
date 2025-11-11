@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { Category } from '../../../models';
 import { CategoriesService } from '../../../services/categories.service';
 import { NotificationService } from '../../../services/notification.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-categories',
@@ -36,7 +37,7 @@ export class CategoriesComponent implements OnInit {
     private fb: FormBuilder,
     private categoriesService: CategoriesService,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -108,17 +109,27 @@ export class CategoriesComponent implements OnInit {
   }
 
   deleteCategory(id: string): void {
-    if (confirm('Tem certeza que deseja deletar esta categoria?')) {
-      this.categoriesService.deleteCategory(id).subscribe({
-        next: () => {
-          this.notificationService.success('Categoria deletada com sucesso!');
-        },
-        error: (err) => {
-          console.error('Error deleting category:', err);
-          this.notificationService.error('Erro ao deletar categoria');
-        }
-      });
-    }
+    Swal.fire({
+      title: 'Tem certeza que deseja deletar esta categoria?',
+      text: 'Esta ação não pode ser desfeita.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#1d2d44',
+      confirmButtonText: 'Sim, remover',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.categoriesService.deleteCategory(id).subscribe({
+          next: () => {
+            this.notificationService.success('Categoria deletada com sucesso!');
+          },
+          error: (err) => {
+            console.error('Error deleting category:', err);
+            this.notificationService.error('Erro ao deletar categoria');
+          }
+        });
+      }
+    });
   }
 
   toggleIconPicker(): void {
