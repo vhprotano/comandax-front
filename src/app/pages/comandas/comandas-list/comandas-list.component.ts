@@ -326,5 +326,29 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     this.canScrollLeftMobile = container.scrollLeft > 0;
     this.canScrollRightMobile = container.scrollLeft < (container.scrollWidth - container.clientWidth - 1);
   }
-}
 
+  onReceiptSendEmail(): void {
+    if (!this.selectedTabForReceipt) {
+      return;
+    }
+
+    const email = prompt('Digite o e-mail do cliente:');
+    if (!email) {
+      return;
+    }
+
+    this.ordersService.sendCustomerTabEmail(this.selectedTabForReceipt.id, email).subscribe({
+      next: (success) => {
+        if (success) {
+          this.notificationService.success('E-mail enviado com sucesso!');
+        } else {
+          this.notificationService.error('Erro ao enviar e-mail');
+        }
+      },
+      error: (err) => {
+        console.error('Error sending email:', err);
+        this.notificationService.error('Erro ao enviar e-mail');
+      },
+    });
+  }
+}

@@ -391,7 +391,7 @@
 
 <!-- Receipt Component -->
 <app-receipt *ngIf="selectedTabForReceipt" [tab]="selectedTabForReceipt" (close)="onReceiptClose()"
-  (finalize)="finalizeOrder($event)"></app-receipt>
+  (finalize)="finalizeOrder($event)" (sendEmail)="onReceiptSendEmail()"></app-receipt>
 
 <div *ngIf="isLoadingTabs">
   <div class="loading-overlay">

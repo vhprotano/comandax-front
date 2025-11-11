@@ -5,7 +5,12 @@ import { map, tap } from 'rxjs/operators';
 import { Tab } from '../models';
 
 // ==================== GRAPHQL QUERIES ====================
-
+const SEND_CUSTOMER_TAB_EMAIL = gql`
+      mutation SendCustomerTabEmail($customerTabId: UUID!, $email: String!) {
+        sendCustomerTabEmail(customerTabId: $customerTabId, email: $email)
+      }
+    `;
+    
 const GET_CUSTOMER_TABS = gql`
   query GetCustomerTabs {
   customerTabs {
@@ -354,6 +359,21 @@ export class OrdersService {
         }))
       }], total_price: groupedProducts.reduce((sum: number, p: any) => sum + p.totalPrice, 0)
     }
+  }
+
+  sendCustomerTabEmail(customerTabId: string, email: string): Observable<any> {
+
+    return this.apollo
+      .mutate({
+        mutation: SEND_CUSTOMER_TAB_EMAIL,
+        variables: {
+          customerTabId,
+          email,
+        },
+      })
+      .pipe(
+        map((result: any) => result.data?.sendCustomerTabEmail)
+      );
   }
 }
 
