@@ -16,8 +16,52 @@ const GET_CUSTOMER_TABS = gql`
       id
       number
     }
+    orders {
+        id
+      status
+      customerTabId
+      products {
+        productId
+        quantity
+        totalPrice
+        product {
+          id
+          name
+          price
+        }
+      }
+      }
   }
 }
+`;
+
+const GET_CUSTOMER_TABS_BY_STATUS = gql`
+  query GetCustomerTabsByStatus($status: CustomerTabStatusEnum!) {
+    customerTabs(status: $status) {
+      id
+      name
+      status
+      table {
+        id
+        number
+      }
+      orders {
+        id
+      status
+      customerTabId
+      products {
+        productId
+        quantity
+        totalPrice
+        product {
+          id
+          name
+          price
+        }
+      }
+      }
+    }
+  }
 `;
 
 const GET_ORDERS = gql`
@@ -116,6 +160,12 @@ const CLOSE_ORDER = gql`
   }
 `;
 
+const CLOSE_CUSTOMER_TAB = gql`
+  mutation CloseCustomerTab($command: CloseCustomerTabCommandInput!) {
+    closeCustomerTab(command: $command)
+  }
+`;
+
 
 // ==================== SERVICE ====================
 
@@ -123,7 +173,8 @@ const CLOSE_ORDER = gql`
   providedIn: 'root',
 })
 export class OrdersService {
-  private orders$ = new BehaviorSubject<Tab[]>([]);
+  private tabs$ = new BehaviorSubject<Tab[]>([]);
+  private closedTabs$ = new BehaviorSubject<Tab[]>([]);
   private isLoadingTabs = new BehaviorSubject<boolean>(false);
   public loading$ = this.isLoadingTabs.asObservable();
 
@@ -132,7 +183,37 @@ export class OrdersService {
   }
 
   getTabs(): Observable<Tab[]> {
-    return this.orders$.asObservable();
+    return this.tabs$.asObservable();
+  }
+
+  getClosedTabs(): Observable<Tab[]> {
+    return this.closedTabs$.asObservable();
+  }
+
+  // Fetch customer tabs filtered by status (e.g. 'CLOSED')
+  getTabsByStatus(status: 'OPEN' | 'CLOSED'): Observable<Tab[]> {
+    return this.apollo
+      .watchQuery<any>({
+        query: GET_CUSTOMER_TABS_BY_STATUS,
+        variables: { status },
+        fetchPolicy: 'network-only',
+      })
+      .valueChanges.pipe(map((result) => result.data?.customerTabs?.map((tab: any) => {
+        const normalize = (id?: string) => (id || '').replace(/-/g, '').toLowerCase();
+        const tabOrders = tab?.orders?.filter((o: any) => normalize(o?.customerTabId) === normalize(tab?.id));
+        // First, group products by their ID across all orders
+        const ordersData = this.mapOrders(tabOrders);
+        return {
+          id: tab.id,
+          customer_name: tab.name || 'Cliente',
+          table_number: tab.table?.number?.toString() || '',
+          status: tab?.status,
+          orders: ordersData.orders,
+          created_at: new Date(),
+          updated_at: new Date(),
+          total_price: ordersData.total_price,
+        }
+      })));
   }
 
   createCustomerTab(tableId: string, name?: string): Observable<any> {
@@ -147,21 +228,7 @@ export class OrdersService {
         },
       })
       .pipe(
-        map((result: any) => result.data?.createCustomerTab),
-        tap((tab) => {
-          const newTab: Tab = {
-            id: tab.id,
-            customer_name: tab.name || 'Cliente',
-            table_number: tab.table?.number?.toString() || '',
-            status: 'OPEN',
-            orders: tab?.orders || [],
-            created_at: new Date(),
-            updated_at: new Date(),
-            total_price: 0
-          };
-          const current = this.orders$.value;
-          this.orders$.next([...current, newTab]);
-        })
+        map((result: any) => result.data?.createCustomerTab)
       );
   }
 
@@ -176,10 +243,7 @@ export class OrdersService {
           },
         })
         .pipe(
-          map((result: any) => result.data?.createOrder),
-          tap((order) => {
-            this.loadTabs();
-          })
+          map((result: any) => result.data?.createOrder)
         );
     } else {
       return this.apollo
@@ -191,9 +255,6 @@ export class OrdersService {
         })
         .pipe(
           map((result: any) => result.data?.createOrder),
-          tap((order) => {
-            this.loadTabs();
-          })
         );
     }
   }
@@ -212,74 +273,50 @@ export class OrdersService {
         map((result: any) => result.data?.closeOrder),
         tap((success) => {
           if (success) {
-            const current = this.orders$.value;
+            const current = this.tabs$.value;
             const updated = current?.map((o) =>
               o.id === orderId ? { ...o, status: 'CLOSED' as const } : o
             );
-            this.orders$.next(updated);
+            this.tabs$.next(updated);
           }
         })
       );
   }
 
-  private loadTabs(): void {
-    this.isLoadingTabs.next(true);
-    this.apollo
-      .watchQuery<any>({
-        query: GET_CUSTOMER_TABS,
-      })
-      .valueChanges.pipe(
-        map((result) => result)
-      )
-      .subscribe({
-        next: (result) => {
-          if (result.data?.customerTabs) {
-            const tabs = result.data?.customerTabs;
-            this.loadOrders().subscribe({
-              next: (orders) => {
-                const closedOrders = tabs?.filter((o: any) => o.status === 'CLOSED');
-                if (tabs?.length === 0) {
-                  this.orders$.next([]);
-                } else {
-
-                  const mappedTabs: Tab[] = tabs?.filter((tab: any) => tab.status === 'OPEN').map((tab: any) => {
-                    const normalize = (id?: string) => (id || '').replace(/-/g, '').toLowerCase();
-                    const tabOrders = orders?.filter((o: any) => normalize(o?.customerTabId) === normalize(tab?.id));
-                    // First, group products by their ID across all orders
-                    const groupedProducts = tabOrders?.reduce((acc: any[], order: any) => {
-                      order.products?.forEach((p: any) => {
-                        const existingProduct = acc.find(item => item.productId === p.productId);
-                        if (existingProduct) {
-                          existingProduct.quantity += p.quantity;
-                          existingProduct.totalPrice += p.totalPrice;
-                        } else {
-                          acc.push({ ...p });
-                        }
-                      });
-                      return acc;
-                    }, []) || [];
-                    const ordersData = this.mapOrders(tabOrders);
-                    return {
-                      id: tab.id,
-                      customer_name: tab.name || 'Cliente',
-                      table_number: tab.table?.number?.toString() || '',
-                      status: tab?.status,
-                      orders: ordersData.orders,
-                      created_at: new Date(),
-                      updated_at: new Date(),
-                      total_price: ordersData.total_price,
-                    }
-                  });
-                  this.orders$.next(mappedTabs);
-                }
-                this.isLoadingTabs.next(false);
-              },
-              error: (err) => console.error('Error loading orders:', err),
-            });
-          }
+  // Close a customer tab by its id using the closeCustomerTab mutation
+  closeCustomerTab(customerTabId: string): Observable<boolean> {
+    return this.apollo
+      .mutate({
+        mutation: CLOSE_CUSTOMER_TAB,
+        variables: {
+          command: {
+            customerTabId,
+          },
         },
-        error: (err) => console.error('Error loading customer tabs:', err),
+      })
+      .pipe(
+        map((result: any) => result.data?.closeCustomerTab),
+        tap((success) => {
+          if (success) {
+            const current = this.tabs$.value;
+            const updated = current?.map((o) =>
+              o.id === customerTabId ? { ...o, status: 'CLOSED' as const } : o
+            );
+            this.tabs$.next(updated);
+          }
+        })
+      );
+  }
+
+  loadTabs(): void {
+    this.isLoadingTabs.next(true);
+    this.getTabsByStatus('OPEN').subscribe((tabs) => {
+      this.tabs$.next(tabs);
+      this.getTabsByStatus('CLOSED').subscribe((closedTabs) => {
+        this.closedTabs$.next(closedTabs);
+        this.isLoadingTabs.next(false);
       });
+    });
   }
 
   private loadOrders() {

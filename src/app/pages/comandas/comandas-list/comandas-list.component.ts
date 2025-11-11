@@ -64,6 +64,7 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   ) { }
 
   ngOnInit(): void {
+    this.refreshTabs();
     this.loadTabs();
     this.loadProducts();
     this.loadCategories();
@@ -74,15 +75,22 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     });
   }
 
+  refreshTabs(): void {
+    this.ordersService.loadTabs();
+  }
+
   initAddItemsForm(): void {
     this.addItemsForm = this.fb.group({});
   }
 
   loadTabs(): void {
     this.ordersService.getTabs().subscribe((tabs) => {
-      console.log('Loaded tabs:', tabs);
       this.openedTabs = tabs;
-      // this.closedOrders = orders?.filter((o) => o.status === 'CLOSED');
+    });
+
+    // Load closed tabs separately using the status-filtered query
+    this.ordersService.getClosedTabs().subscribe((tabs) => {
+      this.closedTabs = tabs || [];
     });
   }
 
@@ -241,7 +249,7 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
 
     this.ordersService.createOrderWithProducts(this.selectedTab.id, this.cartItems?.map(item => ({ productId: item.product_id, quantity: item.quantity }))).subscribe({
       next: (orderId) => {
-        this.loadTabs();
+        this.refreshTabs();
       },
       error: (err) => {
         console.error('Error adding items to order:', err);
@@ -250,7 +258,6 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     });
 
     this.notificationService.success('Itens adicionados com sucesso!');
-    this.loadTabs();
     this.closeAddItemsModal();
   }
 
@@ -262,23 +269,24 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
 
   onReceiptClose(): void {
     this.selectedTabForReceipt = null;
-    this.loadTabs();
+    this.refreshTabs();
   }
 
   // Finalizar Comanda (chamado pelo Receipt component)
   finalizeOrder(event: { orderId: string; paymentMethod: string }): void {
-    this.ordersService.closeOrder(event.orderId).subscribe({
+    // Use the closeCustomerTab mutation to close the tab
+    this.ordersService.closeCustomerTab(event.orderId).subscribe({
       next: (success) => {
         if (success) {
           this.notificationService.success('Comanda fechada com sucesso!');
           this.selectedTabForReceipt = null;
-          this.loadTabs();
+          this.refreshTabs();
         } else {
           this.notificationService.error('Erro ao fechar comanda');
         }
       },
       error: (err) => {
-        console.error('Error closing order:', err);
+        console.error('Error closing customer tab:', err);
         this.notificationService.error('Erro ao fechar comanda');
       },
     });

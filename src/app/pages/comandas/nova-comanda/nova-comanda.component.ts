@@ -210,19 +210,34 @@ export class NovaComandaComponent implements OnInit {
         }
       });
     } else {
-      this.ordersService.createOrderWithProducts(null, this.cartItems.map(item => ({ productId: item.product_id, quantity: item.quantity }))).subscribe(data => {
+      this.ordersService.createCustomerTab(tableNumber as any, formValue.customer_name).subscribe(data => {
         if (data && data.id) {
-          this.ordersService.closeOrder(data.id).subscribe(() => {
-            const message = this.isClosedOrder ? 'Pedido criado e fechado com sucesso!' : 'Comanda criada com sucesso!';
-            this.notificationService.success(message);
+          this.ordersService.createOrderWithProducts(data.id, this.cartItems.map(item => ({ productId: item.product_id, quantity: item.quantity }))).subscribe(dataOrder => {
+            this.ordersService.closeCustomerTab(data.id).subscribe(() => {
+              const message = this.isClosedOrder ? 'Pedido criado e fechado com sucesso!' : 'Comanda criada com sucesso!';
+              this.notificationService.success(message);
 
-            // Close offcanvas if open
-            this.offcanvasService.dismiss();
+              // Close offcanvas if open
+              this.offcanvasService.dismiss();
 
-            this.router.navigate(['/comandas']);
+              this.router.navigate(['/comandas']);
+            });
           });
         }
       });
+      // this.ordersService.createOrderWithProducts(null, this.cartItems.map(item => ({ productId: item.product_id, quantity: item.quantity }))).subscribe(data => {
+      //   if (data && data.id) {
+      //     this.ordersService.closeOrder(data.id).subscribe(() => {
+      //       const message = this.isClosedOrder ? 'Pedido criado e fechado com sucesso!' : 'Comanda criada com sucesso!';
+      //       this.notificationService.success(message);
+
+      //       // Close offcanvas if open
+      //       this.offcanvasService.dismiss();
+
+      //       this.router.navigate(['/comandas']);
+      //     });
+      //   }
+      // });
     }
 
 
