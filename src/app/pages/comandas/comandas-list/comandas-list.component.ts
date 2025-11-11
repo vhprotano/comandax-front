@@ -10,6 +10,7 @@ import { CategoriesService } from '../../../services/categories.service';
 import { NotificationService } from '../../../services/notification.service';
 import { ReceiptComponent } from '../../../components/receipt/receipt.component';
 import { LucideAngularModule, Plus } from 'lucide-angular';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-comandas-list',
@@ -332,23 +333,35 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const email = prompt('Digite o e-mail do cliente:');
-    if (!email) {
-      return;
-    }
-
-    this.ordersService.sendCustomerTabEmail(this.selectedTabForReceipt.id, email).subscribe({
-      next: (success) => {
-        if (success) {
-          this.notificationService.success('E-mail enviado com sucesso!');
-        } else {
-          this.notificationService.error('Erro ao enviar e-mail');
+    Swal.fire({
+      title: 'Preencha o e-mail do cliente',
+      input: 'email',
+      inputPlaceholder: 'Digite o e-mail do cliente',
+      showCancelButton: true,
+      confirmButtonColor: '#1d2d44',
+      confirmButtonText: 'Enviar E-mail',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const email = result.value;
+        if (!email) {
+          return;
         }
-      },
-      error: (err) => {
-        console.error('Error sending email:', err);
-        this.notificationService.error('Erro ao enviar e-mail');
-      },
+
+        this.ordersService.sendCustomerTabEmail(this.selectedTabForReceipt?.id || '', email).subscribe({
+          next: (success) => {
+            if (success) {
+              this.notificationService.success('E-mail enviado com sucesso!');
+            } else {
+              this.notificationService.error('Erro ao enviar e-mail');
+            }
+          },
+          error: (err) => {
+            console.error('Error sending email:', err);
+            this.notificationService.error('Erro ao enviar e-mail');
+          },
+        });
+      }
     });
   }
 }

@@ -46,8 +46,6 @@ export class ReceiptComponent {
 
   onSendEmail(): void {
     this.sendEmail.emit();
-    // Aqui você pode implementar a lógica de envio de e-mail
-    this.notificationService.success('Recibo enviado por e-mail com sucesso!');
   }
 
   onFinalize(): void {
