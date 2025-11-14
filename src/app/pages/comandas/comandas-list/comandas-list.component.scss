@@ -149,6 +149,12 @@
       }
     }
 
+    .card-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
     .status-badge {
       padding: 0.25rem 0.75rem;
       border-radius: 9999px;
@@ -249,6 +255,63 @@
     font-size: 0.875rem;
     color: #9ca3af;
     margin: 0;
+  }
+}
+
+// Delete Button
+.btn-delete-icon {
+  background: transparent;
+  border: none;
+  padding: 0.375rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  lucide-angular {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.btn-delete-icon-small {
+  background: transparent;
+  border: none;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  color: #9ca3af;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  lucide-angular {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
@@ -620,11 +683,37 @@
   }
 
   .items-table {
+    .order-group {
+      margin-bottom: 1.5rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      overflow: hidden;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+
+        .order-label {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #6b7280;
+        }
+      }
+    }
+
     .table-row {
       display: flex;
       align-items: center;
       gap: 1rem;
-      padding: 0.75rem;
+      padding: 0.75rem 1rem;
       border-bottom: 1px solid #f3f4f6;
 
       &:last-child {

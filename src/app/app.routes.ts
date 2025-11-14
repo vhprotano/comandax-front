@@ -1,72 +1,82 @@
-import { Routes } from '@angular/router';
-import { LoginComponent } from './pages/login/login.component';
-import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
-import { authGuard } from './guards/auth.guard';
-import { roleGuard } from './guards/role.guard';
+import { Routes } from "@angular/router";
+import { LoginComponent } from "./pages/login/login.component";
+import { MainLayoutComponent } from "./layouts/main-layout/main-layout.component";
+import { authGuard } from "./guards/auth.guard";
+import { roleGuard } from "./guards/role.guard";
 
 export const routes: Routes = [
   {
-    path: '',
-    redirectTo: '/login',
-    pathMatch: 'full',
+    path: "",
+    redirectTo: "/login",
+    pathMatch: "full",
   },
   {
-    path: 'login',
+    path: "login",
     component: LoginComponent,
   },
   {
-    path: '',
+    path: "",
     component: MainLayoutComponent,
     canActivate: [authGuard],
     children: [
       {
-        path: 'comandas',
+        path: "comandas",
         loadComponent: () =>
-          import('./pages/comandas/comandas-list/comandas-list.component').then(
+          import("./pages/comandas/comandas-list/comandas-list.component").then(
             (m) => m.ComandasListComponent
           ),
       },
       {
-        path: 'comandas/nova',
+        path: "comandas/nova",
         loadComponent: () =>
-          import('./pages/comandas/nova-comanda/nova-comanda.component').then(
+          import("./pages/comandas/nova-comanda/nova-comanda.component").then(
             (m) => m.NovaComandaComponent
           ),
       },
       {
-        path: 'comandas/novo-pedido',
+        path: "comandas/novo-pedido",
         loadComponent: () =>
-          import('./pages/comandas/nova-comanda/nova-comanda.component').then(
+          import("./pages/comandas/nova-comanda/nova-comanda.component").then(
             (m) => m.NovaComandaComponent
           ),
       },
       {
-        path: 'produtos',
+        path: "produtos",
         loadComponent: () =>
-          import('./pages/manager/products/products.component').then((m) => m.ProductsComponent),
+          import("./pages/manager/products/products.component").then(
+            (m) => m.ProductsComponent
+          ),
       },
       {
-        path: 'categorias',
+        path: "categorias",
         loadComponent: () =>
-          import('./pages/manager/categories/categories.component').then(
+          import("./pages/manager/categories/categories.component").then(
             (m) => m.CategoriesComponent
           ),
       },
       {
-        path: 'mesas',
+        path: "mesas",
         loadComponent: () =>
-          import('./pages/manager/table-view/table-view.component').then((m) => m.TableViewComponent),
+          import("./pages/manager/table-view/table-view.component").then(
+            (m) => m.TableViewComponent
+          ),
       },
       {
-        path: 'dashboard',
-        redirectTo: '/comandas',
-        pathMatch: 'full',
+        path: "relatorios",
+        loadComponent: () =>
+          import(
+            "./components/statistics-dashboard/statistics-dashboard.component"
+          ).then((m) => m.StatisticsDashboardComponent),
+      },
+      {
+        path: "dashboard",
+        redirectTo: "/comandas",
+        pathMatch: "full",
       },
     ],
   },
   {
-    path: '**',
-    redirectTo: '/login',
+    path: "**",
+    redirectTo: "/login",
   },
 ];
-

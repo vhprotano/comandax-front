@@ -1,10 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { NgbOffcanvasModule } from '@ng-bootstrap/ng-bootstrap';
-import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { LucideAngularModule, Menu, ChevronLeft, ChevronRight } from 'lucide-angular';
+import { Component, OnInit } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { Router, RouterModule } from "@angular/router";
+import { AuthService } from "../../services/auth.service";
+import { NgbOffcanvasModule } from "@ng-bootstrap/ng-bootstrap";
+import { NgbOffcanvas } from "@ng-bootstrap/ng-bootstrap";
+import {
+  LucideAngularModule,
+  Menu,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-angular";
 
 interface MenuItem {
   id: string;
@@ -17,11 +22,16 @@ interface MenuItem {
 }
 
 @Component({
-  selector: 'app-main-layout',
+  selector: "app-main-layout",
   standalone: true,
-  imports: [CommonModule, RouterModule, NgbOffcanvasModule, LucideAngularModule],
-  templateUrl: './main-layout.component.html',
-  styleUrls: ['./main-layout.component.scss'],
+  imports: [
+    CommonModule,
+    RouterModule,
+    NgbOffcanvasModule,
+    LucideAngularModule,
+  ],
+  templateUrl: "./main-layout.component.html",
+  styleUrls: ["./main-layout.component.scss"],
 })
 export class MainLayoutComponent implements OnInit {
   sidebarCollapsed = false;
@@ -33,47 +43,53 @@ export class MainLayoutComponent implements OnInit {
 
   menuItems: MenuItem[] = [
     {
-      id: 'comandas',
-      label: 'Comandas',
-      icon: '📋',
-      route: '/comandas',
+      id: "comandas",
+      label: "Comandas",
+      icon: "📋",
+      route: "/comandas",
     },
     {
-      id: 'cozinha',
-      label: 'Cozinha',
-      icon: '👨‍🍳',
+      id: "cozinha",
+      label: "Cozinha",
+      icon: "👨‍🍳",
       disabled: true,
-      tooltip: 'Em Breve',
+      tooltip: "Em Breve",
     },
     {
-      id: 'separator',
-      label: '',
-      icon: '',
+      id: "separator",
+      label: "",
+      icon: "",
     },
     {
-      id: 'gestao',
-      label: 'Gestão',
-      icon: '⚙️',
+      id: "gestao",
+      label: "Gestão",
+      icon: "⚙️",
       children: [
         {
-          id: 'produtos',
-          label: 'Produtos',
-          icon: '🍽️',
-          route: '/produtos',
+          id: "produtos",
+          label: "Produtos",
+          icon: "🍽️",
+          route: "/produtos",
         },
         {
-          id: 'categorias',
-          label: 'Categorias',
-          icon: '📂',
-          route: '/categorias',
+          id: "categorias",
+          label: "Categorias",
+          icon: "📂",
+          route: "/categorias",
         },
         {
-          id: 'mesas',
-          label: 'Mesas',
-          icon: '🪑',
-          route: '/mesas',
+          id: "mesas",
+          label: "Mesas",
+          icon: "🪑",
+          route: "/mesas",
         },
       ],
+    },
+    {
+      id: "relatorios",
+      label: "Relatórios",
+      icon: "📈",
+      route: "/relatorios",
     },
   ];
 
@@ -89,7 +105,7 @@ export class MainLayoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkMobile();
-    window.addEventListener('resize', () => this.checkMobile());
+    window.addEventListener("resize", () => this.checkMobile());
   }
 
   checkMobile(): void {
@@ -116,11 +132,11 @@ export class MainLayoutComponent implements OnInit {
   }
 
   openOffcanvas(content: any): void {
-    this.offcanvasService.open(content, { 
-      position: 'start',
+    this.offcanvasService.open(content, {
+      position: "start",
       backdrop: true,
       keyboard: true,
-      panelClass: 'offcanvas-menu'
+      panelClass: "offcanvas-menu",
     });
   }
 
@@ -134,12 +150,11 @@ export class MainLayoutComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(["/login"]);
   }
 
   isActiveRoute(route?: string): boolean {
     if (!route) return false;
-    return this.router.url === route || this.router.url.startsWith(route + '/');
+    return this.router.url === route || this.router.url.startsWith(route + "/");
   }
 }
-

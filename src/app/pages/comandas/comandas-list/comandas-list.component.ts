@@ -1,23 +1,41 @@
-import { Component, OnInit, TemplateRef, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { NgbOffcanvas, NgbOffcanvasModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { Tab, Product, Category } from '../../../models';
-import { OrdersService } from '../../../services/orders.service';
-import { ProductsService } from '../../../services/products.service';
-import { CategoriesService } from '../../../services/categories.service';
-import { NotificationService } from '../../../services/notification.service';
-import { ReceiptComponent } from '../../../components/receipt/receipt.component';
-import { LucideAngularModule, Plus } from 'lucide-angular';
-import Swal from 'sweetalert2';
+import {
+  Component,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+} from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { Router } from "@angular/router";
+import { ReactiveFormsModule, FormBuilder, FormGroup } from "@angular/forms";
+import {
+  NgbOffcanvas,
+  NgbOffcanvasModule,
+  NgbTooltipModule,
+} from "@ng-bootstrap/ng-bootstrap";
+import { Tab, Product, Category } from "../../../models";
+import { OrdersService } from "../../../services/orders.service";
+import { ProductsService } from "../../../services/products.service";
+import { CategoriesService } from "../../../services/categories.service";
+import { NotificationService } from "../../../services/notification.service";
+import { ReceiptComponent } from "../../../components/receipt/receipt.component";
+import { LucideAngularModule, Plus, Trash2 } from "lucide-angular";
+import Swal from "sweetalert2";
 
 @Component({
-  selector: 'app-comandas-list',
+  selector: "app-comandas-list",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ReceiptComponent, NgbOffcanvasModule, LucideAngularModule, NgbTooltipModule],
-  templateUrl: './comandas-list.component.html',
-  styleUrls: ['./comandas-list.component.scss'],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ReceiptComponent,
+    NgbOffcanvasModule,
+    LucideAngularModule,
+    NgbTooltipModule,
+  ],
+  templateUrl: "./comandas-list.component.html",
+  styleUrls: ["./comandas-list.component.scss"],
 })
 export class ComandasListComponent implements OnInit, AfterViewInit {
   openedTabs: Tab[] = [];
@@ -28,6 +46,10 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   // FAB Menu
   fabExpanded = false;
 
+  // Icons
+  Plus = Plus;
+  Trash2 = Trash2;
+
   // Detalhes da comanda
   selectedTab: Tab | null = null;
 
@@ -36,7 +58,7 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   addItemsForm!: FormGroup;
   products: Product[] = [];
   categories: Category[] = [];
-  selectedCategory = '';
+  selectedCategory = "";
   cartItems: any[] = [];
   cartTotal = 0;
 
@@ -47,11 +69,11 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   canScrollLeftMobile = false;
   canScrollRightMobile = false;
 
-  @ViewChild('orderDetailOffcanvas') orderDetailOffcanvas!: TemplateRef<any>;
-  @ViewChild('addItemsOffcanvas') addItemsOffcanvas!: TemplateRef<any>;
-  @ViewChild('categoriesContainerMobile') categoriesContainerMobile!: ElementRef;
+  @ViewChild("orderDetailOffcanvas") orderDetailOffcanvas!: TemplateRef<any>;
+  @ViewChild("addItemsOffcanvas") addItemsOffcanvas!: TemplateRef<any>;
+  @ViewChild("categoriesContainerMobile")
+  categoriesContainerMobile!: ElementRef;
 
-  readonly Plus = Plus;
   isLoadingTabs = false;
 
   constructor(
@@ -62,7 +84,7 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     private categoriesService: CategoriesService,
     private notificationService: NotificationService,
     private offcanvasService: NgbOffcanvas
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.refreshTabs();
@@ -112,15 +134,24 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   }
 
   getDisplayItems(tab: Tab): any[] {
-    return tab.orders.map((order) => order?.products).flat().slice(0, this.maxItemsToShow);
+    return tab.orders
+      .map((order) => order?.products)
+      .flat()
+      .slice(0, this.maxItemsToShow);
   }
 
   hasMoreItems(tab: Tab): boolean {
-    return tab.orders.map((order) => order?.products).flat()?.length > this.maxItemsToShow;
+    return (
+      tab.orders.map((order) => order?.products).flat()?.length >
+      this.maxItemsToShow
+    );
   }
 
   getRemainingItemsCount(tab: Tab): number {
-    return tab.orders.map((order) => order?.products).flat()?.length - this.maxItemsToShow;
+    return (
+      tab.orders.map((order) => order?.products).flat()?.length -
+      this.maxItemsToShow
+    );
   }
 
   openTab(tab: Tab): void {
@@ -129,8 +160,8 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     // Use offcanvas em mobile/tablet, modal em desktop
     if (window.innerWidth < 1024) {
       this.offcanvasService.open(this.orderDetailOffcanvas, {
-        position: 'bottom',
-        panelClass: 'offcanvas-bottom-full',
+        position: "bottom",
+        panelClass: "offcanvas-bottom-full",
       });
     }
   }
@@ -146,12 +177,12 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
 
   createNewComanda(): void {
     this.fabExpanded = false; // Close FAB menu
-    this.router.navigate(['/comandas/nova']);
+    this.router.navigate(["/comandas/nova"]);
   }
 
   createNewPedido(): void {
     this.fabExpanded = false; // Close FAB menu
-    this.router.navigate(['/comandas/novo-pedido']);
+    this.router.navigate(["/comandas/novo-pedido"]);
   }
 
   // Adicionar Itens
@@ -161,7 +192,7 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     this.showAddItemsModal = true;
     this.cartItems = [];
     this.cartTotal = 0;
-    this.selectedCategory = '';
+    this.selectedCategory = "";
 
     // Fechar offcanvas de detalhes se estiver aberto
     this.offcanvasService.dismiss();
@@ -169,8 +200,8 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     // Use offcanvas em mobile/tablet, modal em desktop
     if (window.innerWidth < 1024) {
       this.offcanvasService.open(this.addItemsOffcanvas, {
-        position: 'bottom',
-        panelClass: 'offcanvas-bottom-full',
+        position: "bottom",
+        panelClass: "offcanvas-bottom-full",
       });
     }
   }
@@ -190,12 +221,17 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     if (!this.products) {
       return [];
     }
-    const normalize = (id?: string) => (id || '').replace(/-/g, '').toLowerCase();
-    return this.products.filter(p => normalize(p.category_id) === normalize(this.selectedCategory));
+    const normalize = (id?: string) =>
+      (id || "").replace(/-/g, "").toLowerCase();
+    return this.products.filter(
+      (p) => normalize(p.category_id) === normalize(this.selectedCategory)
+    );
   }
 
   addToCart(product: Product): void {
-    const existingItem = this.cartItems.find((item) => item.product_id === product.id);
+    const existingItem = this.cartItems.find(
+      (item) => item.product_id === product.id
+    );
 
     if (existingItem) {
       existingItem.quantity++;
@@ -234,11 +270,13 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
   }
 
   triggerProductAnimation(productId: string): void {
-    const productElement = document.querySelector(`[data-product-id="${productId}"]`);
+    const productElement = document.querySelector(
+      `[data-product-id="${productId}"]`
+    );
     if (productElement) {
-      productElement.classList.add('product-added-animation');
+      productElement.classList.add("product-added-animation");
       setTimeout(() => {
-        productElement.classList.remove('product-added-animation');
+        productElement.classList.remove("product-added-animation");
       }, 600);
     }
   }
@@ -248,17 +286,25 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.ordersService.createOrderWithProducts(this.selectedTab.id, this.cartItems?.map(item => ({ productId: item.product_id, quantity: item.quantity }))).subscribe({
-      next: (orderId) => {
-        this.refreshTabs();
-      },
-      error: (err) => {
-        console.error('Error adding items to order:', err);
-        this.notificationService.error('Erro ao adicionar itens à comanda');
-      }
-    });
+    this.ordersService
+      .createOrderWithProducts(
+        this.selectedTab.id,
+        this.cartItems?.map((item) => ({
+          productId: item.product_id,
+          quantity: item.quantity,
+        }))
+      )
+      .subscribe({
+        next: (orderId) => {
+          this.refreshTabs();
+        },
+        error: (err) => {
+          console.error("Error adding items to order:", err);
+          this.notificationService.error("Erro ao adicionar itens à comanda");
+        },
+      });
 
-    this.notificationService.success('Itens adicionados com sucesso!');
+    this.notificationService.success("Itens adicionados com sucesso!");
     this.closeAddItemsModal();
   }
 
@@ -279,16 +325,16 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     this.ordersService.closeCustomerTab(event.orderId).subscribe({
       next: (success) => {
         if (success) {
-          this.notificationService.success('Comanda fechada com sucesso!');
+          this.notificationService.success("Comanda fechada com sucesso!");
           this.selectedTabForReceipt = null;
           this.refreshTabs();
         } else {
-          this.notificationService.error('Erro ao fechar comanda');
+          this.notificationService.error("Erro ao fechar comanda");
         }
       },
       error: (err) => {
-        console.error('Error closing customer tab:', err);
-        this.notificationService.error('Erro ao fechar comanda');
+        console.error("Error closing customer tab:", err);
+        this.notificationService.error("Erro ao fechar comanda");
       },
     });
   }
@@ -300,18 +346,19 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     }, 100);
   }
 
-  scrollCategoriesMobile(direction: 'left' | 'right'): void {
+  scrollCategoriesMobile(direction: "left" | "right"): void {
     const container = this.categoriesContainerMobile?.nativeElement;
     if (!container) return;
 
     const scrollAmount = 200;
-    const targetScroll = direction === 'left'
-      ? container.scrollLeft - scrollAmount
-      : container.scrollLeft + scrollAmount;
+    const targetScroll =
+      direction === "left"
+        ? container.scrollLeft - scrollAmount
+        : container.scrollLeft + scrollAmount;
 
     container.scrollTo({
       left: targetScroll,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
 
     // Update button states after scroll
@@ -325,7 +372,8 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     if (!container) return;
 
     this.canScrollLeftMobile = container.scrollLeft > 0;
-    this.canScrollRightMobile = container.scrollLeft < (container.scrollWidth - container.clientWidth - 1);
+    this.canScrollRightMobile =
+      container.scrollLeft < container.scrollWidth - container.clientWidth - 1;
   }
 
   onReceiptSendEmail(): void {
@@ -334,13 +382,13 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
     }
 
     Swal.fire({
-      title: 'Preencha o e-mail do cliente',
-      input: 'email',
-      inputPlaceholder: 'Digite o e-mail do cliente',
+      title: "Preencha o e-mail do cliente",
+      input: "email",
+      inputPlaceholder: "Digite o e-mail do cliente",
       showCancelButton: true,
-      confirmButtonColor: '#1d2d44',
-      confirmButtonText: 'Enviar E-mail',
-      cancelButtonText: 'Cancelar'
+      confirmButtonColor: "#1d2d44",
+      confirmButtonText: "Enviar E-mail",
+      cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
         const email = result.value;
@@ -348,17 +396,83 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
           return;
         }
 
-        this.ordersService.sendCustomerTabEmail(this.selectedTabForReceipt?.id || '', email).subscribe({
+        this.ordersService
+          .sendCustomerTabEmail(this.selectedTabForReceipt?.id || "", email)
+          .subscribe({
+            next: (success) => {
+              if (success) {
+                this.notificationService.success("E-mail enviado com sucesso!");
+              } else {
+                this.notificationService.error("Erro ao enviar e-mail");
+              }
+            },
+            error: (err) => {
+              console.error("Error sending email:", err);
+              this.notificationService.error("Erro ao enviar e-mail");
+            },
+          });
+      }
+    });
+  }
+
+  deleteComanda(tab: Tab, event: Event): void {
+    event.stopPropagation();
+
+    Swal.fire({
+      title: "Excluir Comanda?",
+      text: `Tem certeza que deseja excluir a comanda de ${tab.customer_name}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc3545",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Sim, excluir",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.ordersService.deleteCustomerTab(tab.id).subscribe({
           next: (success) => {
             if (success) {
-              this.notificationService.success('E-mail enviado com sucesso!');
+              this.notificationService.success("Comanda excluída com sucesso!");
+              this.refreshTabs();
             } else {
-              this.notificationService.error('Erro ao enviar e-mail');
+              this.notificationService.error("Erro ao excluir comanda");
             }
           },
           error: (err) => {
-            console.error('Error sending email:', err);
-            this.notificationService.error('Erro ao enviar e-mail');
+            console.error("Error deleting comanda:", err);
+            this.notificationService.error("Erro ao excluir comanda");
+          },
+        });
+      }
+    });
+  }
+
+  deleteOrder(orderId: string, event: Event): void {
+    event.stopPropagation();
+
+    Swal.fire({
+      title: "Excluir Pedido?",
+      text: "Tem certeza que deseja excluir este pedido?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc3545",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Sim, excluir",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.ordersService.deleteOrder(orderId).subscribe({
+          next: (success) => {
+            if (success) {
+              this.notificationService.success("Pedido excluído com sucesso!");
+              this.refreshTabs();
+            } else {
+              this.notificationService.error("Erro ao excluir pedido");
+            }
+          },
+          error: (err) => {
+            console.error("Error deleting order:", err);
+            this.notificationService.error("Erro ao excluir pedido");
           },
         });
       }

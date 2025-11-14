@@ -1,43 +1,43 @@
-import { Injectable } from '@angular/core';
-import { Apollo, gql } from 'apollo-angular';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { Tab } from '../models';
+import { Injectable } from "@angular/core";
+import { Apollo, gql } from "apollo-angular";
+import { BehaviorSubject, Observable } from "rxjs";
+import { map, tap } from "rxjs/operators";
+import { Tab } from "../models";
 
 // ==================== GRAPHQL QUERIES ====================
 const SEND_CUSTOMER_TAB_EMAIL = gql`
-      mutation SendCustomerTabEmail($customerTabId: UUID!, $email: String!) {
-        sendCustomerTabEmail(customerTabId: $customerTabId, email: $email)
-      }
-    `;
-    
+  mutation SendCustomerTabEmail($customerTabId: UUID!, $email: String!) {
+    sendCustomerTabEmail(customerTabId: $customerTabId, email: $email)
+  }
+`;
+
 const GET_CUSTOMER_TABS = gql`
   query GetCustomerTabs {
-  customerTabs {
-    name
-    id
-    status
-    table {
+    customerTabs {
+      name
       id
-      number
-    }
-    orders {
-        id
       status
-      customerTabId
-      products {
-        productId
-        quantity
-        totalPrice
-        product {
-          id
-          name
-          price
+      table {
+        id
+        number
+      }
+      orders {
+        id
+        status
+        customerTabId
+        products {
+          productId
+          quantity
+          totalPrice
+          product {
+            id
+            name
+            price
+          }
         }
       }
-      }
+    }
   }
-}
 `;
 
 const GET_CUSTOMER_TABS_BY_STATUS = gql`
@@ -46,24 +46,28 @@ const GET_CUSTOMER_TABS_BY_STATUS = gql`
       id
       name
       status
+      createdAt
+      updatedAt
       table {
         id
         number
       }
       orders {
         id
-      status
-      customerTabId
-      products {
-        productId
-        quantity
-        totalPrice
-        product {
-          id
-          name
-          price
+        status
+        customerTabId
+        createdAt
+        updatedAt
+        products {
+          productId
+          quantity
+          totalPrice
+          product {
+            id
+            name
+            price
+          }
         }
-      }
       }
     }
   }
@@ -88,7 +92,6 @@ const GET_ORDERS = gql`
     }
   }
 `;
-
 
 const GET_ORDER_BY_ID = gql`
   query GetOrderById($id: UUID!) {
@@ -119,9 +122,11 @@ const CREATE_CUSTOMER_TAB = gql`
   }
 `;
 
-
 const CREATE_ORDER = gql`
-  mutation CreateOrder($customerTabId: UUID, $products: [CreateOrderProductInput!]!) {
+  mutation CreateOrder(
+    $customerTabId: UUID
+    $products: [CreateOrderProductInput!]!
+  ) {
     createOrder(customerTabId: $customerTabId, products: $products) {
       id
       status
@@ -171,11 +176,22 @@ const CLOSE_CUSTOMER_TAB = gql`
   }
 `;
 
+const DELETE_CUSTOMER_TAB = gql`
+  mutation DeleteCustomerTab($id: UUID!) {
+    deleteCustomerTab(id: $id)
+  }
+`;
+
+const DELETE_ORDER = gql`
+  mutation DeleteOrder($id: UUID!) {
+    deleteOrder(id: $id)
+  }
+`;
 
 // ==================== SERVICE ====================
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class OrdersService {
   private tabs$ = new BehaviorSubject<Tab[]>([]);
@@ -196,29 +212,52 @@ export class OrdersService {
   }
 
   // Fetch customer tabs filtered by status (e.g. 'CLOSED')
-  getTabsByStatus(status: 'OPEN' | 'CLOSED'): Observable<Tab[]> {
+  getTabsByStatus(status: "OPEN" | "CLOSED"): Observable<Tab[]> {
     return this.apollo
       .watchQuery<any>({
         query: GET_CUSTOMER_TABS_BY_STATUS,
         variables: { status },
-        fetchPolicy: 'network-only',
+        fetchPolicy: "network-only",
       })
-      .valueChanges.pipe(map((result) => result.data?.customerTabs?.map((tab: any) => {
-        const normalize = (id?: string) => (id || '').replace(/-/g, '').toLowerCase();
-        const tabOrders = tab?.orders?.filter((o: any) => normalize(o?.customerTabId) === normalize(tab?.id));
-        // First, group products by their ID across all orders
-        const ordersData = this.mapOrders(tabOrders);
-        return {
-          id: tab.id,
-          customer_name: tab.name || 'Cliente',
-          table_number: tab.table?.number?.toString() || '',
-          status: tab?.status,
-          orders: ordersData.orders,
-          created_at: new Date(),
-          updated_at: new Date(),
-          total_price: ordersData.total_price,
-        }
-      })));
+      .valueChanges.pipe(
+        map((result) => {
+          const tabs =
+            result.data?.customerTabs?.map((tab: any) => {
+              const normalize = (id?: string) =>
+                (id || "").replace(/-/g, "").toLowerCase();
+              const tabOrders = tab?.orders?.filter(
+                (o: any) => normalize(o?.customerTabId) === normalize(tab?.id)
+              );
+              // Sort orders by creation date (descending - newest first)
+              tabOrders?.sort((a: any, b: any) => {
+                const dateA = new Date(a.createdAt || a.created_at).getTime();
+                const dateB = new Date(b.createdAt || b.created_at).getTime();
+                return dateB - dateA;
+              });
+              // First, group products by their ID across all orders
+              const ordersData = this.mapOrders(tabOrders);
+              return {
+                id: tab.id,
+                customer_name: tab.name || "Cliente",
+                table_number: tab.table?.number?.toString() || "",
+                status: tab?.status,
+                orders: ordersData.orders,
+                created_at: new Date(
+                  tab.createdAt || tab.created_at || new Date()
+                ),
+                updated_at: new Date(
+                  tab.updatedAt || tab.updated_at || new Date()
+                ),
+                total_price: ordersData.total_price,
+              };
+            }) || [];
+          // Sort customer tabs by creation date (descending - newest first)
+          tabs.sort((a: Tab, b: Tab) => {
+            return b.created_at.getTime() - a.created_at.getTime();
+          });
+          return tabs;
+        })
+      );
   }
 
   createCustomerTab(tableId: string, name?: string): Observable<any> {
@@ -232,12 +271,14 @@ export class OrdersService {
           },
         },
       })
-      .pipe(
-        map((result: any) => result.data?.createCustomerTab)
-      );
+      .pipe(map((result: any) => result.data?.createCustomerTab));
   }
 
-  createOrderWithProducts(tabId: string | null, products: { productId: string, quantity: number }[], isClosedOrder: boolean = false): Observable<any> {
+  createOrderWithProducts(
+    tabId: string | null,
+    products: { productId: string; quantity: number }[],
+    isClosedOrder: boolean = false
+  ): Observable<any> {
     if (!isClosedOrder) {
       return this.apollo
         .mutate({
@@ -247,9 +288,7 @@ export class OrdersService {
             products,
           },
         })
-        .pipe(
-          map((result: any) => result.data?.createOrder)
-        );
+        .pipe(map((result: any) => result.data?.createOrder));
     } else {
       return this.apollo
         .mutate({
@@ -258,9 +297,7 @@ export class OrdersService {
             products,
           },
         })
-        .pipe(
-          map((result: any) => result.data?.createOrder),
-        );
+        .pipe(map((result: any) => result.data?.createOrder));
     }
   }
 
@@ -280,7 +317,7 @@ export class OrdersService {
           if (success) {
             const current = this.tabs$.value;
             const updated = current?.map((o) =>
-              o.id === orderId ? { ...o, status: 'CLOSED' as const } : o
+              o.id === orderId ? { ...o, status: "CLOSED" as const } : o
             );
             this.tabs$.next(updated);
           }
@@ -305,7 +342,7 @@ export class OrdersService {
           if (success) {
             const current = this.tabs$.value;
             const updated = current?.map((o) =>
-              o.id === customerTabId ? { ...o, status: 'CLOSED' as const } : o
+              o.id === customerTabId ? { ...o, status: "CLOSED" as const } : o
             );
             this.tabs$.next(updated);
           }
@@ -315,9 +352,9 @@ export class OrdersService {
 
   loadTabs(): void {
     this.isLoadingTabs.next(true);
-    this.getTabsByStatus('OPEN').subscribe((tabs) => {
+    this.getTabsByStatus("OPEN").subscribe((tabs) => {
       this.tabs$.next(tabs);
-      this.getTabsByStatus('CLOSED').subscribe((closedTabs) => {
+      this.getTabsByStatus("CLOSED").subscribe((closedTabs) => {
         this.closedTabs$.next(closedTabs);
         this.isLoadingTabs.next(false);
       });
@@ -329,40 +366,46 @@ export class OrdersService {
       .watchQuery<any>({
         query: GET_ORDERS,
       })
-      .valueChanges.pipe(
-        map((result) => result.data?.orders)
-      )
+      .valueChanges.pipe(map((result) => result.data?.orders));
   }
 
   private mapOrders(orders: any[]) {
-    const groupedProducts = orders?.reduce((acc: any[], order: any) => {
-      order.products?.forEach((p: any) => {
-        const existingProduct = acc.find(item => item.productId === p.productId);
-        if (existingProduct) {
-          existingProduct.quantity += p.quantity;
-          existingProduct.totalPrice += p.totalPrice;
-        } else {
-          acc.push({ ...p });
-        }
-      });
-      return acc;
-    }, []) || [];
+    const groupedProducts =
+      orders?.reduce((acc: any[], order: any) => {
+        order.products?.forEach((p: any) => {
+          const existingProduct = acc.find(
+            (item) => item.productId === p.productId
+          );
+          if (existingProduct) {
+            existingProduct.quantity += p.quantity;
+            existingProduct.totalPrice += p.totalPrice;
+          } else {
+            acc.push({ ...p });
+          }
+        });
+        return acc;
+      }, []) || [];
     return {
-      orders: [{
-        products: groupedProducts.map((p: any) => ({
-          product_id: p.productId,
-          product_name: p.product?.name,
-          quantity: p.quantity,
-          totalPrice: p.totalPrice,
-          unit_price: p.product?.price,
-          status: 'pending' as const,
-        }))
-      }], total_price: groupedProducts.reduce((sum: number, p: any) => sum + p.totalPrice, 0)
-    }
+      orders: [
+        {
+          products: groupedProducts.map((p: any) => ({
+            product_id: p.productId,
+            product_name: p.product?.name,
+            quantity: p.quantity,
+            totalPrice: p.totalPrice,
+            unit_price: p.product?.price,
+            status: "pending" as const,
+          })),
+        },
+      ],
+      total_price: groupedProducts.reduce(
+        (sum: number, p: any) => sum + p.totalPrice,
+        0
+      ),
+    };
   }
 
   sendCustomerTabEmail(customerTabId: string, email: string): Observable<any> {
-
     return this.apollo
       .mutate({
         mutation: SEND_CUSTOMER_TAB_EMAIL,
@@ -371,9 +414,43 @@ export class OrdersService {
           email,
         },
       })
+      .pipe(map((result: any) => result.data?.sendCustomerTabEmail));
+  }
+
+  deleteCustomerTab(id: string): Observable<boolean> {
+    return this.apollo
+      .mutate({
+        mutation: DELETE_CUSTOMER_TAB,
+        variables: { id },
+      })
       .pipe(
-        map((result: any) => result.data?.sendCustomerTabEmail)
+        map((result: any) => result.data?.deleteCustomerTab),
+        tap((deleted: boolean) => {
+          if (deleted) {
+            // Remove from both open and closed tabs
+            const currentOpen = this.tabs$.value;
+            const currentClosed = this.closedTabs$.value;
+            this.tabs$.next(currentOpen.filter((t) => t.id !== id));
+            this.closedTabs$.next(currentClosed.filter((t) => t.id !== id));
+          }
+        })
+      );
+  }
+
+  deleteOrder(id: string): Observable<boolean> {
+    return this.apollo
+      .mutate({
+        mutation: DELETE_ORDER,
+        variables: { id },
+      })
+      .pipe(
+        map((result: any) => result.data?.deleteOrder),
+        tap((deleted: boolean) => {
+          if (deleted) {
+            // Reload tabs to reflect the changes
+            this.loadTabs();
+          }
+        })
       );
   }
 }
-

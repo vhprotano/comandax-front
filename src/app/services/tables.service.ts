@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { Apollo, gql } from 'apollo-angular';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { Table } from '../models';
+import { Injectable } from "@angular/core";
+import { Apollo, gql } from "apollo-angular";
+import { BehaviorSubject, Observable } from "rxjs";
+import { map, tap } from "rxjs/operators";
+import { Table } from "../models";
 
 // ==================== GRAPHQL QUERIES ====================
 
@@ -27,25 +27,25 @@ const CREATE_TABLE = gql`
 `;
 
 const DELETE_TABLE = gql`
-    mutation DeleteTable($id: UUID!) {
-      deleteTable(id: $id)
-    }
-  `;
+  mutation DeleteTable($id: UUID!) {
+    deleteTable(id: $id)
+  }
+`;
 
-  const UPDATE_TABLE = gql`
-    mutation UpdateTable($id: UUID!, $number: Int!) {
-      updateTable(id: $id, number: $number) {
-        id
-        number
-        status
-      }
+const UPDATE_TABLE = gql`
+  mutation UpdateTable($id: UUID!, $number: Int!) {
+    updateTable(id: $id, number: $number) {
+      id
+      number
+      status
     }
-  `;
+  }
+`;
 
 // ==================== SERVICE ====================
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class TablesService {
   private tables$ = new BehaviorSubject<Table[]>([]);
@@ -54,16 +54,14 @@ export class TablesService {
     this.loadTables();
   }
 
-
-
   getTables(): Observable<Table[]> {
     return this.tables$.asObservable();
   }
 
   getAvailableTables(): Observable<Table[]> {
-    return this.tables$.asObservable().pipe(
-      map((tables) => tables.filter((t) => t.status === 'FREE'))
-    );
+    return this.tables$
+      .asObservable()
+      .pipe(map((tables) => tables.filter((t) => t.status === "FREE")));
   }
 
   createTable(): Observable<any> {
@@ -76,11 +74,18 @@ export class TablesService {
         tap((newTable) => {
           const table: Table = {
             id: newTable.id,
-            number: newTable?.number?.toString() || '',
+            number: newTable?.number?.toString() || "",
             status: newTable.status,
           };
           const current = this.tables$.value;
-          this.tables$.next([...current, table]);
+          const updated = [...current, table];
+          // Sort tables by number (ascending)
+          updated.sort((a, b) => {
+            const numA = parseInt(a.number, 10) || 0;
+            const numB = parseInt(b.number, 10) || 0;
+            return numA - numB;
+          });
+          this.tables$.next(updated);
         })
       );
   }
@@ -90,7 +95,7 @@ export class TablesService {
       .mutate({
         mutation: CREATE_TABLE,
         variables: {
-          number: table.number
+          number: table.number,
         },
       })
       .pipe(
@@ -98,7 +103,7 @@ export class TablesService {
         tap((newTable) => {
           const addedTable: Table = {
             id: newTable.id,
-            number: newTable?.number?.toString() || '',
+            number: newTable?.number?.toString() || "",
             status: newTable.status,
           };
           const current = this.tables$.value;
@@ -113,7 +118,7 @@ export class TablesService {
         mutation: UPDATE_TABLE,
         variables: {
           id,
-          number: parseInt(table.number + '' || '0', 10),
+          number: parseInt(table.number + "" || "0", 10),
         },
       })
       .pipe(
@@ -124,17 +129,15 @@ export class TablesService {
           if (index !== -1) {
             const updated: Table = {
               id: updatedTable.id,
-              number: updatedTable?.number?.toString() || '',
+              number: updatedTable?.number?.toString() || "",
               status: updatedTable.status,
             };
             current[index] = updated;
             this.tables$.next([...current]);
           }
         })
-      )
+      );
   }
-
-
 
   deleteTable(id: string): Observable<boolean> {
     return this.apollo
@@ -153,18 +156,16 @@ export class TablesService {
       );
   }
 
-
-
   private loadTables(): void {
     this.apollo
       .watchQuery<any>({
         query: GET_TABLES,
-        fetchPolicy: 'network-only',
+        fetchPolicy: "network-only",
       })
       .valueChanges.pipe(
         map((result: any) => {
           if (result.errors) {
-            console.error('GraphQL errors:', result.errors);
+            console.error("GraphQL errors:", result.errors);
           }
           return result.data?.tables || [];
         })
@@ -173,13 +174,18 @@ export class TablesService {
         next: (tables) => {
           const mappedTables: Table[] = tables?.map((t: any) => ({
             id: t.id,
-            number: t.number?.toString() || '',
+            number: t.number?.toString() || "",
             status: t.status,
           }));
+          // Sort tables by number (ascending)
+          mappedTables.sort((a, b) => {
+            const numA = parseInt(a.number, 10) || 0;
+            const numB = parseInt(b.number, 10) || 0;
+            return numA - numB;
+          });
           this.tables$.next(mappedTables);
         },
-        error: (err) => console.error('Error loading tables:', err),
+        error: (err) => console.error("Error loading tables:", err),
       });
   }
 }
-
