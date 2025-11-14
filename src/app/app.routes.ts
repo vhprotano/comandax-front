@@ -20,25 +20,25 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       {
-        path: "comandas",
+        path: "customer-tabs",
         loadComponent: () =>
-          import("./pages/comandas/comandas-list/comandas-list.component").then(
-            (m) => m.ComandasListComponent
-          ),
+          import(
+            "./pages/customer-tabs/customer-tab-list/customer-tab-list.component"
+          ).then((m) => m.CustomerTabListComponent),
       },
       {
-        path: "comandas/nova",
+        path: "customer-tabs/nova",
         loadComponent: () =>
-          import("./pages/comandas/nova-comanda/nova-comanda.component").then(
-            (m) => m.NovaComandaComponent
-          ),
+          import(
+            "./pages/customer-tabs/new-customer-tab/new-customer-tab.component"
+          ).then((m) => m.NewCustomerTabComponent),
       },
       {
-        path: "comandas/novo-pedido",
+        path: "customer-tabs/novo-pedido",
         loadComponent: () =>
-          import("./pages/comandas/nova-comanda/nova-comanda.component").then(
-            (m) => m.NovaComandaComponent
-          ),
+          import(
+            "./pages/customer-tabs/new-customer-tab/new-customer-tab.component"
+          ).then((m) => m.NewCustomerTabComponent),
       },
       {
         path: "produtos",
@@ -70,7 +70,7 @@ export const routes: Routes = [
       },
       {
         path: "dashboard",
-        redirectTo: "/comandas",
+        redirectTo: "/customer-tabs",
         pathMatch: "full",
       },
     ],

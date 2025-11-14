@@ -6,7 +6,7 @@
   box-sizing: border-box;
 }
 
-.nova-comanda-container {
+.new-customer-tab-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 1rem 1rem 1rem;
@@ -374,7 +374,6 @@
       }
     }
   }
-
 }
 
 .products-grid {
@@ -638,7 +637,6 @@
 
 // Animations
 @keyframes productAdded {
-
   0%,
   100% {
     transform: scale(1);
@@ -661,7 +659,6 @@
 }
 
 @keyframes cartPulse {
-
   0%,
   100% {
     transform: scale(1);

@@ -1,4 +1,4 @@
-.comandas-container {
+.customer-tab-container {
   max-width: 1400px;
   margin: 0 auto;
   padding-bottom: 80px; // Space for FABs on mobile
@@ -76,7 +76,7 @@
   }
 }
 
-.comandas-grid {
+.customer-tab-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
@@ -96,7 +96,7 @@
   }
 }
 
-.comanda-card {
+.customer-tab-card {
   background: white;
   border-radius: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);

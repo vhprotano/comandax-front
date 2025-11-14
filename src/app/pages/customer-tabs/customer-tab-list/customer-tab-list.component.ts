@@ -24,7 +24,7 @@ import { LucideAngularModule, Plus, Trash2 } from "lucide-angular";
 import Swal from "sweetalert2";
 
 @Component({
-  selector: "app-comandas-list",
+  selector: "app-customer-tab-list",
   standalone: true,
   imports: [
     CommonModule,
@@ -34,10 +34,10 @@ import Swal from "sweetalert2";
     LucideAngularModule,
     NgbTooltipModule,
   ],
-  templateUrl: "./comandas-list.component.html",
-  styleUrls: ["./comandas-list.component.scss"],
+  templateUrl: "./customer-tab-list.component.html",
+  styleUrls: ["./customer-tab-list.component.scss"],
 })
-export class ComandasListComponent implements OnInit, AfterViewInit {
+export class CustomerTabListComponent implements OnInit, AfterViewInit {
   openedTabs: Tab[] = [];
   closedTabs: Tab[] = [];
   showClosedTabs = false;
@@ -177,12 +177,12 @@ export class ComandasListComponent implements OnInit, AfterViewInit {
 
   createNewComanda(): void {
     this.fabExpanded = false; // Close FAB menu
-    this.router.navigate(["/comandas/nova"]);
+    this.router.navigate(["/customer-tabs/nova"]);
   }
 
   createNewPedido(): void {
     this.fabExpanded = false; // Close FAB menu
-    this.router.navigate(["/comandas/novo-pedido"]);
+    this.router.navigate(["/customer-tabs/novo-pedido"]);
   }
 
   // Adicionar Itens

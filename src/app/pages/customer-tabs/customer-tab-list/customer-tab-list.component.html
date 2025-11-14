@@ -1,4 +1,4 @@
-<div class="comandas-container">
+<div class="customer-tab-container">
   <!-- Header with Toggle -->
   <div class="header-section">
     <h1 class="page-title">Comandas</h1>
@@ -29,12 +29,12 @@
   </div>
 
   <!-- Comandas Abertas -->
-  <div *ngIf="!showClosedTabs" class="comandas-section">
-    <div class="comandas-grid">
+  <div *ngIf="!showClosedTabs" class="customer-tab-section">
+    <div class="customer-tab-grid">
       <div
         *ngFor="let tab of openedTabs"
         (click)="openTab(tab)"
-        class="comanda-card"
+        class="customer-tab-card"
       >
         <div class="card-header">
           <div class="card-title-section">
@@ -103,12 +103,12 @@
   </div>
 
   <!-- Comandas Fechadas -->
-  <div *ngIf="showClosedTabs" class="comandas-section">
-    <div class="comandas-grid">
+  <div *ngIf="showClosedTabs" class="customer-tab-section">
+    <div class="customer-tab-grid">
       <div
         *ngFor="let tab of closedTabs"
         (click)="openTab(tab)"
-        class="comanda-card"
+        class="customer-tab-card"
       >
         <div class="card-header">
           <div class="card-title-section">

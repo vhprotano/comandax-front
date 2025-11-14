@@ -46,7 +46,7 @@ export class MainLayoutComponent implements OnInit {
       id: "comandas",
       label: "Comandas",
       icon: "📋",
-      route: "/comandas",
+      route: "/customer-tabs",
     },
     {
       id: "cozinha",
