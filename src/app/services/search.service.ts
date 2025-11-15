@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Product, Category, Order, Employee } from '../models';
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { Product, Category, Order, Employee } from "../models";
 
 export interface SearchFilters {
   query: string;
@@ -12,17 +12,17 @@ export interface SearchFilters {
   role?: string;
   dateFrom?: Date;
   dateTo?: Date;
-  sortBy?: 'name' | 'price' | 'date' | 'status';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "name" | "price" | "date" | "status";
+  sortOrder?: "asc" | "desc";
 }
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class SearchService {
   private filters$ = new BehaviorSubject<SearchFilters>({
-    query: '',
-    sortOrder: 'asc',
+    query: "",
+    sortOrder: "asc",
   });
 
   constructor() {}
@@ -38,24 +38,19 @@ export class SearchService {
 
   clearFilters(): void {
     this.filters$.next({
-      query: '',
-      sortOrder: 'asc',
+      query: "",
+      sortOrder: "asc",
     });
   }
 
   // Buscar produtos
-  searchProducts(
-    products: Product[],
-    filters: SearchFilters
-  ): Product[] {
+  searchProducts(products: Product[], filters: SearchFilters): Product[] {
     let results = [...products];
 
     // Filtro por query
     if (filters.query) {
       const query = filters.query.toLowerCase();
-      results = results.filter((p) =>
-        p.name.toLowerCase().includes(query)
-      );
+      results = results.filter((p) => p.name.toLowerCase().includes(query));
     }
 
     // Filtro por categoria
@@ -78,18 +73,15 @@ export class SearchService {
   }
 
   // Buscar pedidos
-  searchOrders(
-    orders: Order[],
-    filters: SearchFilters
-  ): Order[] {
+  searchOrders(orders: Order[], filters: SearchFilters): Order[] {
     let results = [...orders];
 
     // Filtro por query (cliente, mesa, ID)
     if (filters.query) {
       const query = filters.query.toLowerCase();
       results = results.filter((o) =>
-        o.customer_name.toLowerCase().includes(query) ||
-        o.table_number.toLowerCase().includes(query) ||
+        // o.customer_name.toLowerCase().includes(query) ||
+        // o.table_number.toLowerCase().includes(query) ||
         o.id.toLowerCase().includes(query)
       );
     }
@@ -101,22 +93,26 @@ export class SearchService {
 
     // Filtro por data
     if (filters.dateFrom) {
-      results = results.filter((o) => new Date(o.created_at) >= filters.dateFrom!);
+      results = results.filter(
+        (o) => new Date(o.created_at) >= filters.dateFrom!
+      );
     }
     if (filters.dateTo) {
-      results = results.filter((o) => new Date(o.created_at) <= filters.dateTo!);
+      results = results.filter(
+        (o) => new Date(o.created_at) <= filters.dateTo!
+      );
     }
 
     // Ordenação
-    if (filters.sortBy === 'date') {
+    if (filters.sortBy === "date") {
       results.sort((a, b) => {
         const dateA = new Date(a.created_at).getTime();
         const dateB = new Date(b.created_at).getTime();
-        return filters.sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+        return filters.sortOrder === "asc" ? dateA - dateB : dateB - dateA;
       });
-    } else if (filters.sortBy === 'price') {
+    } else if (filters.sortBy === "price") {
       results.sort((a, b) => {
-        return filters.sortOrder === 'asc'
+        return filters.sortOrder === "asc"
           ? a.total_price - b.total_price
           : b.total_price - a.total_price;
       });
@@ -126,18 +122,16 @@ export class SearchService {
   }
 
   // Buscar funcionários
-  searchEmployees(
-    employees: Employee[],
-    filters: SearchFilters
-  ): Employee[] {
+  searchEmployees(employees: Employee[], filters: SearchFilters): Employee[] {
     let results = [...employees];
 
     // Filtro por query
     if (filters.query) {
       const query = filters.query.toLowerCase();
-      results = results.filter((e) =>
-        e.name.toLowerCase().includes(query) ||
-        e.email.toLowerCase().includes(query)
+      results = results.filter(
+        (e) =>
+          e.name.toLowerCase().includes(query) ||
+          e.email.toLowerCase().includes(query)
       );
     }
 
@@ -153,17 +147,12 @@ export class SearchService {
   }
 
   // Buscar categorias
-  searchCategories(
-    categories: Category[],
-    filters: SearchFilters
-  ): Category[] {
+  searchCategories(categories: Category[], filters: SearchFilters): Category[] {
     let results = [...categories];
 
     if (filters.query) {
       const query = filters.query.toLowerCase();
-      results = results.filter((c) =>
-        c.name.toLowerCase().includes(query)
-      );
+      results = results.filter((c) => c.name.toLowerCase().includes(query));
     }
 
     return results;
@@ -172,7 +161,7 @@ export class SearchService {
   private sortResults(
     results: any[],
     sortBy?: string,
-    sortOrder: 'asc' | 'desc' = 'asc'
+    sortOrder: "asc" | "desc" = "asc"
   ): any[] {
     if (!sortBy) return results;
 
@@ -180,16 +169,16 @@ export class SearchService {
       let valueA = a[sortBy];
       let valueB = b[sortBy];
 
-      if (typeof valueA === 'string') {
+      if (typeof valueA === "string") {
         valueA = valueA.toLowerCase();
         valueB = valueB.toLowerCase();
       }
 
       if (valueA < valueB) {
-        return sortOrder === 'asc' ? -1 : 1;
+        return sortOrder === "asc" ? -1 : 1;
       }
       if (valueA > valueB) {
-        return sortOrder === 'asc' ? 1 : -1;
+        return sortOrder === "asc" ? 1 : -1;
       }
       return 0;
     });
@@ -199,19 +188,16 @@ export class SearchService {
   getSearchSuggestions(
     items: any[],
     query: string,
-    field: string = 'name'
+    field: string = "name"
   ): string[] {
     if (!query) return [];
 
     const queryLower = query.toLowerCase();
     const suggestions = items
-      .filter((item) =>
-        item[field].toLowerCase().includes(queryLower)
-      )
+      .filter((item) => item[field].toLowerCase().includes(queryLower))
       .map((item) => item[field])
       .slice(0, 5);
 
     return [...new Set(suggestions)];
   }
 }
-

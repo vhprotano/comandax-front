@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Apollo, gql } from "apollo-angular";
-import { BehaviorSubject, Observable } from "rxjs";
-import { map, tap } from "rxjs/operators";
+import { BehaviorSubject, forkJoin, Observable } from "rxjs";
+import { finalize, map, take, tap } from "rxjs/operators";
 import { Tab } from "../models";
 
 // ==================== GRAPHQL QUERIES ====================
@@ -200,7 +200,7 @@ export class OrdersService {
   public loading$ = this.isLoadingTabs.asObservable();
 
   constructor(private apollo: Apollo) {
-    this.loadTabs();
+    // Don't load tabs in constructor - let components trigger the load
   }
 
   getTabs(): Observable<Tab[]> {
@@ -214,12 +214,12 @@ export class OrdersService {
   // Fetch customer tabs filtered by status (e.g. 'CLOSED')
   getTabsByStatus(status: "OPEN" | "CLOSED"): Observable<Tab[]> {
     return this.apollo
-      .watchQuery<any>({
+      .query<any>({
         query: GET_CUSTOMER_TABS_BY_STATUS,
         variables: { status },
         fetchPolicy: "network-only",
       })
-      .valueChanges.pipe(
+      .pipe(
         map((result) => {
           const tabs =
             result.data?.customerTabs?.map((tab: any) => {
@@ -352,13 +352,23 @@ export class OrdersService {
 
   loadTabs(): void {
     this.isLoadingTabs.next(true);
-    this.getTabsByStatus("OPEN").subscribe((tabs) => {
-      this.tabs$.next(tabs);
-      this.getTabsByStatus("CLOSED").subscribe((closedTabs) => {
-        this.closedTabs$.next(closedTabs);
-        this.isLoadingTabs.next(false);
+
+    forkJoin({
+      open: this.getTabsByStatus("OPEN"),
+      closed: this.getTabsByStatus("CLOSED"),
+    })
+      .pipe(finalize(() => this.isLoadingTabs.next(false)))
+      .subscribe({
+        next: (result) => {
+          console.log("Open tabs:", result.open);
+          console.log("Closed tabs:", result.closed);
+          this.tabs$.next(result.open);
+          this.closedTabs$.next(result.closed);
+        },
+        error: (err) => {
+          console.error("Error loading tabs:", err);
+        },
       });
-    });
   }
 
   private loadOrders() {

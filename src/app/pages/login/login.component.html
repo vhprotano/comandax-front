@@ -6,7 +6,11 @@
   <div class="login-card">
     <!-- Logo and Title -->
     <div class="login-header flex align-center justify-content-center">
-      <img src="assets/logo/branco-transparente.png" alt="ComandaX Logo" class="logo-image" />
+      <img
+        src="assets/logo/branco-transparente.png"
+        alt="ComandaX Logo"
+        class="logo-image"
+      />
       <!-- <div class="logo-circle">
         <img *ngIf="logoUrl" [src]="logoUrl" alt="Logo" class="logo-image" />
         <span *ngIf="!logoUrl" class="logo-emoji">🍽️</span>
@@ -17,22 +21,46 @@
 
     <!-- Google OAuth Login -->
     <div class="login-content">
-      <p class="login-instruction">Faça login com sua conta Google</p>
+      @if (!loading) {
+      <ng-container>
+        <p class="login-instruction">Faça login com sua conta Google</p>
 
-      <!-- Google Sign-In Button -->
-      <div id="google-signin-button" class="google-signin-container"></div>
+        <!-- Google Sign-In Button -->
+        <div id="google-signin-button" class="google-signin-container"></div>
 
-      <!-- Error Message -->
-      <div *ngIf="error" class="error-message">
-        <span class="error-icon">⚠️</span>
-        <span>{{ error }}</span>
-      </div>
+        <!-- Error Message -->
+        <div *ngIf="error" class="error-message">
+          <span class="error-icon">⚠️</span>
+          <span>{{ error }}</span>
+        </div>
+      </ng-container>
+      }
 
       <!-- Loading State -->
-      <div *ngIf="loading" class="loading-state">
-        <div class="spinner"></div>
-        <p>Autenticando...</p>
+      @if (loading) {
+      <div class="loading-state">
+        <div class="restaurant-loading">
+          <div class="plate-container">
+            <div class="plate">
+              <div class="food-item food-1">🍕</div>
+              <div class="food-item food-2">🍔</div>
+              <div class="food-item food-3">🍟</div>
+            </div>
+            <div class="steam steam-1"></div>
+            <div class="steam steam-2"></div>
+            <div class="steam steam-3"></div>
+          </div>
+          <div class="loading-text">
+            <p class="loading-message">Preparando seu acesso...</p>
+            <div class="loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
       </div>
+      }
     </div>
   </div>
 </div>

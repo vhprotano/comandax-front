@@ -4,6 +4,7 @@ import {
   AfterViewInit,
   Inject,
   PLATFORM_ID,
+  ChangeDetectorRef,
 } from "@angular/core";
 import { CommonModule, isPlatformBrowser } from "@angular/common";
 import { FormsModule } from "@angular/forms";
@@ -30,6 +31,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   constructor(
     private authService: AuthService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -85,8 +87,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   handleCredentialResponse(response: any): void {
+    console.log("loading true");
     this.loading = true;
     this.error = "";
+    this.cdr.detectChanges(); // Force change detection
 
     try {
       // Decode JWT token
@@ -105,18 +109,48 @@ export class LoginComponent implements OnInit, AfterViewInit {
       this.authService.loginWithGoogle(response.credential, user).subscribe({
         next: () => {
           this.loading = false;
+          this.cdr.detectChanges(); // Force change detection
           this.router.navigate(["/customer-tabs"]);
         },
         error: (err: any) => {
           this.loading = false;
-          this.error = "Erro ao autenticar com Google. Tente novamente.";
+          this.setError("Erro ao autenticar com Google. Tente novamente.");
+
           console.error("Auth error:", err);
         },
       });
     } catch (err) {
       this.loading = false;
-      this.error = "Erro ao processar credenciais do Google.";
+      this.setError(
+        "Erro ao processar credenciais do Google. Tente novamente."
+      );
       console.error(err);
+    }
+  }
+
+  setError(error: string): void {
+    this.error = error;
+    this.cdr.detectChanges(); // Force change detection
+
+    setTimeout(() => this.reinitializeGoogleButton(), 100);
+  }
+
+  reinitializeGoogleButton(): void {
+    if (typeof google !== "undefined" && !this.loading) {
+      const buttonElement = document.getElementById("google-signin-button");
+      if (buttonElement) {
+        // Clear the button container
+        buttonElement.innerHTML = "";
+        // Re-render the button
+        google.accounts.id.renderButton(buttonElement, {
+          theme: "filled_blue",
+          size: "large",
+          width: 350,
+          text: "signin_with",
+          shape: "rectangular",
+          logo_alignment: "left",
+        });
+      }
     }
   }
 

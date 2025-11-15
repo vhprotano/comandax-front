@@ -18,6 +18,34 @@
     </div>
   </div>
 
+  <!-- Loading State -->
+  @if (isLoadingTabs) {
+  <div class="loading-overlay">
+    <div class="loading-content">
+      <div class="notepad-animation">
+        <div class="notepad">
+          <div class="notepad-header"></div>
+          <div class="notepad-lines">
+            <div class="line line-1"></div>
+            <div class="line line-2"></div>
+            <div class="line line-3"></div>
+            <div class="line line-4"></div>
+          </div>
+          <div class="pen">✏️</div>
+        </div>
+      </div>
+      <div class="loading-text-container">
+        <p class="loading-title">Carregando comandas</p>
+        <div class="loading-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
   <!-- Desktop Action Buttons -->
   <div class="desktop-actions">
     <button class="btn btn-primary" (click)="createNewComanda()">
@@ -94,7 +122,10 @@
       </div>
 
       <!-- Empty State -->
-      <div *ngIf="!openedTabs || openedTabs.length === 0" class="empty-state">
+      <div
+        *ngIf="(!openedTabs || openedTabs.length === 0) && !isLoadingTabs"
+        class="empty-state"
+      >
         <div class="empty-icon">📋</div>
         <p class="empty-title">Nenhuma comanda aberta</p>
         <p class="empty-subtitle">Crie uma nova comanda para começar</p>
@@ -559,9 +590,3 @@
   (finalize)="finalizeOrder($event)"
   (sendEmail)="onReceiptSendEmail()"
 ></app-receipt>
-
-<div *ngIf="isLoadingTabs">
-  <div class="loading-overlay">
-    <div class="loading-spinner"></div>
-  </div>
-</div>

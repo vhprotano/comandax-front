@@ -5,6 +5,7 @@ import {
   ViewChild,
   ElementRef,
   AfterViewInit,
+  ChangeDetectorRef,
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router } from "@angular/router";
@@ -83,7 +84,8 @@ export class CustomerTabListComponent implements OnInit, AfterViewInit {
     private productsService: ProductsService,
     private categoriesService: CategoriesService,
     private notificationService: NotificationService,
-    private offcanvasService: NgbOffcanvas
+    private offcanvasService: NgbOffcanvas,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -95,6 +97,7 @@ export class CustomerTabListComponent implements OnInit, AfterViewInit {
 
     this.ordersService.loading$.subscribe((loading) => {
       this.isLoadingTabs = loading;
+      this.cdr.detectChanges();
     });
   }
 
