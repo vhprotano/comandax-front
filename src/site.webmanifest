@@ -1,1 +1,77 @@
-{"name":"","short_name":"","icons":[{"src":"/android-chrome-192x192.png","sizes":"192x192","type":"image/png"},{"src":"/android-chrome-512x512.png","sizes":"512x512","type":"image/png"}],"theme_color":"#ffffff","background_color":"#ffffff","display":"standalone"}
+{
+  "name": "ComandaX - Sistema de Comandas Digital",
+  "short_name": "ComandaX",
+  "description": "Sistema de comandas digital para restaurantes, bares e lanchonetes. Gerencie pedidos, mesas e produtos.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#1d2d44",
+  "background_color": "#f9fafb",
+  "categories": ["business", "food", "productivity"],
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/screenshot-wide.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard de comandas do ComandaX"
+    },
+    {
+      "src": "/assets/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "ComandaX no celular"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nova Comanda",
+      "short_name": "Nova",
+      "description": "Abrir uma nova comanda",
+      "url": "/customer-tabs/nova",
+      "icons": [{ "src": "/assets/icons/new-tab.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Ver Comandas",
+      "short_name": "Comandas",
+      "description": "Ver todas as comandas abertas",
+      "url": "/customer-tabs",
+      "icons": [{ "src": "/assets/icons/tabs.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

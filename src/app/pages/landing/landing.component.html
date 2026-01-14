@@ -1,0 +1,512 @@
+<div class="min-h-screen bg-black text-white">
+  <!-- Header -->
+  <header class="border-b border-gray-800">
+    <div class="container mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <img
+            src="/assets/logo/branco.png"
+            alt="ComandaX Logo"
+            class="w-8 h-8"
+            loading="eager"
+          />
+          <span class="text-xl font-semibold">ComandaX</span>
+        </div>
+        <div class="flex items-center space-x-6">
+          <span class="text-sm text-gray-400">100% Gratuito</span>
+          <a
+            routerLink="/login"
+            class="text-sm font-medium hover:text-gray-300 transition-colors"
+          >
+            Entrar
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="py-24 lg:py-32">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-5xl lg:text-7xl font-bold mb-8 leading-tight">
+          Sistema de Comandas Digitais para Restaurantes
+        </h1>
+        <p
+          class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed"
+        >
+          Gerencie pedidos, mesas e funcionários do seu restaurante com o
+          sistema mais completo do Brasil. Aumente suas vendas e reduza erros
+          operacionais.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <a
+            routerLink="/login"
+            class="inline-flex items-center justify-center px-8 py-4 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            Começar Agora - É Grátis
+            <svg
+              class="ml-2 w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              ></path>
+            </svg>
+          </a>
+          <button
+            class="inline-flex items-center justify-center px-8 py-4 border border-gray-600 text-gray-300 font-semibold rounded-lg hover:border-gray-500 hover:text-white transition-colors"
+            (click)="scrollToAnchor('functionalities')"
+          >
+            Ver Funcionalidades
+          </button>
+        </div>
+
+        <!-- Large Screenshot -->
+        <div class="relative">
+          <div
+            class="bg-gray-900 rounded-2xl shadow-2xl p-2 border border-gray-800"
+          >
+            <img
+              appLazyLoad
+              data-src="/assets/real-images/comandas.png"
+              alt="Sistema de Comandas - Interface principal do ComandaX"
+              class="w-full rounded-xl lazy"
+              width="1200"
+              height="800"
+              loading="lazy"
+            />
+          </div>
+          <div
+            class="absolute -top-3 -right-3 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium"
+          >
+            100% FREE
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-24 lg:py-32 bg-gray-900">
+    <div class="container mx-auto px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+            Tudo que seu restaurante precisa
+          </h2>
+          <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+            Sistema completo para gestão de restaurantes, bares, lanchonetes e
+            estabelecimentos de food service
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-16">
+          <div class="space-y-12">
+            <div class="flex items-start space-x-4">
+              <div
+                class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold mb-2">Pedidos Digitais</h3>
+                <p class="text-gray-400">
+                  Comandas totalmente digitais eliminam erros de anotação e
+                  agilizam o atendimento.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4">
+              <div
+                class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold mb-2">Controle de Mesas</h3>
+                <p class="text-gray-400">
+                  Gerencie a ocupação das mesas em tempo real e otimize o fluxo
+                  do restaurante.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4">
+              <div
+                class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold mb-2">
+                  Relatórios Detalhados
+                </h3>
+                <p class="text-gray-400">
+                  Acompanhe vendas, produtos mais pedidos e desempenho do seu
+                  negócio.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-12">
+            <div class="flex items-start space-x-4">
+              <div
+                class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold mb-2">
+                  Integração com Impressoras
+                </h3>
+                <p class="text-gray-400">
+                  Imprima comandas automaticamente na cozinha e no caixa.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4">
+              <div
+                class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold mb-2">Controle de Acesso</h3>
+                <p class="text-gray-400">
+                  Permissões personalizadas para gerentes, garçons e cozinha.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4">
+              <div
+                class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold mb-2">
+                  Acesso de Qualquer Lugar
+                </h3>
+                <p class="text-gray-400">
+                  Sistema web responsivo funciona em computadores, tablets e
+                  smartphones.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screenshots Section -->
+  <section class="py-24 lg:py-32" id="functionalities">
+    <div class="container mx-auto px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+            Veja o sistema em ação
+          </h2>
+          <p class="text-xl text-gray-400">
+            Interfaces intuitivas e poderosas para gerenciar seu negócio
+          </p>
+        </div>
+
+        <div class="space-y-16">
+          <!-- Large Screenshot 1 -->
+          <div class="relative">
+            <div
+              class="bg-gray-900 rounded-2xl shadow-2xl p-2 border border-gray-800"
+            >
+              <img
+                appLazyLoad
+                data-src="/assets/real-images/mesas.png"
+                alt="Controle de Mesas - Acompanhe ocupação em tempo real"
+                class="w-full rounded-xl lazy"
+                width="1200"
+                height="800"
+                loading="lazy"
+              />
+            </div>
+            <div class="mt-6 text-center">
+              <h3 class="text-2xl font-semibold mb-2">Controle de Mesas</h3>
+              <p class="text-gray-400 text-lg">
+                Visualize e gerencie a ocupação das mesas instantaneamente
+              </p>
+            </div>
+          </div>
+
+          <!-- Large Screenshot 2 -->
+          <div class="relative">
+            <div
+              class="bg-gray-900 rounded-2xl shadow-2xl p-2 border border-gray-800"
+            >
+              <img
+                appLazyLoad
+                data-src="/assets/real-images/categorias.png"
+                alt="Gestão de Cardápio - Organize produtos por categorias"
+                class="w-full rounded-xl lazy"
+                width="1200"
+                height="800"
+                loading="lazy"
+              />
+            </div>
+            <div class="mt-6 text-center">
+              <h3 class="text-2xl font-semibold mb-2">Cadastro de cardápio</h3>
+              <p class="text-gray-400 text-lg">
+                Organize seu menu de forma inteligente, cadastrando categorias e
+                produtos da forma que preferir.
+              </p>
+            </div>
+          </div>
+
+          <!-- Large Screenshot 3 -->
+          <div class="relative">
+            <div
+              class="bg-gray-900 rounded-2xl shadow-2xl p-2 border border-gray-800"
+            >
+              <img
+                appLazyLoad
+                data-src="/assets/real-images/relatorios.png"
+                alt="Relatórios e Estatísticas - Acompanhe seu desempenho"
+                class="w-full rounded-xl lazy"
+                width="1200"
+                height="800"
+                loading="lazy"
+              />
+            </div>
+            <div class="mt-6 text-center">
+              <h3 class="text-2xl font-semibold mb-2">Relatórios Avançados</h3>
+              <p class="text-gray-400 text-lg">
+                Alavanque e entenda seu negócio. Dados detalhados para tomar
+                decisões estratégicas.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="py-24 lg:py-32 bg-gray-900">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-4xl lg:text-5xl font-bold mb-16">
+          O que nossos clientes dizem
+        </h2>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+            <div class="flex text-yellow-400 mb-4">
+              <svg
+                *ngFor="let star of [].constructor(5)"
+                class="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                ></path>
+              </svg>
+            </div>
+            <p class="text-gray-300 mb-6 italic">
+              "O ComandaX revolucionou nosso atendimento. Reduzimos erros em 80%
+              e aumentamos nossas vendas."
+            </p>
+            <div>
+              <p class="font-semibold">Carlos Silva</p>
+              <p class="text-sm text-gray-400">
+                Restaurante Dona Maria, São Paulo
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+            <div class="flex text-yellow-400 mb-4">
+              <svg
+                *ngFor="let star of [].constructor(5)"
+                class="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                ></path>
+              </svg>
+            </div>
+            <p class="text-gray-300 mb-6 italic">
+              "Sistema intuitivo e fácil de usar. Meus funcionários aprenderam
+              em minutos."
+            </p>
+            <div>
+              <p class="font-semibold">Ana Costa</p>
+              <p class="text-sm text-gray-400">
+                Lanchonete Express, Rio de Janeiro
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+            <div class="flex text-yellow-400 mb-4">
+              <svg
+                *ngFor="let star of [].constructor(5)"
+                class="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                ></path>
+              </svg>
+            </div>
+            <p class="text-gray-300 mb-6 italic">
+              "Controle total sobre mesas e pedidos. Recomendo para todos os
+              estabelecimentos."
+            </p>
+            <div>
+              <p class="font-semibold">Roberto Santos</p>
+              <p class="text-sm text-gray-400">Bar do Zé, Belo Horizonte</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-24 lg:py-32">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+          Pronto para digitalizar seu restaurante?
+        </h2>
+        <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+          Junte-se a centenas de estabelecimentos que já transformaram seus
+          negócios com o ComandaX
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            routerLink="/login"
+            class="inline-flex items-center justify-center px-8 py-4 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            Começar Agora - É Grátis
+            <svg
+              class="ml-2 w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              ></path>
+            </svg>
+          </a>
+          <a
+            href="https://wa.me/5543999721068"
+            class="inline-flex items-center justify-center px-8 py-4 border border-gray-600 text-gray-300 font-semibold rounded-lg hover:border-gray-500 hover:text-white transition-colors"
+          >
+            Falar com Especialista
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- WhatsApp Floating Button -->
+<a
+  href="https://wa.me/5543999721068"
+  target="_blank"
+  class="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-lg transition-all hover:scale-110 z-50"
+  aria-label="Falar no WhatsApp"
+>
+  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+  </svg>
+</a>

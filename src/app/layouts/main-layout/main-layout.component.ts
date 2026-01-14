@@ -91,6 +91,12 @@ export class MainLayoutComponent implements OnInit {
       icon: "📈",
       route: "/relatorios",
     },
+    {
+      id: "ajuda",
+      label: "Ajuda",
+      icon: "❓",
+      route: "https://wa.me/5543999721068",
+    },
   ];
 
   expandedMenus: Set<string> = new Set();
@@ -125,7 +131,13 @@ export class MainLayoutComponent implements OnInit {
   }
 
   navigate(route: string): void {
-    this.router.navigate([route]);
+    if (route.startsWith('http')) {
+      // External URL (like WhatsApp)
+      window.open(route, '_blank');
+    } else {
+      // Internal route
+      this.router.navigate([route]);
+    }
     if (this.isMobile) {
       this.closeOffcanvas();
     }

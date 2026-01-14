@@ -1,14 +1,14 @@
 import { Routes } from "@angular/router";
 import { LoginComponent } from "./pages/login/login.component";
 import { MainLayoutComponent } from "./layouts/main-layout/main-layout.component";
+import { LandingComponent } from "./pages/landing/landing.component";
 import { authGuard } from "./guards/auth.guard";
 import { roleGuard } from "./guards/role.guard";
 
 export const routes: Routes = [
   {
     path: "",
-    redirectTo: "/login",
-    pathMatch: "full",
+    component: LandingComponent,
   },
   {
     path: "login",

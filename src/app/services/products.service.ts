@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { Apollo, gql } from 'apollo-angular';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { Product } from '../models';
+import { Injectable } from "@angular/core";
+import { Apollo, gql } from "apollo-angular";
+import { BehaviorSubject, Observable } from "rxjs";
+import { map, tap } from "rxjs/operators";
+import { Product } from "../models";
 
 // ==================== GRAPHQL QUERIES ====================
 
@@ -25,8 +25,16 @@ const GET_PRODUCTS = gql`
 `;
 
 const CREATE_PRODUCT = gql`
-  mutation CreateProduct($name: String!, $price: Decimal!, $productCategoryId: UUID) {
-    createProduct(name: $name, price: $price, productCategoryId: $productCategoryId) {
+  mutation CreateProduct(
+    $name: String!
+    $price: Decimal!
+    $productCategoryId: UUID
+  ) {
+    createProduct(
+      name: $name
+      price: $price
+      productCategoryId: $productCategoryId
+    ) {
       id
       name
       price
@@ -62,7 +70,7 @@ const DELETE_PRODUCT = gql`
 // ==================== SERVICE ====================
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class ProductsService {
   private products$ = new BehaviorSubject<Product[]>([]);
@@ -71,17 +79,23 @@ export class ProductsService {
     this.loadProducts();
   }
 
-
-
   getProducts(): Observable<Product[]> {
     return this.products$.asObservable();
   }
 
-  createProduct(name: string, price: number, productCategoryId: string): Observable<any> {
+  createProduct(
+    name: string,
+    price: number,
+    productCategoryId?: string | null
+  ): Observable<any> {
     return this.apollo
       .mutate({
         mutation: CREATE_PRODUCT,
-        variables: { name, price, productCategoryId },
+        variables: {
+          name,
+          price,
+          productCategoryId: productCategoryId || null,
+        },
       })
       .pipe(
         map((result: any) => result.data?.createProduct),
@@ -105,7 +119,7 @@ export class ProductsService {
       name?: string;
       price?: number;
       needPreparation?: boolean;
-      productCategoryId?: string;
+      productCategoryId?: string | null;
     }
   ): Observable<any> {
     return this.apollo
@@ -116,7 +130,7 @@ export class ProductsService {
           name: updates.name,
           price: updates.price,
           needPreparation: updates.needPreparation,
-          productCategoryId: updates.productCategoryId,
+          productCategoryId: updates.productCategoryId || null,
         },
       })
       .pipe(
@@ -127,11 +141,11 @@ export class ProductsService {
             const updated = current?.map((p) =>
               p.id === id
                 ? {
-                  ...p,
-                  name: updates.name ?? p.name,
-                  price: updates.price ?? p.price,
-                  category_id: updates.productCategoryId ?? p.category_id,
-                }
+                    ...p,
+                    name: updates.name ?? p.name,
+                    price: updates.price ?? p.price,
+                    category_id: updates.productCategoryId ?? p.category_id,
+                  }
                 : p
             );
             this.products$.next(updated);
@@ -151,7 +165,7 @@ export class ProductsService {
           const current = this.products$.value;
           this.products$.next(current.filter((p) => p.id !== id));
         },
-        error: (err) => console.error('Error deleting product:', err),
+        error: (err) => console.error("Error deleting product:", err),
       });
   }
 
@@ -160,22 +174,19 @@ export class ProductsService {
       .watchQuery<any>({
         query: GET_PRODUCTS,
       })
-      .valueChanges.pipe(
-        map((result) => result.data?.products)
-      )
+      .valueChanges.pipe(map((result) => result.data?.products))
       .subscribe({
         next: (products) => {
           const mappedProducts: Product[] = products?.map((p: any) => ({
             id: p.id,
             name: p.name,
             price: p.price,
-            category_id: p.productCategoryId || '',
+            category_id: p.productCategoryId || "",
             active: true,
           }));
           this.products$.next(mappedProducts);
         },
-        error: (err) => console.error('Error loading products:', err),
+        error: (err) => console.error("Error loading products:", err),
       });
   }
 }
-
