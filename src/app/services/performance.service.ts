@@ -6,7 +6,7 @@ import { PLATFORM_ID, Inject } from "@angular/core";
   providedIn: "root",
 })
 export class PerformanceService {
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {}
 
   /**
    * Lazy load images with Intersection Observer

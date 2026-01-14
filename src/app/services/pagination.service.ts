@@ -69,7 +69,7 @@ export class PaginationService {
     }
   }
 
-  paginate<T>(items: T[], pageSize: number = 10): PaginatedResult<T> {
+  paginate<T>(items: T[], pageSize = 10): PaginatedResult<T> {
     const totalItems = items.length;
     const totalPages = Math.ceil(totalItems / pageSize);
     const currentPage = Math.max(1, Math.min(this.getCurrentPage(), totalPages));
@@ -95,7 +95,7 @@ export class PaginationService {
 
   paginateObservable<T>(
     items$: Observable<T[]>,
-    pageSize: number = 10
+    pageSize = 10
   ): Observable<PaginatedResult<T>> {
     return items$.pipe(
       map((items) => this.paginate(items, pageSize))
@@ -114,7 +114,7 @@ export class PaginationService {
   // Lazy loading - carregar itens sob demanda
   lazyLoad<T>(
     items: T[],
-    pageSize: number = 20
+    pageSize = 20
   ): Observable<T[]> {
     return new Observable((observer) => {
       let currentIndex = 0;
@@ -140,7 +140,7 @@ export class PaginationService {
   // Infinite scroll
   infiniteScroll<T>(
     items: T[],
-    pageSize: number = 20
+    pageSize = 20
   ): Observable<T[]> {
     return new Observable((observer) => {
       let loadedItems: T[] = [];

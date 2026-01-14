@@ -9,7 +9,7 @@ import { PLATFORM_ID, Inject } from "@angular/core";
 export class LazyLoadDirective implements OnInit {
   constructor(
     private el: ElementRef<HTMLImageElement>,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: object
   ) {}
 
   ngOnInit(): void {

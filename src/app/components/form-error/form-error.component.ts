@@ -20,7 +20,7 @@ import { ValidationService } from '../../services/validation.service';
 })
 export class FormErrorComponent {
   @Input() control: AbstractControl | null = null;
-  @Input() fieldName: string = 'Campo';
+  @Input() fieldName = 'Campo';
 
   constructor(private validationService: ValidationService) {}
 

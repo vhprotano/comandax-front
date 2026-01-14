@@ -14,9 +14,7 @@ export interface SeoConfig {
   noIndex?: boolean;
 }
 
-interface RouteMetaConfig {
-  [key: string]: SeoConfig;
-}
+type RouteMetaConfig = Record<string, SeoConfig>;
 
 @Injectable({
   providedIn: "root",
@@ -94,7 +92,7 @@ export class SeoService {
     private titleService: Title,
     private router: Router,
     @Inject(DOCUMENT) private document: Document,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: object
   ) {
     this.initRouteListener();
   }

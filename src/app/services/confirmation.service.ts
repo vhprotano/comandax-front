@@ -53,7 +53,7 @@ export class ConfirmationService {
     });
   }
 
-  delete(title: string = 'Deletar item?', message: string = 'Esta ação não pode ser desfeita.'): Promise<boolean> {
+  delete(title = 'Deletar item?', message = 'Esta ação não pode ser desfeita.'): Promise<boolean> {
     return this.confirm({
       title,
       message,

@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: object
   ) {}
 
   ngOnInit(): void {

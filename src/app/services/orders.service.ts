@@ -277,7 +277,7 @@ export class OrdersService {
   createOrderWithProducts(
     tabId: string | null,
     products: { productId: string; quantity: number }[],
-    isClosedOrder: boolean = false
+    isClosedOrder = false
   ): Observable<any> {
     if (!isClosedOrder) {
       return this.apollo

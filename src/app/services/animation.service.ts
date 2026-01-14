@@ -10,7 +10,7 @@ export class AnimationService {
   /**
    * Anima a entrada de um elemento com fade in
    */
-  fadeIn(element: HTMLElement, duration: number = 0.5): gsap.core.Tween {
+  fadeIn(element: HTMLElement, duration = 0.5): gsap.core.Tween {
     return gsap.to(element, {
       opacity: 1,
       duration,
@@ -21,7 +21,7 @@ export class AnimationService {
   /**
    * Anima a saída de um elemento com fade out
    */
-  fadeOut(element: HTMLElement, duration: number = 0.5): gsap.core.Tween {
+  fadeOut(element: HTMLElement, duration = 0.5): gsap.core.Tween {
     return gsap.to(element, {
       opacity: 0,
       duration,
@@ -32,7 +32,7 @@ export class AnimationService {
   /**
    * Anima a entrada de um elemento com slide up
    */
-  slideUp(element: HTMLElement, duration: number = 0.5): gsap.core.Tween {
+  slideUp(element: HTMLElement, duration = 0.5): gsap.core.Tween {
     return gsap.to(element, {
       y: 0,
       opacity: 1,
@@ -44,7 +44,7 @@ export class AnimationService {
   /**
    * Anima a entrada de um elemento com slide down
    */
-  slideDown(element: HTMLElement, duration: number = 0.5): gsap.core.Tween {
+  slideDown(element: HTMLElement, duration = 0.5): gsap.core.Tween {
     return gsap.to(element, {
       y: 0,
       opacity: 1,
@@ -56,7 +56,7 @@ export class AnimationService {
   /**
    * Anima a entrada de um elemento com scale
    */
-  scaleIn(element: HTMLElement, duration: number = 0.5): gsap.core.Tween {
+  scaleIn(element: HTMLElement, duration = 0.5): gsap.core.Tween {
     return gsap.to(element, {
       scale: 1,
       opacity: 1,
@@ -68,7 +68,7 @@ export class AnimationService {
   /**
    * Anima um elemento com bounce
    */
-  bounce(element: HTMLElement, duration: number = 0.6): gsap.core.Tween {
+  bounce(element: HTMLElement, duration = 0.6): gsap.core.Tween {
     return gsap.to(element, {
       y: -10,
       duration: duration / 2,
@@ -81,7 +81,7 @@ export class AnimationService {
   /**
    * Anima um elemento com pulse
    */
-  pulse(element: HTMLElement, duration: number = 0.6): gsap.core.Tween {
+  pulse(element: HTMLElement, duration = 0.6): gsap.core.Tween {
     return gsap.to(element, {
       scale: 1.05,
       duration: duration / 2,
@@ -94,7 +94,7 @@ export class AnimationService {
   /**
    * Anima um elemento com shake
    */
-  shake(element: HTMLElement, duration: number = 0.5): gsap.core.Tween {
+  shake(element: HTMLElement, duration = 0.5): gsap.core.Tween {
     return gsap.to(element, {
       x: -5,
       duration: duration / 4,
@@ -107,7 +107,7 @@ export class AnimationService {
   /**
    * Anima um elemento com rotate
    */
-  rotate(element: HTMLElement, angle: number = 360, duration: number = 1): gsap.core.Tween {
+  rotate(element: HTMLElement, angle = 360, duration = 1): gsap.core.Tween {
     return gsap.to(element, {
       rotation: angle,
       duration,
@@ -118,7 +118,7 @@ export class AnimationService {
   /**
    * Anima múltiplos elementos em sequência
    */
-  staggerIn(elements: HTMLElement[], duration: number = 0.5, stagger: number = 0.1): gsap.core.Timeline {
+  staggerIn(elements: HTMLElement[], duration = 0.5, stagger = 0.1): gsap.core.Timeline {
     const tl = gsap.timeline();
     tl.to(elements, {
       opacity: 1,
@@ -133,7 +133,7 @@ export class AnimationService {
   /**
    * Anima um elemento com flip
    */
-  flip(element: HTMLElement, duration: number = 0.6): gsap.core.Tween {
+  flip(element: HTMLElement, duration = 0.6): gsap.core.Tween {
     return gsap.to(element, {
       rotationY: 360,
       duration,
@@ -144,7 +144,7 @@ export class AnimationService {
   /**
    * Anima um elemento com glow
    */
-  glow(element: HTMLElement, duration: number = 0.5): gsap.core.Tween {
+  glow(element: HTMLElement, duration = 0.5): gsap.core.Tween {
     return gsap.to(element, {
       boxShadow: '0 0 20px rgba(59, 130, 246, 0.8)',
       duration,
@@ -157,7 +157,7 @@ export class AnimationService {
   /**
    * Anima um elemento com slide left
    */
-  slideLeft(element: HTMLElement, duration: number = 0.5): gsap.core.Tween {
+  slideLeft(element: HTMLElement, duration = 0.5): gsap.core.Tween {
     return gsap.to(element, {
       x: 0,
       opacity: 1,
@@ -169,7 +169,7 @@ export class AnimationService {
   /**
    * Anima um elemento com slide right
    */
-  slideRight(element: HTMLElement, duration: number = 0.5): gsap.core.Tween {
+  slideRight(element: HTMLElement, duration = 0.5): gsap.core.Tween {
     return gsap.to(element, {
       x: 0,
       opacity: 1,

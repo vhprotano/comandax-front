@@ -91,7 +91,7 @@ export class PaginationComponent implements OnInit, OnDestroy {
   @Output() pageChanged = new EventEmitter<number>();
   @Output() pageSizeChanged = new EventEmitter<number>();
 
-  pageSize: number = 10;
+  pageSize = 10;
   private destroy$ = new Subject<void>();
 
   constructor(private paginationService: PaginationService) {}
@@ -117,7 +117,7 @@ export class PaginationComponent implements OnInit, OnDestroy {
     const halfPages = Math.floor(maxPages / 2);
 
     let startPage = Math.max(1, this.pagination.currentPage - halfPages);
-    let endPage = Math.min(
+    const endPage = Math.min(
       this.pagination.totalPages,
       startPage + maxPages - 1
     );

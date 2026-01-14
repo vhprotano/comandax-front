@@ -99,7 +99,7 @@ export class MainLayoutComponent implements OnInit {
     },
   ];
 
-  expandedMenus: Set<string> = new Set();
+  expandedMenus = new Set<string>();
   isMobile = false;
   isOffcanvasOpen = false;
 

@@ -141,7 +141,7 @@ export class ValidationService {
   }
 
   // Validar objeto completo
-  validateObject(obj: any, rules: { [key: string]: ValidatorFn[] }): ValidationError[] {
+  validateObject(obj: any, rules: Record<string, ValidatorFn[]>): ValidationError[] {
     const errors: ValidationError[] = [];
 
     for (const field in rules) {

@@ -188,7 +188,7 @@ export class SearchService {
   getSearchSuggestions(
     items: any[],
     query: string,
-    field: string = "name"
+    field = "name"
   ): string[] {
     if (!query) return [];
 

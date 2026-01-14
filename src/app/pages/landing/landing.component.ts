@@ -130,7 +130,7 @@ export class LandingComponent implements OnInit {
   }
 
   getIconPath(icon: string): string {
-    const icons: { [key: string]: string } = {
+    const icons: Record<string, string> = {
       smartphone:
         "M12 18h-2a1 1 0 01-1-1v-1H9a1 1 0 010-2h2a1 1 0 011 1v1h1a1 1 0 010 2zM8 4V2a1 1 0 011-1h6a1 1 0 011 1v2h3a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1h3zm2 0h4V3h-4v1z",
       users: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
