@@ -1,43 +1,120 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Category } from '../../../models';
-import { CategoriesService } from '../../../services/categories.service';
-import { NotificationService } from '../../../services/notification.service';
-import Swal from 'sweetalert2';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  HostListener,
+} from "@angular/core";
+import { CommonModule } from "@angular/common";
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
+import { Category } from "../../../models";
+import { CategoriesService } from "../../../services/categories.service";
+import { NotificationService } from "../../../services/notification.service";
+import Swal from "sweetalert2";
 
 @Component({
-  selector: 'app-categories',
+  selector: "app-categories",
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  templateUrl: './categories.component.html',
-  styleUrls: ['./categories.component.scss'],
+  templateUrl: "./categories.component.html",
+  styleUrls: ["./categories.component.scss"],
 })
 export class CategoriesComponent implements OnInit {
+  @ViewChild("iconPickerContainer") iconPickerContainer!: ElementRef;
+  @ViewChild("iconToggleButton") iconToggleButton!: ElementRef;
+
   categories: Category[] = [];
   categoryForm!: FormGroup;
   showForm = false;
   editingId: string | null = null;
   showIconPicker = false;
 
+  // Click outside listener
+  @HostListener("document:mousedown", ["$event"])
+  onGlobalClick(event: MouseEvent): void {
+    if (!this.showIconPicker) {
+      return;
+    }
+
+    const clickedInsidePicker =
+      this.iconPickerContainer?.nativeElement.contains(event.target);
+    const clickedOnToggleButton =
+      this.iconToggleButton?.nativeElement.contains(event.target);
+
+    if (!clickedInsidePicker && !clickedOnToggleButton) {
+      this.showIconPicker = false;
+    }
+  }
+
   // Available icons (emojis são strings)
   availableIcons = [
-    '🥤', '🍽️', '🍰', '🥗', '🌮', '☕',
-    '🍕', '🍔', '🌭', '🥪', '🍜', '🍲',
-    '🥘', '🍱', '🍛', '🍝', '🍣', '🍤',
-    '🥩', '🍖', '🌭', '🥓', '🍗', '🥞',
-    '🧇', '🥐', '🍞', '🥖', '🥨', '🥯',
-    '🧀', '🍳', '🥚', '🍶', '🍺', '🍻',
-    '🥂', '🍷', '🍸', '🍹', '🍾', '🥃',
-    '🍲', '🥗', '🍿', '🍩', '🍪', '🎂',
-    '🍮', '🍭', '🍬', '🍫', '🍿', '🍯',
+    "🥤",
+    "🍽️",
+    "🍰",
+    "🥗",
+    "🌮",
+    "☕",
+    "🍕",
+    "🍔",
+    "🌭",
+    "🥪",
+    "🍜",
+    "🍲",
+    "🥘",
+    "🍱",
+    "🍛",
+    "🍝",
+    "🍣",
+    "🍤",
+    "🥩",
+    "🍖",
+    "🌭",
+    "🥓",
+    "🍗",
+    "🥞",
+    "🧇",
+    "🥐",
+    "🍞",
+    "🥖",
+    "🥨",
+    "🥯",
+    "🧀",
+    "🍳",
+    "🥚",
+    "🍶",
+    "🍺",
+    "🍻",
+    "🥂",
+    "🍷",
+    "🍸",
+    "🍹",
+    "🍾",
+    "🥃",
+    "🍲",
+    "🥗",
+    "🍿",
+    "🍩",
+    "🍪",
+    "🎂",
+    "🍮",
+    "🍭",
+    "🍬",
+    "🍫",
+    "🍿",
+    "🍯",
   ];
 
   constructor(
     private fb: FormBuilder,
     private categoriesService: CategoriesService,
     private notificationService: NotificationService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.initForm();
@@ -46,8 +123,8 @@ export class CategoriesComponent implements OnInit {
 
   initForm(): void {
     this.categoryForm = this.fb.group({
-      name: ['', [Validators.required]],
-      icon: ['🍽️', [Validators.required]],
+      name: ["", [Validators.required]],
+      icon: ["🍽️", [Validators.required]],
     });
   }
 
@@ -60,7 +137,7 @@ export class CategoriesComponent implements OnInit {
   openForm(): void {
     this.showForm = true;
     this.editingId = null;
-    this.categoryForm.reset({ icon: '🍽️' });
+    this.categoryForm.reset({ icon: "🍽️" });
   }
 
   closeForm(): void {
@@ -71,34 +148,40 @@ export class CategoriesComponent implements OnInit {
 
   onSubmit(): void {
     if (this.categoryForm.invalid) {
-      this.notificationService.error('Por favor, preencha todos os campos');
+      this.notificationService.error("Por favor, preencha todos os campos");
       return;
     }
 
     const formValue = this.categoryForm.value;
 
     if (this.editingId) {
-      this.categoriesService.updateCategory(this.editingId, formValue).subscribe({
-        next: () => {
-          this.notificationService.success('Categoria atualizada com sucesso!');
-          this.closeForm();
-        },
-        error: (err) => {
-          console.error('Error updating category:', err);
-          this.notificationService.error('Erro ao atualizar categoria');
-        }
-      });
+      this.categoriesService
+        .updateCategory(this.editingId, formValue)
+        .subscribe({
+          next: () => {
+            this.notificationService.success(
+              "Categoria atualizada com sucesso!"
+            );
+            this.closeForm();
+          },
+          error: (err) => {
+            console.error("Error updating category:", err);
+            this.notificationService.error("Erro ao atualizar categoria");
+          },
+        });
     } else {
-      this.categoriesService.createCategory(formValue.name, formValue.icon).subscribe({
-        next: () => {
-          this.notificationService.success('Categoria criada com sucesso!');
-          this.closeForm();
-        },
-        error: (err) => {
-          console.error('Error creating category:', err);
-          this.notificationService.error('Erro ao criar categoria');
-        }
-      });
+      this.categoriesService
+        .createCategory(formValue.name, formValue.icon)
+        .subscribe({
+          next: () => {
+            this.notificationService.success("Categoria criada com sucesso!");
+            this.closeForm();
+          },
+          error: (err) => {
+            console.error("Error creating category:", err);
+            this.notificationService.error("Erro ao criar categoria");
+          },
+        });
     }
   }
 
@@ -110,23 +193,23 @@ export class CategoriesComponent implements OnInit {
 
   deleteCategory(id: string): void {
     Swal.fire({
-      title: 'Tem certeza que deseja deletar esta categoria?',
-      text: 'Esta ação não pode ser desfeita.',
-      icon: 'warning',
+      title: "Tem certeza que deseja deletar esta categoria?",
+      text: "Esta ação não pode ser desfeita.",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#1d2d44',
-      confirmButtonText: 'Sim, remover',
-      cancelButtonText: 'Cancelar'
+      confirmButtonColor: "#1d2d44",
+      confirmButtonText: "Sim, remover",
+      cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
         this.categoriesService.deleteCategory(id).subscribe({
           next: () => {
-            this.notificationService.success('Categoria deletada com sucesso!');
+            this.notificationService.success("Categoria deletada com sucesso!");
           },
           error: (err) => {
-            console.error('Error deleting category:', err);
-            this.notificationService.error('Erro ao deletar categoria');
-          }
+            console.error("Error deleting category:", err);
+            this.notificationService.error("Erro ao deletar categoria");
+          },
         });
       }
     });
@@ -141,4 +224,3 @@ export class CategoriesComponent implements OnInit {
     this.showIconPicker = false;
   }
 }
-

@@ -25,7 +25,7 @@ export class SeoService {
     "ComandaX - Sistema de Comandas Digital para Restaurantes";
   private readonly defaultDescription =
     "ComandaX é o sistema de comandas digital mais completo do Brasil. Gerencie pedidos, mesas, produtos e funcionários do seu restaurante, bar, lanchonete ou café.";
-  private readonly defaultImage = `${this.baseUrl}/assets/og-image.png`;
+  private readonly defaultImage = `${this.baseUrl}/assets/logo/branco.png`;
 
   private routeMeta: RouteMetaConfig = {
     "/": {

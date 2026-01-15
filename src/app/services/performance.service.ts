@@ -53,8 +53,8 @@ export class PerformanceService {
     );
 
     // Preload critical images
-    this.preloadImage("/assets/logo/logo.png");
-    this.preloadImage("/assets/og-image.png");
+    this.preloadImage("/assets/logo/branco.png");
+    this.preloadImage("/assets/logo/branco.png");
   }
 
   /**

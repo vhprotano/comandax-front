@@ -42,14 +42,14 @@
   ],
   "screenshots": [
     {
-      "src": "/assets/screenshot-wide.png",
+      "src": "/assets/real-images/comandas.png",
       "sizes": "1920x1080",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Dashboard de comandas do ComandaX"
     },
     {
-      "src": "/assets/screenshot-mobile.png",
+      "src": "/assets/real-images/relatorios.png",
       "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",

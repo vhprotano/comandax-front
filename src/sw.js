@@ -11,8 +11,8 @@ const STATIC_ASSETS = [
   "/polyfills.js",
   "/runtime.js",
   "/styles.css",
-  "/assets/logo/logo.png",
-  "/assets/og-image.png",
+  "/assets/logo/branco.png",
+  "/assets/logo/branco.png",
   "/favicon.ico",
   "/manifest.json",
 ];
@@ -201,8 +201,8 @@ self.addEventListener("push", (event) => {
 
     const options = {
       body: data.body,
-      icon: "/assets/logo/logo.png",
-      badge: "/assets/logo/logo.png",
+      icon: "/assets/logo/branco.png",
+      badge: "/assets/logo/branco.png",
       vibrate: [100, 50, 100],
       data: {
         dateOfArrival: Date.now(),
