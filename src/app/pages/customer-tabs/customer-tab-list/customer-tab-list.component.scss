@@ -45,7 +45,8 @@
   height: 100%;
   background: linear-gradient(145deg, #ffffff, #f8f9fa);
   border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15),
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   position: relative;
   animation: notepadFloat 3s ease-in-out infinite;

@@ -27,7 +27,13 @@ import { NgxMaskDirective } from "ngx-mask";
 @Component({
   selector: "app-new-customer-tab",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgbOffcanvasModule, NgxMaskDirective, FormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    NgbOffcanvasModule,
+    NgxMaskDirective,
+    FormsModule,
+  ],
   templateUrl: "./new-customer-tab.component.html",
   styleUrls: ["./new-customer-tab.component.scss"],
 })
@@ -60,8 +66,8 @@ export class NewCustomerTabComponent implements OnInit {
     private categoriesService: CategoriesService,
     private tablesService: TablesService,
     private notificationService: NotificationService,
-    private offcanvasService: NgbOffcanvas
-  ) { }
+    private offcanvasService: NgbOffcanvas,
+  ) {}
 
   ngOnInit(): void {
     // Check if it's a closed order (Novo Pedido)
@@ -79,7 +85,7 @@ export class NewCustomerTabComponent implements OnInit {
 
   loadData(): void {
     this.productsService.getProducts().subscribe((products) => {
-      this.products = products?.filter((p) => p.active).map(p => ({ ...p, isPricePerKg: true })) || [];
+      this.products = products?.filter((p) => p.active) || [];
     });
 
     this.categoriesService.getCategories().subscribe((categories) => {
@@ -87,9 +93,7 @@ export class NewCustomerTabComponent implements OnInit {
     });
 
     this.tablesService.getTables().subscribe((tables) => {
-      console.log("Loaded tables:", tables);
       this.tables = tables?.filter((t) => t.status === "FREE");
-      console.log("Available tables:", this.tables);
     });
   }
 
@@ -104,7 +108,7 @@ export class NewCustomerTabComponent implements OnInit {
       (id || "").replace(/-/g, "").toLowerCase();
     return (
       this.products.filter(
-        (p) => normalize(p.category_id) === normalize(this.selectedCategory)
+        (p) => normalize(p.category_id) === normalize(this.selectedCategory),
       ) || []
     );
   }
@@ -113,10 +117,24 @@ export class NewCustomerTabComponent implements OnInit {
     return this.products.find((p) => p.id === productId);
   }
 
-  updateWeight(item: OrderItem, weight: string): void {
-    const cleanedWeight = String(weight).replace(",", ".");
-    const weightValue = parseFloat(cleanedWeight);
+  onWeightChange(item: OrderItem, weight: any): void {
+    const weightValue =
+      typeof weight === "string"
+        ? parseFloat(weight.replace(",", "."))
+        : weight;
     item.quantity = weightValue || 0;
+    this.calculateTotal();
+  }
+
+  onPriceChange(item: OrderItem, price: any): void {
+    const priceValue =
+      typeof price === "string" ? parseFloat(price.replace(",", ".")) : price;
+
+    if (priceValue && item.unit_price > 0) {
+      item.quantity = priceValue / item.unit_price;
+    } else {
+      item.quantity = 0;
+    }
     this.calculateTotal();
   }
 
@@ -131,7 +149,7 @@ export class NewCustomerTabComponent implements OnInit {
 
   addToCart(product: Product): void {
     const existingItem = this.cartItems.find(
-      (item) => item.product_id === product.id
+      (item) => item.product_id === product.id,
     );
 
     if (existingItem) {
@@ -199,7 +217,7 @@ export class NewCustomerTabComponent implements OnInit {
   calculateTotal(): void {
     this.total = this.cartItems.reduce(
       (sum, item) => sum + item.unit_price * item.quantity,
-      0
+      0,
     );
   }
 
@@ -241,7 +259,7 @@ export class NewCustomerTabComponent implements OnInit {
                 this.cartItems.map((item) => ({
                   productId: item.product_id,
                   quantity: item.quantity,
-                }))
+                })),
               )
               .subscribe((data) => {
                 const message = this.isClosedOrder
@@ -267,7 +285,7 @@ export class NewCustomerTabComponent implements OnInit {
                 this.cartItems.map((item) => ({
                   productId: item.product_id,
                   quantity: item.quantity,
-                }))
+                })),
               )
               .subscribe((dataOrder) => {
                 this.ordersService.closeCustomerTab(data.id).subscribe(() => {

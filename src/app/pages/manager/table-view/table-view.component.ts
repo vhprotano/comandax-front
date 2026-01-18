@@ -39,7 +39,7 @@ export class TableViewComponent implements OnInit {
     private ordersService: OrdersService,
     private notificationService: NotificationService,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
   ) {}
 
   ngOnInit(): void {
@@ -71,7 +71,7 @@ export class TableViewComponent implements OnInit {
   private updateTableStatus(): void {
     this.tables.forEach((table) => {
       const tab = this.tabs?.find(
-        (o) => o.table_number === table.number && o.status === "OPEN"
+        (o) => o.table_number === table.number && o.status === "OPEN",
       );
       if (tab) {
         table.status = "BUSY";
@@ -98,8 +98,6 @@ export class TableViewComponent implements OnInit {
       this.notificationService.error("Por favor, preencha o número da mesa");
       return;
     }
-
-    console.log("Submitting table form with value:", this.tableForm.value);
 
     const newTable: Table = {
       id: `table-${Date.now()}`,
@@ -132,7 +130,7 @@ export class TableViewComponent implements OnInit {
           error: (err) => {
             console.error("Erro ao remover mesa:", err);
             this.notificationService.error(
-              "Erro ao remover mesa. Tente novamente."
+              "Erro ao remover mesa. Tente novamente.",
             );
           },
         });

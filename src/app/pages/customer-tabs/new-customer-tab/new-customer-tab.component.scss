@@ -532,7 +532,6 @@
 
     .item-info {
       flex: 1;
-      min-width: 0;
 
       .item-name {
         font-weight: 600;
@@ -575,6 +574,14 @@
 
         &:active {
           transform: scale(0.9);
+        }
+
+        &.last-item {
+          background: #f17d7d;
+
+          &:hover {
+            background: #b91c1c;
+          }
         }
       }
 
@@ -1047,4 +1054,37 @@
       background: darken(#1d2d44, 10%);
     }
   }
+}
+
+.item-controls-kg {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.item-controls-kg .input-group {
+  flex: 1;
+}
+
+.per-kg-inputs {
+  display: flex;
+  flex-grow: 1;
+  gap: 0.5rem;
+}
+
+.qty-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.qty-input:focus {
+  outline: none;
+  border-color: #1d2d44;
+  box-shadow: 0 0 0 3px rgba(29, 45, 68, 0.1);
 }

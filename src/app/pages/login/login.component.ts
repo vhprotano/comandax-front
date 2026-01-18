@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    @Inject(PLATFORM_ID) private platformId: object
+    @Inject(PLATFORM_ID) private platformId: object,
   ) {}
 
   ngOnInit(): void {
@@ -81,13 +81,12 @@ export class LoginComponent implements OnInit, AfterViewInit {
           text: "signin_with",
           shape: "rectangular",
           logo_alignment: "left",
-        }
+        },
       );
     }
   }
 
   handleCredentialResponse(response: any): void {
-    console.log("loading true");
     this.loading = true;
     this.error = "";
     this.cdr.detectChanges(); // Force change detection
@@ -122,7 +121,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     } catch (err) {
       this.loading = false;
       this.setError(
-        "Erro ao processar credenciais do Google. Tente novamente."
+        "Erro ao processar credenciais do Google. Tente novamente.",
       );
       console.error(err);
     }
@@ -161,7 +160,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
       atob(base64)
         .split("")
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
+        .join(""),
     );
     return JSON.parse(jsonPayload);
   }
