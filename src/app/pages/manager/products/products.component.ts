@@ -48,7 +48,7 @@ export class ProductsComponent implements OnInit {
     private productsService: ProductsService,
     private categoriesService: CategoriesService,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -61,6 +61,7 @@ export class ProductsComponent implements OnInit {
       name: ["", [Validators.required]],
       price: ["", [Validators.required, Validators.min(0)]],
       category_id: [""],
+      isPricePerKg: [false]
     });
   }
 
@@ -82,7 +83,7 @@ export class ProductsComponent implements OnInit {
     // lidar com formatos diferentes (ex: "2455e6c1-..." vs "2455e6c14311...")
     const normalize = (id?: string) =>
       (id || "").replace(/-/g, "").toLowerCase();
-    const category = this.categories.find(
+    const category = this.categories?.find(
       (c) => normalize(c.id) === normalize(categoryId)
     );
 
@@ -193,6 +194,7 @@ export class ProductsComponent implements OnInit {
           name: formValue.name,
           price: formValue.price,
           productCategoryId: formValue.category_id,
+          isPricePerKg: formValue.isPricePerKg
         })
         .subscribe({
           next: () => {
@@ -210,7 +212,8 @@ export class ProductsComponent implements OnInit {
         .createProduct(
           formValue?.name,
           formValue?.price,
-          formValue?.category_id
+          formValue?.category_id,
+          formValue.isPricePerKg
         )
         .subscribe({
           next: () => {
@@ -234,7 +237,7 @@ export class ProductsComponent implements OnInit {
     // Normaliza antes de comparar para cobrir ids com/sem hifens
     const normalize = (id?: string) =>
       (id || "").replace(/-/g, "").toLowerCase();
-    const category = this.categories.find(
+    const category = this.categories?.find(
       (c) => normalize(c.id) === normalize(product.category_id)
     );
     if (category) {

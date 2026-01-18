@@ -10,6 +10,7 @@ import { CommonModule } from "@angular/common";
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
@@ -21,11 +22,12 @@ import { ProductsService } from "../../../services/products.service";
 import { CategoriesService } from "../../../services/categories.service";
 import { TablesService } from "../../../services/tables.service";
 import { NotificationService } from "../../../services/notification.service";
+import { NgxMaskDirective } from "ngx-mask";
 
 @Component({
   selector: "app-new-customer-tab",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgbOffcanvasModule],
+  imports: [CommonModule, ReactiveFormsModule, NgbOffcanvasModule, NgxMaskDirective, FormsModule],
   templateUrl: "./new-customer-tab.component.html",
   styleUrls: ["./new-customer-tab.component.scss"],
 })
@@ -59,7 +61,7 @@ export class NewCustomerTabComponent implements OnInit {
     private tablesService: TablesService,
     private notificationService: NotificationService,
     private offcanvasService: NgbOffcanvas
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Check if it's a closed order (Novo Pedido)
@@ -77,7 +79,7 @@ export class NewCustomerTabComponent implements OnInit {
 
   loadData(): void {
     this.productsService.getProducts().subscribe((products) => {
-      this.products = products?.filter((p) => p.active);
+      this.products = products?.filter((p) => p.active).map(p => ({ ...p, isPricePerKg: true })) || [];
     });
 
     this.categoriesService.getCategories().subscribe((categories) => {
@@ -105,6 +107,17 @@ export class NewCustomerTabComponent implements OnInit {
         (p) => normalize(p.category_id) === normalize(this.selectedCategory)
       ) || []
     );
+  }
+
+  getProduct(productId: string): Product | undefined {
+    return this.products.find((p) => p.id === productId);
+  }
+
+  updateWeight(item: OrderItem, weight: string): void {
+    const cleanedWeight = String(weight).replace(",", ".");
+    const weightValue = parseFloat(cleanedWeight);
+    item.quantity = weightValue || 0;
+    this.calculateTotal();
   }
 
   selectTable(table: Table): void {

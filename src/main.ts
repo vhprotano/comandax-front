@@ -12,6 +12,8 @@ import { environment } from "./environments/environment";
 import { authInterceptor } from "./app/interceptors/auth.interceptor";
 import { isPlatformBrowser } from "@angular/common";
 import { PLATFORM_ID } from "@angular/core";
+import { NgxMaskConfig, provideEnvironmentNgxMask } from "ngx-mask";
+const maskConfig: Partial<NgxMaskConfig> = { validation: false };
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -41,6 +43,7 @@ bootstrapApplication(AppComponent, {
         },
       };
     }),
+    provideEnvironmentNgxMask(maskConfig)
   ],
 })
   .then(() => {

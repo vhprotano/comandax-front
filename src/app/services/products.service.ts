@@ -14,6 +14,7 @@ const GET_PRODUCTS = gql`
       price
       code
       needPreparation
+      isPricePerKg
       productCategoryId
       productCategory {
         id
@@ -29,16 +30,19 @@ const CREATE_PRODUCT = gql`
     $name: String!
     $price: Decimal!
     $productCategoryId: UUID
+    $isPricePerKg: Boolean
   ) {
     createProduct(
       name: $name
       price: $price
       productCategoryId: $productCategoryId
+      isPricePerKg: $isPricePerKg
     ) {
       id
       name
       price
       productCategoryId
+      isPricePerKg
     }
   }
 `;
@@ -50,6 +54,7 @@ const UPDATE_PRODUCT = gql`
     $price: Decimal
     $needPreparation: Boolean
     $productCategoryId: UUID
+    $isPricePerKg: Boolean
   ) {
     updateProduct(
       id: $id
@@ -57,6 +62,7 @@ const UPDATE_PRODUCT = gql`
       price: $price
       needPreparation: $needPreparation
       productCategoryId: $productCategoryId
+      isPricePerKg: $isPricePerKg
     )
   }
 `;
@@ -86,7 +92,8 @@ export class ProductsService {
   createProduct(
     name: string,
     price: number,
-    productCategoryId?: string | null
+    productCategoryId?: string | null,
+    isPricePerKg?: boolean
   ): Observable<any> {
     return this.apollo
       .mutate({
@@ -95,6 +102,7 @@ export class ProductsService {
           name,
           price,
           productCategoryId: productCategoryId || null,
+          isPricePerKg: isPricePerKg || false,
         },
       })
       .pipe(
@@ -105,6 +113,7 @@ export class ProductsService {
             name: newProduct.name,
             price: newProduct.price,
             category_id: newProduct.productCategoryId,
+            isPricePerKg: isPricePerKg || false,
             active: true,
           };
           const current = this.products$.value;
@@ -120,6 +129,7 @@ export class ProductsService {
       price?: number;
       needPreparation?: boolean;
       productCategoryId?: string | null;
+      isPricePerKg?: boolean;
     }
   ): Observable<any> {
     return this.apollo
@@ -131,6 +141,7 @@ export class ProductsService {
           price: updates.price,
           needPreparation: updates.needPreparation,
           productCategoryId: updates.productCategoryId || null,
+          isPricePerKg: updates.isPricePerKg || false,
         },
       })
       .pipe(
@@ -141,11 +152,11 @@ export class ProductsService {
             const updated = current?.map((p) =>
               p.id === id
                 ? {
-                    ...p,
-                    name: updates.name ?? p.name,
-                    price: updates.price ?? p.price,
-                    category_id: updates.productCategoryId ?? p.category_id,
-                  }
+                  ...p,
+                  name: updates.name ?? p.name,
+                  price: updates.price ?? p.price,
+                  category_id: updates.productCategoryId ?? p.category_id,
+                }
                 : p
             );
             this.products$.next(updated);
@@ -182,6 +193,7 @@ export class ProductsService {
             name: p.name,
             price: p.price,
             category_id: p.productCategoryId || "",
+            isPricePerKg: p.isPricePerKg || false,
             active: true,
           }));
           this.products$.next(mappedProducts);

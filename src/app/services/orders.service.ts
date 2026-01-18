@@ -33,6 +33,7 @@ const GET_CUSTOMER_TABS = gql`
             id
             name
             price
+            isPricePerKg
           }
         }
       }
@@ -66,6 +67,7 @@ const GET_CUSTOMER_TABS_BY_STATUS = gql`
             id
             name
             price
+            isPricePerKg
           }
         }
       }
@@ -87,6 +89,7 @@ const GET_ORDERS = gql`
           id
           name
           price
+          isPricePerKg
         }
       }
     }
@@ -139,6 +142,7 @@ const CREATE_ORDER = gql`
           id
           name
           price
+          isPricePerKg
         }
       }
     }
@@ -158,6 +162,7 @@ const CREATE_ORDER_WITHOUT_CUSTOMER_TAB = gql`
           id
           name
           price
+          isPricePerKg
         }
       }
     }
@@ -360,8 +365,6 @@ export class OrdersService {
       .pipe(finalize(() => this.isLoadingTabs.next(false)))
       .subscribe({
         next: (result) => {
-          console.log("Open tabs:", result.open);
-          console.log("Closed tabs:", result.closed);
           this.tabs$.next(result.open);
           this.closedTabs$.next(result.closed);
         },
@@ -384,7 +387,7 @@ export class OrdersService {
       orders?.reduce((acc: any[], order: any) => {
         order.products?.forEach((p: any) => {
           const existingProduct = acc.find(
-            (item) => item.productId === p.productId
+            (item) => item.productId === p.productId && !item?.product?.isPricePerKg
           );
           if (existingProduct) {
             existingProduct.quantity += p.quantity;

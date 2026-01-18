@@ -9,13 +9,13 @@ import {
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router } from "@angular/router";
-import { ReactiveFormsModule, FormBuilder, FormGroup } from "@angular/forms";
+import { ReactiveFormsModule, FormBuilder, FormGroup, FormsModule } from "@angular/forms";
 import {
   NgbOffcanvas,
   NgbOffcanvasModule,
   NgbTooltipModule,
 } from "@ng-bootstrap/ng-bootstrap";
-import { Tab, Product, Category } from "../../../models";
+import { Tab, Product, Category, OrderItem } from "../../../models";
 import { OrdersService } from "../../../services/orders.service";
 import { ProductsService } from "../../../services/products.service";
 import { CategoriesService } from "../../../services/categories.service";
@@ -23,6 +23,7 @@ import { NotificationService } from "../../../services/notification.service";
 import { ReceiptComponent } from "../../../components/receipt/receipt.component";
 import { LucideAngularModule, Plus, Trash2 } from "lucide-angular";
 import Swal from "sweetalert2";
+import { NgxMaskDirective } from "ngx-mask";
 
 @Component({
   selector: "app-customer-tab-list",
@@ -34,6 +35,8 @@ import Swal from "sweetalert2";
     NgbOffcanvasModule,
     LucideAngularModule,
     NgbTooltipModule,
+    FormsModule,
+    NgxMaskDirective
   ],
   templateUrl: "./customer-tab-list.component.html",
   styleUrls: ["./customer-tab-list.component.scss"],
@@ -86,7 +89,7 @@ export class CustomerTabListComponent implements OnInit, AfterViewInit {
     private notificationService: NotificationService,
     private offcanvasService: NgbOffcanvas,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.refreshTabs();
@@ -137,8 +140,17 @@ export class CustomerTabListComponent implements OnInit, AfterViewInit {
   }
 
   getDisplayItems(tab: Tab): any[] {
+    const normalize = (id?: string) =>
+      (id || "").replace(/-/g, "").toLowerCase();
     return tab.orders
       .map((order) => order?.products)
+      .map((products) =>
+        products?.map((item) => ({
+          ...item,
+          isPricePerKg: this.products.find((p) => normalize(p.id) === normalize(item.product_id))
+            ?.isPricePerKg,
+        }))
+      )
       .flat()
       .slice(0, this.maxItemsToShow);
   }
@@ -244,6 +256,7 @@ export class CustomerTabListComponent implements OnInit, AfterViewInit {
         product_name: product.name,
         quantity: 1,
         unit_price: product.price,
+        isPricePerKg: product.isPricePerKg
       });
     }
 
@@ -416,6 +429,13 @@ export class CustomerTabListComponent implements OnInit, AfterViewInit {
           });
       }
     });
+  }
+
+  updateWeight(item: OrderItem, weight: string): void {
+    const cleanedWeight = String(weight).replace(",", ".");
+    const weightValue = parseFloat(cleanedWeight);
+    item.quantity = weightValue || 0;
+    this.updateCartTotal();
   }
 
   deleteComanda(tab: Tab, event: Event): void {

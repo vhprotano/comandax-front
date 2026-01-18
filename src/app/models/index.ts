@@ -5,6 +5,7 @@ export interface Product {
   name: string;
   price: number;
   image_url?: string;
+  isPricePerKg: boolean;
   category_id: string;
   active: boolean;
 }
