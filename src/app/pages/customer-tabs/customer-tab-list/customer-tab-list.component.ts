@@ -277,6 +277,12 @@ export class CustomerTabListComponent implements OnInit, AfterViewInit {
     }
     this.updateCartTotal();
   }
+  
+  removeFromCart(itemId: string): void {
+    this.cartItems = this.cartItems?.filter((item) => item.id !== itemId);
+    this.updateCartTotal();
+  }
+
 
   updateCartTotal(): void {
     this.cartTotal = this.cartItems.reduce(
@@ -431,12 +437,27 @@ export class CustomerTabListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  updateWeight(item: OrderItem, weight: string): void {
-    const cleanedWeight = String(weight).replace(",", ".");
-    const weightValue = parseFloat(cleanedWeight);
+  onWeightChange(item: OrderItem, weight: any): void {
+    const weightValue =
+      typeof weight === "string"
+        ? parseFloat(weight.replace(",", "."))
+        : weight;
     item.quantity = weightValue || 0;
     this.updateCartTotal();
   }
+
+  onPriceChange(item: OrderItem, price: any): void {
+    const priceValue =
+      typeof price === "string" ? parseFloat(price.replace(",", ".")) : price;
+
+    if (priceValue && item.unit_price > 0) {
+      item.quantity = priceValue / item.unit_price;
+    } else {
+      item.quantity = 0;
+    }
+    this.updateCartTotal();
+  }
+  
 
   deleteComanda(tab: Tab, event: Event): void {
     event.stopPropagation();

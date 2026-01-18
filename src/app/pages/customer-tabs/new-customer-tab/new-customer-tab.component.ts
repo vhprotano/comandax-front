@@ -57,6 +57,12 @@ export class NewCustomerTabComponent implements OnInit {
   canScrollLeft = false;
   canScrollRight = true;
 
+  // Hold/Long Press controls
+  private holdingItemId: string | null = null;
+  private holdInterval: any = null;
+  private holdDelay = 500; // ms antes de começar a repetir
+  private holdSpeed = 100; // ms entre cada incremento/decremento
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -163,6 +169,7 @@ export class NewCustomerTabComponent implements OnInit {
         quantity: 1,
         unit_price: product.price,
         status: "CREATED",
+        isPricePerKg: product.isPricePerKg,
       };
       this.cartItems.push(newItem);
       this.triggerCartAnimation();
@@ -198,13 +205,47 @@ export class NewCustomerTabComponent implements OnInit {
     this.triggerCartAnimation();
   }
 
-  decreaseQuantity(item: OrderItem): void {
+  decreaseQuantity(item: OrderItem, isHold: boolean = false): void {
     if (item.quantity > 1) {
       item.quantity--;
       this.calculateTotal();
       this.triggerCartAnimation();
-    } else {
+    } else if (!isHold) {
       this.removeFromCart(item.id);
+    }
+  }
+
+  startIncreasing(item: OrderItem): void {
+    this.holdingItemId = item.id;
+    setTimeout(() => {
+      if (this.holdingItemId === item.id) {
+        this.holdInterval = setInterval(() => {
+          if (this.holdingItemId === item.id) {
+            this.increaseQuantity(item);
+          }
+        }, this.holdSpeed);
+      }
+    }, this.holdDelay);
+  }
+
+  startDecreasing(item: OrderItem): void {
+    this.holdingItemId = item.id;
+    setTimeout(() => {
+      if (this.holdingItemId === item.id) {
+        this.holdInterval = setInterval(() => {
+          if (this.holdingItemId === item.id) {
+            this.decreaseQuantity(item, true);
+          }
+        }, this.holdSpeed);
+      }
+    }, this.holdDelay);
+  }
+
+  stopAdjusting(): void {
+    this.holdingItemId = null;
+    if (this.holdInterval) {
+      clearInterval(this.holdInterval);
+      this.holdInterval = null;
     }
   }
 

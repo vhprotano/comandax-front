@@ -408,6 +408,7 @@ export class OrdersService {
             totalPrice: p.totalPrice,
             unit_price: p.product?.price,
             status: "pending" as const,
+            isPricePerKg: p?.product?.isPricePerKg,
           })),
         },
       ],
