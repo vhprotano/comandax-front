@@ -19,8 +19,12 @@
       <form [formGroup]="orderForm" class="order-info-card">
         <div class="form-group">
           <label class="form-label">Nome do Cliente</label>
-          <input type="text" formControlName="customer_name" class="form-input"
-            placeholder="Digite o nome do cliente" />
+          <input
+            type="text"
+            formControlName="customer_name"
+            class="form-input"
+            placeholder="Digite o nome do cliente"
+          />
         </div>
 
         <!-- Table Selection (only for Nova Comanda) -->
@@ -28,7 +32,11 @@
           <label class="form-label">Mesa (Opcional)</label>
 
           <div *ngIf="!selectedTable" class="table-select-trigger">
-            <button type="button" class="select-table-btn" (click)="showTableSelection = true">
+            <button
+              type="button"
+              class="select-table-btn"
+              (click)="showTableSelection = true"
+            >
               <span class="btn-icon">🪑</span>
               <span>Selecionar Mesa</span>
             </button>
@@ -39,7 +47,11 @@
               <span class="table-icon">🪑</span>
               <span class="table-number">{{ selectedTable.number }}</span>
             </div>
-            <button type="button" class="remove-table-btn" (click)="removeTable()">
+            <button
+              type="button"
+              class="remove-table-btn"
+              (click)="removeTable()"
+            >
               ✕
             </button>
           </div>
@@ -48,33 +60,51 @@
 
       <!-- Categories Tabs with Horizontal Scroll -->
       <div class="categories-tabs-wrapper">
-        <button class="category-scroll-btn category-scroll-left d-none d-md-block" (click)="scrollCategories('left')">
+        <button
+          class="category-scroll-btn category-scroll-left d-none d-md-block"
+          (click)="scrollCategories('left')"
+        >
           ‹
         </button>
 
         <div class="categories-tabs-container">
           <div class="categories-tabs" #categoriesContainer>
-            <button class="category-tab" [class.active]="selectedCategory === ''" (click)="selectedCategory = ''">
+            <button
+              class="category-tab"
+              [class.active]="selectedCategory === ''"
+              (click)="selectedCategory = ''"
+            >
               <span class="tab-icon">🍽️</span>
               <span class="tab-label">Todos</span>
             </button>
-            <button *ngFor="let category of categories" class="category-tab"
-              [class.active]="selectedCategory === category.id" (click)="selectedCategory = category.id">
+            <button
+              *ngFor="let category of categories"
+              class="category-tab"
+              [class.active]="selectedCategory === category.id"
+              (click)="selectedCategory = category.id"
+            >
               <span class="tab-icon" [innerHTML]="category.icon"></span>
               <span class="tab-label">{{ category.name }}</span>
             </button>
           </div>
         </div>
 
-        <button class="category-scroll-btn category-scroll-right d-none d-md-block" (click)="scrollCategories('right')">
+        <button
+          class="category-scroll-btn category-scroll-right d-none d-md-block"
+          (click)="scrollCategories('right')"
+        >
           ›
         </button>
       </div>
 
       <!-- Products Grid -->
       <div class="products-grid">
-        <div *ngFor="let product of getFilteredProducts()" [attr.data-product-id]="product.id"
-          (click)="addToCart(product)" class="product-card">
+        <div
+          *ngFor="let product of getFilteredProducts()"
+          [attr.data-product-id]="product.id"
+          (click)="addToCart(product)"
+          class="product-card"
+        >
           <h3 class="product-name">{{ product.name }}</h3>
           <p class="product-price">
             R$ {{ product.price.toFixed(2)
@@ -111,28 +141,63 @@
             <div class="item-controls">
               <ng-container *ngIf="getProduct(item.product_id)?.isPricePerKg">
                 <div class="per-kg-inputs">
-                  <input type="text" mask="separator.2" thousandSeparator="," decimalMarker="." suffix=" kg"
-                    [(ngModel)]="item.quantity" (ngModelChange)="onWeightChange(item, $event)"
-                    class="form-control qty-input" placeholder="Peso" />
-                  <input type="text" mask="separator.2" thousandSeparator="," decimalMarker="." prefix="R$ "
-                    [ngModel]="item.unit_price * item.quantity" (ngModelChange)="onPriceChange(item, $event)"
-                    class="form-control qty-input" placeholder="Preço" />
+                  <input
+                    type="text"
+                    mask="separator.3"
+                    thousandSeparator=","
+                    decimalMarker="."
+                    suffix=" kg"
+                    [(ngModel)]="item.quantity"
+                    (ngModelChange)="onWeightChange(item, $event)"
+                    class="form-control qty-input"
+                    placeholder="Peso"
+                  />
+                  <input
+                    type="text"
+                    mask="separator.2"
+                    thousandSeparator=","
+                    decimalMarker="."
+                    prefix="R$ "
+                    [ngModel]="item.unit_price * item.quantity"
+                    (ngModelChange)="onPriceChange(item, $event)"
+                    class="form-control qty-input"
+                    placeholder="Preço"
+                  />
                 </div>
-                <button class="qty-btn last-item" (click)="removeFromCart(item.id)">
+                <button
+                  class="qty-btn last-item"
+                  (click)="removeFromCart(item.id)"
+                >
                   🗑️
                 </button>
               </ng-container>
-              <ng-container *ngIf="getProduct(item.product_id)?.isPricePerKg == false">
-                <button [ngClass]="{
+              <ng-container
+                *ngIf="getProduct(item.product_id)?.isPricePerKg == false"
+              >
+                <button
+                  [ngClass]="{
                     'qty-btn': true,
                     'last-item': item.quantity === 1,
-                  }" (click)="decreaseQuantity(item)" (mousedown)="startDecreasing(item)" (mouseup)="stopAdjusting()"
-                  (mouseleave)="stopAdjusting()" (touchstart)="startDecreasing(item)" (touchend)="stopAdjusting()">
+                  }"
+                  (click)="decreaseQuantity(item)"
+                  (mousedown)="startDecreasing(item)"
+                  (mouseup)="stopAdjusting()"
+                  (mouseleave)="stopAdjusting()"
+                  (touchstart)="startDecreasing(item)"
+                  (touchend)="stopAdjusting()"
+                >
                   −
                 </button>
                 <span class="qty-display">{{ item.quantity }}</span>
-                <button class="qty-btn" (click)="increaseQuantity(item)" (mousedown)="startIncreasing(item)" (mouseup)="stopAdjusting()"
-                  (mouseleave)="stopAdjusting()" (touchstart)="startIncreasing(item)" (touchend)="stopAdjusting()">
+                <button
+                  class="qty-btn"
+                  (click)="increaseQuantity(item)"
+                  (mousedown)="startIncreasing(item)"
+                  (mouseup)="stopAdjusting()"
+                  (mouseleave)="stopAdjusting()"
+                  (touchstart)="startIncreasing(item)"
+                  (touchend)="stopAdjusting()"
+                >
                   +
                 </button>
               </ng-container>
@@ -154,12 +219,18 @@
   </div>
 
   <!-- Cart Fixed Bottom (Mobile Only) -->
-  <div *ngIf="cartItems && cartItems.length > 0" class="cart-fixed-bottom-mobile" (click)="openCartOffcanvas()">
+  <div
+    *ngIf="cartItems && cartItems.length > 0"
+    class="cart-fixed-bottom-mobile"
+    (click)="openCartOffcanvas()"
+  >
     <div class="cart-summary">
       <div class="cart-icon">🛒</div>
       <div class="cart-info">
-        <span class="cart-items-count">{{ cartItems.length }}
-          {{ cartItems.length === 1 ? "item" : "itens" }}</span>
+        <span class="cart-items-count"
+          >{{ cartItems.length }}
+          {{ cartItems.length === 1 ? "item" : "itens" }}</span
+        >
         <span class="cart-total-mobile">R$ {{ total.toFixed(2) }}</span>
       </div>
     </div>
@@ -170,7 +241,11 @@
 </div>
 
 <!-- Table Selection Modal -->
-<div *ngIf="showTableSelection" class="modal-overlay" (click)="showTableSelection = false">
+<div
+  *ngIf="showTableSelection"
+  class="modal-overlay"
+  (click)="showTableSelection = false"
+>
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2 class="modal-title">Selecionar Mesa</h2>
@@ -180,7 +255,11 @@
     </div>
 
     <div class="tables-grid">
-      <div *ngFor="let table of tables" (click)="selectTable(table)" class="table-card">
+      <div
+        *ngFor="let table of tables"
+        (click)="selectTable(table)"
+        class="table-card"
+      >
         <div class="table-icon">🪑</div>
         <div class="table-number">{{ table.number }}</div>
         <div class="table-status">Disponível</div>
@@ -197,7 +276,11 @@
 <ng-template #cartOffcanvas let-offcanvas>
   <div class="offcanvas-header">
     <h2 class="offcanvas-title">Carrinho</h2>
-    <button type="button" class="btn-close" (click)="closeCartOffcanvas()"></button>
+    <button
+      type="button"
+      class="btn-close"
+      (click)="closeCartOffcanvas()"
+    ></button>
   </div>
   <div class="offcanvas-body offcanvas-cart-body">
     <div *ngIf="cartItems.length === 0" class="empty-cart-offcanvas">
@@ -206,8 +289,14 @@
     </div>
 
     <div *ngIf="cartItems && cartItems.length > 0" class="cart-items-offcanvas">
-      <div *ngFor="let item of cartItems" class="cart-item-offcanvas"
-        [ngClass]="{'align-items-baseline flex-column': getProduct(item.product_id)?.isPricePerKg}">
+      <div
+        *ngFor="let item of cartItems"
+        class="cart-item-offcanvas"
+        [ngClass]="{
+          'align-items-baseline flex-column': getProduct(item.product_id)
+            ?.isPricePerKg,
+        }"
+      >
         <div class="item-info">
           <p class="item-name">{{ item.product_name }}</p>
           <p class="item-price">R$ {{ item.unit_price.toFixed(2) }}</p>
@@ -218,22 +307,53 @@
               🗑️
             </button>
             <div class="per-kg-inputs">
-              <input type="text" mask="separator.2" thousandSeparator="," decimalMarker="." suffix=" kg"
-                [(ngModel)]="item.quantity" (ngModelChange)="onWeightChange(item, $event)"
-                class="form-control qty-input" placeholder="Peso" />
-              <input type="text" mask="separator.2" thousandSeparator="," decimalMarker="." prefix="R$ "
-                [ngModel]="item.unit_price * item.quantity" (ngModelChange)="onPriceChange(item, $event)"
-                class="form-control qty-input" placeholder="Preço" />
+              <input
+                type="text"
+                mask="separator.3"
+                thousandSeparator=","
+                decimalMarker="."
+                suffix=" kg"
+                [ngModel]="item.quantity"
+                (ngModelChange)="onWeightChange(item, $event)"
+                class="form-control qty-input"
+                placeholder="Peso"
+              />
+              <div class="input-group">
+                <span class="input-group-text">R$</span>
+                <input
+                  type="text"
+                  [ngModel]="(item.unit_price * item.quantity).toFixed(2)"
+                  (ngModelChange)="onPriceChange(item, $event)"
+                  class="form-control qty-input"
+                  placeholder="Preço"
+                />
+              </div>
             </div>
           </ng-container>
           <ng-container *ngIf="!getProduct(item.product_id)?.isPricePerKg">
-            <button class="qty-btn" (click)="decreaseQuantity(item)" (mousedown)="startDecreasing(item)"
-              (mouseup)="stopAdjusting()" (mouseleave)="stopAdjusting()" (touchstart)="startDecreasing(item)"
-              (touchend)="stopAdjusting()">−</button>
+            <button
+              class="qty-btn"
+              (click)="decreaseQuantity(item)"
+              (mousedown)="startDecreasing(item)"
+              (mouseup)="stopAdjusting()"
+              (mouseleave)="stopAdjusting()"
+              (touchstart)="startDecreasing(item)"
+              (touchend)="stopAdjusting()"
+            >
+              −
+            </button>
             <span class="qty-display">{{ item.quantity }}</span>
-            <button class="qty-btn" (click)="increaseQuantity(item)" (mousedown)="startIncreasing(item)" (mouseup)="stopAdjusting()"
-              (mouseleave)="stopAdjusting()" (touchstart)="startIncreasing(item)"
-              (touchend)="stopAdjusting()">+</button>
+            <button
+              class="qty-btn"
+              (click)="increaseQuantity(item)"
+              (mousedown)="startIncreasing(item)"
+              (mouseup)="stopAdjusting()"
+              (mouseleave)="stopAdjusting()"
+              (touchstart)="startIncreasing(item)"
+              (touchend)="stopAdjusting()"
+            >
+              +
+            </button>
           </ng-container>
         </div>
         <div class="item-total">
@@ -242,7 +362,10 @@
       </div>
     </div>
 
-    <div *ngIf="cartItems && cartItems.length > 0" class="cart-footer-offcanvas">
+    <div
+      *ngIf="cartItems && cartItems.length > 0"
+      class="cart-footer-offcanvas"
+    >
       <div class="cart-total-offcanvas">
         <span class="total-label">Total:</span>
         <span class="total-value">R$ {{ total.toFixed(2) }}</span>
