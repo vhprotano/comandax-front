@@ -143,19 +143,8 @@
                 <div class="per-kg-inputs">
                   <input
                     type="text"
-                    mask="separator.3"
-                    thousandSeparator=","
-                    decimalMarker="."
-                    suffix=" kg"
-                    [(ngModel)]="item.quantity"
-                    (ngModelChange)="onWeightChange(item, $event)"
-                    class="form-control qty-input"
-                    placeholder="Peso"
-                  />
-                  <input
-                    type="text"
-                    mask="separator.2"
-                    thousandSeparator=","
+                    mask="separator"
+                    thousandSeparator=" "
                     decimalMarker="."
                     prefix="R$ "
                     [ngModel]="item.unit_price * item.quantity"
@@ -307,7 +296,7 @@
               🗑️
             </button>
             <div class="per-kg-inputs">
-              <input
+              <!-- <input
                 type="text"
                 mask="separator.3"
                 thousandSeparator=","
@@ -317,12 +306,15 @@
                 (ngModelChange)="onWeightChange(item, $event)"
                 class="form-control qty-input"
                 placeholder="Peso"
-              />
+              /> -->
               <div class="input-group">
-                <span class="input-group-text">R$</span>
                 <input
                   type="text"
-                  [ngModel]="(item.unit_price * item.quantity).toFixed(2)"
+                  mask="separator"
+                  thousandSeparator=" "
+                  decimalMarker="."
+                  prefix="R$ "
+                  [ngModel]="item.unit_price * item.quantity"
                   (ngModelChange)="onPriceChange(item, $event)"
                   class="form-control qty-input"
                   placeholder="Preço"
