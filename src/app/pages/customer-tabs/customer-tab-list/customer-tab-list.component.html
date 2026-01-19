@@ -93,7 +93,7 @@
                 >{{ item?.quantity }}x</span
               >
               <span *ngIf="item.isPricePerKg" class="item-quantity"
-                >{{ item?.quantity }} kg</span
+                >{{ item?.quantity.toFixed(2) }} kg</span
               >
               <span class="item-name">{{ item?.product_name }}</span>
               <span class="item-name text-end">R$ {{ item?.totalPrice }}</span>
@@ -173,7 +173,7 @@
                 >{{ item?.quantity }}x</span
               >
               <span *ngIf="item.isPricePerKg" class="item-quantity"
-                >{{ item?.quantity }} kg</span
+                >{{ item?.quantity.toFixed(2) }} kg</span
               >
               <span class="item-name">{{ item?.product_name }}</span>
             </div>
@@ -297,7 +297,7 @@
                 >{{ item?.quantity }}x</span
               >
               <span *ngIf="item.isPricePerKg" class="item-qty"
-                >{{ item?.quantity }} kg</span
+                >{{ item?.quantity?.toFixed(2) }} kg</span
               >
               <span class="item-name">{{ item?.product_name }}</span>
               <span class="item-price"
@@ -377,7 +377,7 @@
               >{{ item?.quantity }}x</span
             >
             <span *ngIf="item.isPricePerKg" class="item-qty"
-              >{{ item?.quantity }} kg</span
+              >{{ item?.quantity?.toFixed(2) }} kg</span
             >
             <span class="item-name">{{ item?.product_name }}</span>
             <span class="item-price"
@@ -510,7 +510,7 @@
                     mask="separator"
                     thousandSeparator=" "
                     prefix="R$ "
-                    [ngModel]="item.unit_price * item.quantity"
+                    [ngModel]="item.totalInput"
                     (ngModelChange)="onPriceChange(item, $event)"
                     class="form-control qty-input"
                     placeholder="Preço"
@@ -635,7 +635,7 @@
                   mask="separator"
                   thousandSeparator=" "
                   prefix="R$ "
-                  [ngModel]="item.unit_price * item.quantity"
+                  [ngModel]="item.totalInput"
                   (ngModelChange)="onPriceChange(item, $event)"
                   class="form-control qty-input"
                   placeholder="Preço"
