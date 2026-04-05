@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterModule } from "@angular/router";
 import { AuthService } from "../../services/auth.service";
@@ -9,16 +9,28 @@ import {
   Menu,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ClipboardList,
+  ChefHat,
+  Package,
+  FolderOpen,
+  Armchair,
+  BarChart3,
+  HelpCircle,
+  LogOut,
+  Settings,
+  X,
 } from "lucide-angular";
 
 interface MenuItem {
   id: string;
   label: string;
-  icon: string;
+  icon: any;
   route?: string;
   children?: MenuItem[];
   disabled?: boolean;
   tooltip?: string;
+  external?: boolean;
 }
 
 @Component({
@@ -33,54 +45,57 @@ interface MenuItem {
   templateUrl: "./main-layout.component.html",
   styleUrls: ["./main-layout.component.scss"],
 })
-export class MainLayoutComponent implements OnInit {
+export class MainLayoutComponent implements OnInit, OnDestroy {
   sidebarCollapsed = false;
 
   // Lucide icons
   readonly Menu = Menu;
   readonly ChevronLeft = ChevronLeft;
   readonly ChevronRight = ChevronRight;
+  readonly ChevronDown = ChevronDown;
+  readonly LogOut = LogOut;
+  readonly X = X;
 
   menuItems: MenuItem[] = [
     {
       id: "comandas",
       label: "Comandas",
-      icon: "📋",
+      icon: ClipboardList,
       route: "/customer-tabs",
     },
     {
       id: "cozinha",
       label: "Cozinha",
-      icon: "👨‍🍳",
+      icon: ChefHat,
       disabled: true,
       tooltip: "Em Breve",
     },
     {
       id: "separator",
       label: "",
-      icon: "",
+      icon: null,
     },
     {
       id: "gestao",
       label: "Gestão",
-      icon: "⚙️",
+      icon: Settings,
       children: [
         {
           id: "produtos",
           label: "Produtos",
-          icon: "🍽️",
+          icon: Package,
           route: "/produtos",
         },
         {
           id: "categorias",
           label: "Categorias",
-          icon: "📂",
+          icon: FolderOpen,
           route: "/categorias",
         },
         {
           id: "mesas",
           label: "Mesas",
-          icon: "🪑",
+          icon: Armchair,
           route: "/mesas",
         },
       ],
@@ -88,20 +103,22 @@ export class MainLayoutComponent implements OnInit {
     {
       id: "relatorios",
       label: "Relatórios",
-      icon: "📈",
+      icon: BarChart3,
       route: "/relatorios",
     },
     {
       id: "ajuda",
       label: "Ajuda",
-      icon: "❓",
+      icon: HelpCircle,
       route: "https://wa.me/5543999721068",
+      external: true,
     },
   ];
 
   expandedMenus = new Set<string>();
   isMobile = false;
   isOffcanvasOpen = false;
+  private resizeListener: (() => void) | null = null;
 
   constructor(
     private router: Router,
@@ -111,7 +128,14 @@ export class MainLayoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkMobile();
-    window.addEventListener("resize", () => this.checkMobile());
+    this.resizeListener = () => this.checkMobile();
+    window.addEventListener("resize", this.resizeListener);
+  }
+
+  ngOnDestroy(): void {
+    if (this.resizeListener) {
+      window.removeEventListener("resize", this.resizeListener);
+    }
   }
 
   checkMobile(): void {
@@ -130,12 +154,10 @@ export class MainLayoutComponent implements OnInit {
     return this.expandedMenus.has(menuId);
   }
 
-  navigate(route: string): void {
-    if (route.startsWith('http')) {
-      // External URL (like WhatsApp)
-      window.open(route, '_blank');
+  navigate(route: string, external?: boolean): void {
+    if (external || route.startsWith("http")) {
+      window.open(route, "_blank");
     } else {
-      // Internal route
       this.router.navigate([route]);
     }
     if (this.isMobile) {

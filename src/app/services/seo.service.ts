@@ -22,68 +22,76 @@ type RouteMetaConfig = Record<string, SeoConfig>;
 export class SeoService {
   private readonly baseUrl = "https://comandax.com.br";
   private readonly defaultTitle =
-    "ComandaX - Sistema de Comandas Digital para Restaurantes";
+    "ComandaX - Comanda Digital para Restaurantes, Bares e Lanchonetes";
   private readonly defaultDescription =
-    "ComandaX é o sistema de comandas digital mais completo do Brasil. Gerencie pedidos, mesas, produtos e funcionários do seu restaurante, bar, lanchonete ou café.";
+    "Sistema de comanda digital gratuito para restaurantes, bares, lanchonetes e cafeterias. Gerencie pedidos, mesas, cardápio e relatórios de vendas.";
   private readonly defaultImage = `${this.baseUrl}/assets/logo/branco.png`;
 
   private routeMeta: RouteMetaConfig = {
     "/": {
       title:
-        "ComandaX - Sistema de Comandas Digital para Restaurantes | Gestão Completa de Pedidos",
+        "ComandaX - Comanda Digital para Restaurantes, Bares e Lanchonetes | Sistema Grátis",
       description:
-        "ComandaX é o sistema de comandas digital mais completo do Brasil. Gerencie pedidos, mesas, produtos e funcionários do seu restaurante, bar, lanchonete ou café. Aumente suas vendas e reduza erros com pedidos digitais. Comece grátis hoje!",
+        "Sistema de comanda digital gratuito para restaurantes, bares, lanchonetes e cafeterias. Gerencie pedidos, mesas, cardápio digital e relatórios de vendas. Comece grátis hoje!",
       keywords:
-        "sistema de comandas, gestão de restaurante, pedidos digitais, comanda eletrônica, sistema para bar, sistema para lanchonete, gestão de mesas, cardápio digital, controle de pedidos, software restaurante, PDV restaurante, sistema food service, comanda digital, gerenciamento restaurante Brasil, sistema comandas online, aplicativo restaurante, gestão pedidos online",
+        "comanda digital, comanda eletrônica, sistema para restaurante, sistema de comandas, sistema para bar, sistema para lanchonete, cardápio digital, gestão de restaurante, controle de mesas, pedidos digitais, software restaurante, sistema food service, comanda digital grátis, PDV restaurante",
       type: "website",
     },
     "/login": {
-      title: "Login | ComandaX - Sistema de Comandas Digital",
+      title: "Entrar | ComandaX - Sistema de Comanda Digital",
       description:
-        "Acesse sua conta ComandaX e gerencie seu restaurante, bar ou lanchonete. Sistema completo de comandas digitais.",
+        "Acesse sua conta ComandaX e gerencie seu restaurante, bar ou lanchonete. Sistema completo de comandas digitais, controle de mesas e relatórios.",
       keywords:
-        "login comandax, acessar sistema comandas, entrar restaurante digital",
+        "login comandax, acessar sistema comandas, entrar comanda digital",
+      noIndex: true,
     },
     "/customer-tabs": {
-      title: "Comandas | ComandaX - Gestão de Pedidos",
+      title: "Comandas | ComandaX - Gestão de Pedidos em Tempo Real",
       description:
-        "Gerencie todas as comandas do seu estabelecimento em tempo real. Controle pedidos, valores e status.",
+        "Gerencie todas as comandas digitais do seu estabelecimento em tempo real. Controle pedidos, valores e status das mesas.",
       keywords:
-        "comandas abertas, gestão pedidos, controle comandas restaurante",
+        "comandas abertas, gestão pedidos, controle comandas restaurante, comanda digital",
+      noIndex: true,
     },
     "/customer-tabs/nova": {
-      title: "Nova Comanda | ComandaX",
+      title: "Nova Comanda | ComandaX - Abrir Pedido",
       description:
-        "Abra uma nova comanda para seu cliente. Adicione pedidos de forma rápida e fácil.",
-      keywords: "abrir comanda, nova comanda, criar pedido restaurante",
+        "Abra uma nova comanda digital para seu cliente. Adicione pedidos de forma rápida e fácil.",
+      keywords:
+        "abrir comanda, nova comanda digital, criar pedido restaurante",
+      noIndex: true,
     },
     "/produtos": {
       title: "Produtos | ComandaX - Cardápio Digital",
       description:
-        "Gerencie os produtos do seu cardápio. Adicione, edite preços e organize categorias.",
+        "Gerencie os produtos do seu cardápio digital. Adicione, edite preços e organize categorias.",
       keywords:
         "cardápio digital, gestão produtos, preços restaurante, menu digital",
+      noIndex: true,
     },
     "/categorias": {
       title: "Categorias | ComandaX - Organização do Cardápio",
       description:
-        "Organize seu cardápio por categorias. Bebidas, pratos, sobremesas e muito mais.",
+        "Organize seu cardápio digital por categorias. Bebidas, pratos, sobremesas e muito mais.",
       keywords:
         "categorias cardápio, organizar menu, tipos produtos restaurante",
+      noIndex: true,
     },
     "/mesas": {
-      title: "Mesas | ComandaX - Controle de Ocupação",
+      title: "Mesas | ComandaX - Controle de Ocupação em Tempo Real",
       description:
-        "Controle a ocupação das mesas do seu estabelecimento. Veja status em tempo real.",
+        "Controle a ocupação das mesas do seu estabelecimento. Visualize status em tempo real.",
       keywords:
-        "controle mesas, ocupação restaurante, gestão salão, mesas livres",
+        "controle mesas, ocupação restaurante, gestão salão, mesas livres ocupadas",
+      noIndex: true,
     },
     "/estatisticas": {
-      title: "Estatísticas | ComandaX - Relatórios e Análises",
+      title: "Estatísticas | ComandaX - Relatórios de Vendas",
       description:
-        "Acompanhe o desempenho do seu negócio. Vendas, produtos mais pedidos e relatórios.",
+        "Acompanhe o desempenho do seu negócio com relatórios de vendas detalhados. Produtos mais pedidos, faturamento e mais.",
       keywords:
-        "relatórios restaurante, estatísticas vendas, análise pedidos, dashboard",
+        "relatórios restaurante, estatísticas vendas, análise pedidos, dashboard vendas",
+      noIndex: true,
     },
   };
 

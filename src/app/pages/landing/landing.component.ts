@@ -12,43 +12,7 @@ import { LazyLoadDirective } from "../../directives/lazy-load.directive";
   styleUrls: ["./landing.component.scss"],
 })
 export class LandingComponent implements OnInit {
-  features = [
-    {
-      icon: "smartphone",
-      title: "Pedidos Digitais",
-      description:
-        "Comandas totalmente digitais eliminam erros de anotação e agilizam o atendimento.",
-    },
-    {
-      icon: "users",
-      title: "Controle de Mesas",
-      description:
-        "Gerencie a ocupação das mesas em tempo real e otimize o fluxo do restaurante.",
-    },
-    {
-      icon: "bar-chart-3",
-      title: "Relatórios Detalhados",
-      description:
-        "Acompanhe vendas, produtos mais pedidos e desempenho do seu negócio.",
-    },
-    {
-      icon: "printer",
-      title: "Integração com Impressoras",
-      description: "Imprima comandas automaticamente na cozinha e no caixa.",
-    },
-    {
-      icon: "shield",
-      title: "Controle de Acesso",
-      description:
-        "Permissões personalizadas para gerentes, garçons e cozinha.",
-    },
-    {
-      icon: "cloud",
-      title: "Acesso de Qualquer Lugar",
-      description:
-        "Sistema web responsivo funciona em computadores, tablets e smartphones.",
-    },
-  ];
+  currentYear = new Date().getFullYear();
 
   testimonials = [
     {
@@ -74,44 +38,41 @@ export class LandingComponent implements OnInit {
     },
   ];
 
-  pricingPlans = [
+  faqItems = [
     {
-      name: "Básico",
-      price: "Grátis",
-      period: "para sempre",
-      features: [
-        "Até 50 pedidos/mês",
-        "2 usuários",
-        "Relatórios básicos",
-        "Suporte por email",
-      ],
-      popular: false,
+      question: "O que é uma comanda digital?",
+      answer:
+        "A comanda digital é um sistema eletrônico que substitui as comandas de papel em restaurantes, bares e lanchonetes. Com o ComandaX, os garçons registram pedidos diretamente pelo celular ou tablet, eliminando erros de anotação e agilizando o atendimento. Os pedidos são enviados automaticamente para a cozinha.",
     },
     {
-      name: "Profissional",
-      price: "R$ 49",
-      period: "/mês",
-      features: [
-        "Pedidos ilimitados",
-        "Usuários ilimitados",
-        "Relatórios avançados",
-        "Integração com impressoras",
-        "Suporte prioritário",
-      ],
-      popular: true,
+      question: "O ComandaX é realmente gratuito?",
+      answer:
+        "Sim! O ComandaX oferece um plano gratuito completo para você começar a digitalizar seu restaurante sem nenhum custo. Não é necessário cartão de crédito. Você pode usar todas as funcionalidades básicas como comandas digitais, controle de mesas e cadastro de produtos sem pagar nada.",
     },
     {
-      name: "Empresarial",
-      price: "R$ 99",
-      period: "/mês",
-      features: [
-        "Tudo do Profissional",
-        "Múltiplas unidades",
-        "API personalizada",
-        "Suporte 24/7",
-        "Consultoria especializada",
-      ],
-      popular: false,
+      question: "Preciso instalar algum programa no computador?",
+      answer:
+        "Não. O ComandaX é um sistema 100% na nuvem (web). Basta acessar pelo navegador em qualquer dispositivo: computador, tablet ou smartphone. Não precisa instalar nada e funciona em qualquer sistema operacional (Windows, Mac, Android, iOS).",
+    },
+    {
+      question: "O sistema funciona para bar e lanchonete também?",
+      answer:
+        "Sim! O ComandaX foi desenvolvido para atender restaurantes, bares, lanchonetes, cafeterias, padarias e qualquer estabelecimento de food service. O sistema se adapta ao fluxo do seu negócio, seja atendimento em mesa, balcão ou delivery.",
+    },
+    {
+      question: "Como funciona o controle de mesas?",
+      answer:
+        "O módulo de mesas do ComandaX permite que você cadastre todas as mesas do seu estabelecimento e visualize em tempo real quais estão livres ou ocupadas. Ao abrir uma comanda, você associa ela a uma mesa. Quando a comanda é fechada, a mesa fica automaticamente disponível.",
+    },
+    {
+      question: "Posso usar o ComandaX no celular?",
+      answer:
+        "Sim! O ComandaX é totalmente responsivo e funciona perfeitamente em smartphones e tablets. Seus garçons podem anotar pedidos diretamente pelo celular, e você pode acompanhar tudo de qualquer lugar pelo seu dispositivo móvel.",
+    },
+    {
+      question: "O ComandaX gera relatórios de vendas?",
+      answer:
+        "Sim. O sistema oferece relatórios detalhados de vendas, produtos mais pedidos, faturamento por período e outras estatísticas essenciais para a gestão do seu negócio. Todos os dados ficam disponíveis em dashboards visuais e intuitivos.",
     },
   ];
 
@@ -120,34 +81,17 @@ export class LandingComponent implements OnInit {
   ngOnInit(): void {
     this.seoService.updateMetaTags({
       title:
-        "ComandaX - Sistema de Comandas Digital para Restaurantes | Gestão Completa de Pedidos",
+        "ComandaX - Comanda Digital para Restaurantes, Bares e Lanchonetes | Sistema Grátis",
       description:
-        "ComandaX é o sistema de comandas digital mais completo do Brasil. Gerencie pedidos, mesas, produtos e funcionários do seu restaurante, bar, lanchonete ou café. Aumente suas vendas e reduza erros com pedidos digitais. Comece grátis hoje!",
+        "Sistema de comanda digital gratuito para restaurantes, bares, lanchonetes e cafeterias. Gerencie pedidos, mesas, cardápio e relatórios de vendas. Comece grátis hoje!",
       keywords:
-        "sistema de comandas, gestão de restaurante, pedidos digitais, comanda eletrônica, sistema para bar, sistema para lanchonete, gestão de mesas, cardápio digital, controle de pedidos, software restaurante, PDV restaurante, sistema food service, comanda digital, gerenciamento restaurante Brasil, sistema comandas online, aplicativo restaurante, gestão pedidos online",
+        "comanda digital, comanda eletrônica, sistema para restaurante, sistema de comandas, sistema para bar, sistema para lanchonete, cardápio digital, gestão de restaurante, controle de mesas, pedidos digitais, software restaurante, sistema food service, comanda digital grátis, PDV restaurante",
       type: "website",
     });
   }
 
-  getIconPath(icon: string): string {
-    const icons: Record<string, string> = {
-      smartphone:
-        "M12 18h-2a1 1 0 01-1-1v-1H9a1 1 0 010-2h2a1 1 0 011 1v1h1a1 1 0 010 2zM8 4V2a1 1 0 011-1h6a1 1 0 011 1v2h3a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1h3zm2 0h4V3h-4v1z",
-      users: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
-      "bar-chart-3":
-        "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
-      printer:
-        "M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z",
-      shield:
-        "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
-      cloud:
-        "M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z",
-    };
-    return icons[icon] || "";
-  }
-
-  scrollToAnchor(anchorId: string){
+  scrollToAnchor(anchorId: string) {
     const element = document.getElementById(anchorId);
-    element?.scrollIntoView({ behavior: 'smooth' });
+    element?.scrollIntoView({ behavior: "smooth" });
   }
 }

@@ -16,12 +16,13 @@ import {
 import { Category } from "../../../models";
 import { CategoriesService } from "../../../services/categories.service";
 import { NotificationService } from "../../../services/notification.service";
+import { LucideAngularModule, Plus } from "lucide-angular";
 import Swal from "sweetalert2";
 
 @Component({
   selector: "app-categories",
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: "./categories.component.html",
   styleUrls: ["./categories.component.scss"],
 })
@@ -29,6 +30,7 @@ export class CategoriesComponent implements OnInit {
   @ViewChild("iconPickerContainer") iconPickerContainer!: ElementRef;
   @ViewChild("iconToggleButton") iconToggleButton!: ElementRef;
 
+  readonly Plus = Plus;
   categories: Category[] = [];
   categoryForm!: FormGroup;
   showForm = false;

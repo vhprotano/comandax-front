@@ -1,67 +1,35 @@
-<div class="login-container">
-  <!-- Decorative elements -->
-  <div class="decorative-circle decorative-circle-1"></div>
-  <div class="decorative-circle decorative-circle-2"></div>
+<div class="login-page">
+  <div class="login-bg-pattern"></div>
 
   <div class="login-card">
-    <!-- Logo and Title -->
-    <div class="login-header flex align-center justify-content-center">
-      <img
-        src="assets/logo/branco-transparente.png"
-        alt="ComandaX Logo"
-        class="logo-image"
-      />
-      <!-- <div class="logo-circle">
-        <img *ngIf="logoUrl" [src]="logoUrl" alt="Logo" class="logo-image" />
-        <span *ngIf="!logoUrl" class="logo-emoji">🍽️</span>
-      </div>
-      <h1 class="app-title">ComandaX</h1>
-      <p class="app-subtitle">Sistema de Gestão de Comandas</p> -->
+    <!-- Logo -->
+    <div class="login-logo">
+      <img src="assets/logo/branco-transparente.png" alt="ComandaX Logo" class="logo-img" />
     </div>
 
-    <!-- Google OAuth Login -->
-    <div class="login-content">
+    <!-- Content -->
+    <div class="login-body">
       @if (!loading) {
-      <ng-container>
-        <p class="login-instruction">
-          Faça login ou cadastre-se com sua conta Google
-        </p>
+        <p class="login-instruction">Faça login com sua conta Google para continuar</p>
 
-        <!-- Google Sign-In Button -->
-        <div id="google-signin-button" class="google-signin-container"></div>
+        <div id="google-signin-button" class="google-btn-container"></div>
 
-        <!-- Error Message -->
-        <div *ngIf="error" class="error-message">
-          <span class="error-icon">⚠️</span>
+        <div *ngIf="error" class="login-error">
+          <span class="error-dot"></span>
           <span>{{ error }}</span>
         </div>
-      </ng-container>
       }
 
-      <!-- Loading State -->
       @if (loading) {
-      <div class="loading-state">
-        <div class="restaurant-loading">
-          <div class="plate-container">
-            <div class="plate">
-              <div class="food-item food-1">🍕</div>
-              <div class="food-item food-2">🍔</div>
-              <div class="food-item food-3">🍟</div>
-            </div>
-            <div class="steam steam-1"></div>
-            <div class="steam steam-2"></div>
-            <div class="steam steam-3"></div>
-          </div>
-          <div class="loading-text">
-            <p class="loading-message">Preparando seu acesso...</p>
-            <div class="loading-dots">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
+        <div class="login-loading">
+          <div class="login-spinner"></div>
+          <p class="login-loading-text">Preparando seu acesso...</p>
+          <div class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
         </div>
-      </div>
       }
     </div>
   </div>

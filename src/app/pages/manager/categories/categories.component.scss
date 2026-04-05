@@ -1,4 +1,12 @@
-:host {
-  display: block;
-}
+@use '../shared-manage' as *;
 
+.icon-preview {
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+}

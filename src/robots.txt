@@ -1,4 +1,4 @@
-# ComandaX - Sistema de Comandas Digital
+# ComandaX - Sistema de Comanda Digital
 # robots.txt for https://comandax.com.br
 
 # Allow all search engine crawlers
@@ -6,7 +6,6 @@ User-agent: *
 
 # Allow indexing of public pages
 Allow: /
-Allow: /login
 
 # Disallow private/authenticated areas
 Disallow: /customer-tabs
@@ -18,11 +17,11 @@ Disallow: /estatisticas
 Disallow: /api/
 Disallow: /graphql
 
-# Disallow common non-content paths
-Disallow: /assets/
-Disallow: /*.js$
-Disallow: /*.css$
-Disallow: /*.json$
+# Allow crawlers to access static assets (images, CSS, JS)
+# Google needs these to properly render and understand pages
+Allow: /assets/
+Allow: /*.js$
+Allow: /*.css$
 
 # Specific bot rules for better crawl efficiency
 User-agent: Googlebot
@@ -33,23 +32,8 @@ User-agent: Bingbot
 Allow: /
 Crawl-delay: 2
 
-User-agent: Yandex
-Allow: /
-Crawl-delay: 2
-
-# Block bad bots
-User-agent: AhrefsBot
-Disallow: /
-
-User-agent: SemrushBot
-Disallow: /
-
-User-agent: MJ12bot
-Disallow: /
-
 # Sitemap location
 Sitemap: https://comandax.com.br/sitemap.xml
 
 # Host directive (for Yandex)
 Host: https://comandax.com.br
-

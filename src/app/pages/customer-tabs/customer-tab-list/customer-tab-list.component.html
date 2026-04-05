@@ -1,317 +1,283 @@
-<div class="customer-tab-container">
-  <!-- Header with Toggle -->
-  <div class="header-section">
-    <h1 class="page-title">Comandas</h1>
+<div class="comandas-page">
+  <!-- Page Header -->
+  <div class="page-header-bar">
+    <div>
+      <h1 class="page-title">Comandas</h1>
+    </div>
+    <div class="header-actions">
+      <!-- Tab Switcher -->
+      <div class="tab-switcher">
+        <button
+          class="tab-switch-btn"
+          [class.active]="!showClosedTabs"
+          (click)="showClosedTabs = false"
+        >
+          Abertas
+        </button>
+        <button
+          class="tab-switch-btn"
+          [class.active]="showClosedTabs"
+          (click)="showClosedTabs = true"
+        >
+          Fechadas
+        </button>
+      </div>
 
-    <!-- Toggle Abertas/Fechadas -->
-    <div class="toggle-container">
-      <span class="toggle-label">
-        {{ showClosedTabs ? "Fechadas" : "Abertas" }}
-      </span>
-      <button (click)="showClosedTabs = !showClosedTabs" [class.active]="!showClosedTabs" class="toggle-switch">
-        <span class="toggle-slider" [class.checked]="!showClosedTabs"></span>
-      </button>
+      <!-- Desktop Action Buttons -->
+      <div class="desktop-actions">
+        <button class="btn btn-primary" (click)="createNewComanda()">
+          <lucide-angular [img]="Plus" [size]="18" [strokeWidth]="2"></lucide-angular>
+          Nova Comanda
+        </button>
+        <button class="btn btn-secondary" (click)="createNewPedido()">
+          <lucide-angular [img]="Plus" [size]="18" [strokeWidth]="2"></lucide-angular>
+          Novo Pedido
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Loading State -->
   @if (isLoadingTabs) {
-  <div class="loading-overlay">
-    <div class="loading-content">
-      <div class="notepad-animation">
-        <div class="notepad">
-          <div class="notepad-header"></div>
-          <div class="notepad-lines">
-            <div class="line line-1"></div>
-            <div class="line line-2"></div>
-            <div class="line line-3"></div>
-            <div class="line line-4"></div>
-          </div>
-          <div class="pen">✏️</div>
-        </div>
-      </div>
-      <div class="loading-text-container">
-        <p class="loading-title">Carregando comandas</p>
-        <div class="loading-dots">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Carregando comandas</p>
+      <div class="loading-dots">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
     </div>
-  </div>
   }
 
-  <!-- Desktop Action Buttons -->
-  <div class="desktop-actions">
-    <button class="btn btn-primary" (click)="createNewComanda()">
-      <lucide-angular [img]="Plus"></lucide-angular> Nova Comanda
-    </button>
-    <button class="btn btn-secondary" (click)="createNewPedido()">
-      📝 Novo Pedido
-    </button>
-  </div>
-
   <!-- Comandas Abertas -->
-  <div *ngIf="!showClosedTabs" class="customer-tab-section">
-    <div class="customer-tab-grid">
-      <div *ngFor="let tab of openedTabs" (click)="openTab(tab)" class="customer-tab-card">
-        <div class="card-header">
-          <div class="card-title-section">
-            <h3 class="card-title">{{ tab.customer_name }}</h3>
-            <span class="card-subtitle" *ngIf="tab.table_number">
-              Mesa {{ tab.table_number }}
-            </span>
+  <div *ngIf="!showClosedTabs" class="comandas-section">
+    <div class="comandas-grid">
+      <div *ngFor="let tab of openedTabs" (click)="openTab(tab)" class="comanda-card card-interactive">
+        <div class="comanda-header">
+          <div class="comanda-identity">
+            <h3 class="comanda-name">{{ tab.customer_name }}</h3>
+            <span class="comanda-meta" *ngIf="tab.table_number">Mesa {{ tab.table_number }}</span>
           </div>
-          <div class="card-header-actions">
-            <span class="status-badge status-open">{{
-              tab.status === "CLOSED" ? "Fechada" : "Aberta"
-              }}</span>
-            <button class="btn-delete-icon" (click)="deleteComanda(tab, $event)" ngbTooltip="Excluir comanda"
-              placement="left">
-              <lucide-angular [img]="Trash2" [size]="18"></lucide-angular>
+          <div class="comanda-header-right">
+            <span class="badge badge-success">Aberta</span>
+            <button class="btn-icon-delete" (click)="deleteComanda(tab, $event)" ngbTooltip="Excluir comanda" placement="left">
+              <lucide-angular [img]="Trash2" [size]="16" [strokeWidth]="1.75"></lucide-angular>
             </button>
           </div>
         </div>
 
-        <div class="card-body">
-          <div class="items-list">
-            <div *ngFor="let item of getDisplayItems(tab)" class="item-row">
-              <span *ngIf="!item.isPricePerKg" class="item-quantity">{{ item?.quantity }}x</span>
-              <span *ngIf="item.isPricePerKg" class="item-quantity">{{ item?.quantity }} kg</span>
-              <span class="item-name">{{ item?.product_name }}</span>
-              <span class="item-name text-end">R$ {{ item?.totalPrice }}</span>
-            </div>
-            <div *ngIf="hasMoreItems(tab)" class="more-items">
-              +{{ getRemainingItemsCount(tab) }} item(s)...
-            </div>
+        <div class="comanda-items">
+          <div *ngFor="let item of getDisplayItems(tab)" class="comanda-item-row">
+            <span class="item-qty">
+              {{ item?.isPricePerKg ? (item?.quantity + ' kg') : (item?.quantity + 'x') }}
+            </span>
+            <span class="item-name">{{ item?.product_name }}</span>
+            <span class="item-price">R$ {{ item?.totalPrice }}</span>
+          </div>
+          <div *ngIf="hasMoreItems(tab)" class="comanda-more">
+            +{{ getRemainingItemsCount(tab) }} item(s)
           </div>
         </div>
 
-        <div class="card-footer">
-          <span class="total-label">Total:</span>
-          <span class="total-value">R$ {{ tab.total_price.toFixed(2) }}</span>
+        <div class="comanda-footer">
+          <span class="footer-label">Total</span>
+          <span class="footer-total">R$ {{ tab.total_price.toFixed(2) }}</span>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="card-actions flex-column flex-sm-row">
-          <button (click)="$event.stopPropagation(); openAddItemsModal(tab, $event)"
-            class="action-btn action-btn-secondary">
-            <lucide-angular [img]="Plus"></lucide-angular> Adicionar Itens
+        <div class="comanda-actions">
+          <button
+            (click)="$event.stopPropagation(); openAddItemsModal(tab, $event)"
+            class="btn btn-outline btn-sm"
+          >
+            <lucide-angular [img]="Plus" [size]="16" [strokeWidth]="2"></lucide-angular>
+            Adicionar
           </button>
-          <button (click)="closeTabAction(tab, $event)" class="action-btn action-btn-success">
-            ✔️ Fechar Comanda
+          <button
+            (click)="closeTabAction(tab, $event)"
+            class="btn btn-success btn-sm"
+          >
+            Fechar Comanda
           </button>
         </div>
       </div>
 
       <!-- Empty State -->
-      <div *ngIf="(!openedTabs || openedTabs.length === 0) && !isLoadingTabs" class="empty-state">
-        <div class="empty-icon">📋</div>
-        <p class="empty-title">Nenhuma comanda aberta</p>
-        <p class="empty-subtitle">Crie uma nova comanda para começar</p>
+      <div *ngIf="(!openedTabs || openedTabs.length === 0) && !isLoadingTabs" class="empty-state-card" style="grid-column: 1 / -1;">
+        <div class="empty-state-icon">
+          <lucide-angular [img]="Plus" [size]="24" [strokeWidth]="1.5"></lucide-angular>
+        </div>
+        <p class="empty-state-title">Nenhuma comanda aberta</p>
+        <p class="empty-state-text">Crie uma nova comanda para começar a receber pedidos</p>
+        <button class="btn btn-primary" style="margin-top: 1rem;" (click)="createNewComanda()">
+          <lucide-angular [img]="Plus" [size]="18" [strokeWidth]="2"></lucide-angular>
+          Nova Comanda
+        </button>
       </div>
     </div>
   </div>
 
   <!-- Comandas Fechadas -->
-  <div *ngIf="showClosedTabs" class="customer-tab-section">
-    <div class="customer-tab-grid">
-      <div *ngFor="let tab of closedTabs" (click)="openTab(tab)" class="customer-tab-card">
-        <div class="card-header">
-          <div class="card-title-section">
-            <h3 class="card-title">{{ tab.customer_name }}</h3>
-            <span class="card-subtitle" *ngIf="tab.table_number">
-              Mesa {{ tab.table_number }}
-            </span>
+  <div *ngIf="showClosedTabs" class="comandas-section">
+    <div class="comandas-grid">
+      <div *ngFor="let tab of closedTabs" (click)="openTab(tab)" class="comanda-card card-interactive">
+        <div class="comanda-header">
+          <div class="comanda-identity">
+            <h3 class="comanda-name">{{ tab.customer_name }}</h3>
+            <span class="comanda-meta" *ngIf="tab.table_number">Mesa {{ tab.table_number }}</span>
           </div>
-          <div class="card-header-actions">
-            <span class="status-badge status-closed">Fechada</span>
-            <button class="btn-delete-icon" (click)="deleteComanda(tab, $event)" ngbTooltip="Excluir comanda"
-              placement="left">
-              <lucide-angular [img]="Trash2" [size]="18"></lucide-angular>
+          <div class="comanda-header-right">
+            <span class="badge badge-neutral">Fechada</span>
+            <button class="btn-icon-delete" (click)="deleteComanda(tab, $event)" ngbTooltip="Excluir comanda" placement="left">
+              <lucide-angular [img]="Trash2" [size]="16" [strokeWidth]="1.75"></lucide-angular>
             </button>
           </div>
         </div>
 
-        <div class="card-body">
-          <div class="items-list">
-            <div *ngFor="let item of getDisplayItems(tab)" class="item-row">
-              <span *ngIf="!item.isPricePerKg" class="item-quantity">{{ item?.quantity }}x</span>
-              <span *ngIf="item.isPricePerKg" class="item-quantity">{{ item?.quantity }} kg</span>
-              <span class="item-name">{{ item?.product_name }}</span>
-            </div>
-            <div *ngIf="hasMoreItems(tab)" class="more-items">
-              +{{ getRemainingItemsCount(tab) }} item(s)...
-            </div>
+        <div class="comanda-items">
+          <div *ngFor="let item of getDisplayItems(tab)" class="comanda-item-row">
+            <span class="item-qty">
+              {{ item?.isPricePerKg ? (item?.quantity + ' kg') : (item?.quantity + 'x') }}
+            </span>
+            <span class="item-name">{{ item?.product_name }}</span>
+          </div>
+          <div *ngIf="hasMoreItems(tab)" class="comanda-more">
+            +{{ getRemainingItemsCount(tab) }} item(s)
           </div>
         </div>
 
-        <div class="card-footer">
-          <span class="total-label">Total:</span>
-          <span class="total-value">R$ {{ tab.total_price.toFixed(2) }}</span>
+        <div class="comanda-footer">
+          <span class="footer-label">Total</span>
+          <span class="footer-total">R$ {{ tab.total_price.toFixed(2) }}</span>
         </div>
       </div>
 
       <!-- Empty State -->
-      <div *ngIf="!closedTabs || closedTabs.length === 0" class="empty-state">
-        <div class="empty-icon">📜</div>
-        <p class="empty-title">Nenhuma comanda fechada</p>
+      <div *ngIf="!closedTabs || closedTabs.length === 0" class="empty-state-card" style="grid-column: 1 / -1;">
+        <div class="empty-state-icon">
+          <lucide-angular [img]="Plus" [size]="24" [strokeWidth]="1.5"></lucide-angular>
+        </div>
+        <p class="empty-state-title">Nenhuma comanda fechada</p>
+        <p class="empty-state-text">As comandas fechadas aparecerão aqui</p>
       </div>
     </div>
   </div>
 
-  <!-- Float Action Button (Mobile) - Expandable -->
+  <!-- FAB (Mobile) -->
   <div class="fab-container">
-    <!-- FAB Options (appear when expanded) -->
-    <div class="fab-options" [class.fab-options-visible]="fabExpanded">
+    <div class="fab-options" [class.visible]="fabExpanded">
       <button class="fab-option" (click)="createNewPedido()" title="Novo Pedido">
-        <span class="fab-option-icon">📝</span>
-        <span class="fab-option-label">Pedido</span>
+        <span class="fab-option-label">Novo Pedido</span>
       </button>
       <button class="fab-option" (click)="createNewComanda()" title="Nova Comanda">
-        <span class="fab-option-icon">🍽️</span>
-        <span class="fab-option-label">Comanda</span>
+        <span class="fab-option-label">Nova Comanda</span>
       </button>
     </div>
-
-    <!-- Main FAB Button -->
-    <button class="fab fab-main" [class.fab-expanded]="fabExpanded" (click)="toggleFab()" title="Menu">
-      <span class="fab-icon fab-icon-plus" [class.fab-icon-hidden]="fabExpanded"><lucide-angular
-          [img]="Plus"></lucide-angular></span>
-      <span class="fab-icon fab-icon-close" [class.fab-icon-visible]="fabExpanded">✕</span>
+    <button class="fab-main" [class.expanded]="fabExpanded" (click)="toggleFab()">
+      <lucide-angular [img]="Plus" [size]="24" [strokeWidth]="2" class="fab-icon" [class.rotated]="fabExpanded"></lucide-angular>
     </button>
-
-    <!-- Backdrop (appears when expanded) -->
-    <!-- <div
-      class="fab-backdrop"
-      [class.fab-backdrop-visible]="fabExpanded"
-      (click)="toggleFab()"
-    ></div> -->
   </div>
 </div>
 
 <!-- Modal Desktop: Detalhes da Comanda -->
 <div *ngIf="selectedTab && !showAddItemsModal" class="modal-overlay modal-desktop-only" (click)="closeOrderDetail()">
-  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2 class="modal-title">Comanda - {{ selectedTab.customer_name }}</h2>
-      <button class="modal-close" (click)="closeOrderDetail()">✕</button>
+  <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+    <div class="modal-header-custom">
+      <div>
+        <h2 class="modal-title-text">{{ selectedTab.customer_name }}</h2>
+        <p class="modal-subtitle-text">Comanda {{ selectedTab.table_number ? '- Mesa ' + selectedTab.table_number : '' }}</p>
+      </div>
+      <button class="btn-icon-close" (click)="closeOrderDetail()">&times;</button>
     </div>
 
-    <div class="modal-body">
-      <div class="order-info">
-        <div class="info-row">
-          <span class="info-label">Mesa:</span>
-          <span class="info-value">{{
-            selectedTab.table_number || "Sem mesa"
-            }}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Status:</span>
-          <span class="status-badge" [class.status-open]="selectedTab.status === 'OPEN'"
-            [class.status-closed]="selectedTab.status === 'CLOSED'">
+    <div class="modal-body-custom">
+      <div class="detail-info-bar">
+        <div class="info-chip">
+          <span class="info-chip-label">Status</span>
+          <span class="badge" [class.badge-success]="selectedTab.status === 'OPEN'" [class.badge-neutral]="selectedTab.status === 'CLOSED'">
             {{ selectedTab.status === "OPEN" ? "Aberta" : "Fechada" }}
           </span>
         </div>
+        <div class="info-chip" *ngIf="selectedTab.table_number">
+          <span class="info-chip-label">Mesa</span>
+          <span class="info-chip-value">{{ selectedTab.table_number }}</span>
+        </div>
       </div>
 
-      <div class="items-section">
-        <h3 class="section-title">Itens</h3>
-        <div class="items-table">
-          <div *ngFor="let order of selectedTab.orders" class="order-group">
-            <div class="order-header">
-              <span class="order-label">Pedido</span>
-              <button class="btn-delete-icon-small" (click)="deleteOrder(order.id, $event)" ngbTooltip="Excluir pedido"
-                placement="left">
-                <lucide-angular [img]="Trash2" [size]="16"></lucide-angular>
-              </button>
-            </div>
-            <div *ngFor="let item of order.products" class="table-row">
-              <span *ngIf="!item.isPricePerKg" class="item-qty">{{ item?.quantity }}x</span>
-              <span *ngIf="item.isPricePerKg" class="item-qty">{{ item?.quantity }} kg</span>
-              <span class="item-name">{{ item?.product_name }}</span>
-              <span class="item-price">R$
-                {{
-                ((item?.quantity || 0) * (item?.unit_price || 0)).toFixed(2)
-                }}</span>
-            </div>
+      <div class="detail-orders">
+        <h3 class="detail-section-title">Itens do Pedido</h3>
+        <div *ngFor="let order of selectedTab.orders" class="order-group-card">
+          <div class="order-group-header">
+            <span>Pedido</span>
+            <button class="btn-icon-delete-sm" (click)="deleteOrder(order.id, $event)" ngbTooltip="Excluir pedido" placement="left">
+              <lucide-angular [img]="Trash2" [size]="14" [strokeWidth]="1.75"></lucide-angular>
+            </button>
+          </div>
+          <div *ngFor="let item of order.products" class="order-item-row">
+            <span class="order-item-qty">{{ item?.isPricePerKg ? (item?.quantity + ' kg') : (item?.quantity + 'x') }}</span>
+            <span class="order-item-name">{{ item?.product_name }}</span>
+            <span class="order-item-price">R$ {{ ((item?.quantity || 0) * (item?.unit_price || 0)).toFixed(2) }}</span>
           </div>
         </div>
       </div>
 
-      <div class="order-total">
-        <span class="total-label">Total:</span>
-        <span class="total-value">R$ {{ selectedTab.total_price.toFixed(2) }}</span>
+      <div class="detail-total-bar">
+        <span>Total</span>
+        <span class="detail-total-value">R$ {{ selectedTab.total_price.toFixed(2) }}</span>
       </div>
     </div>
 
-    <div class="modal-footer" *ngIf="selectedTab.status === 'OPEN'">
-      <button class="btn btn-secondary" (click)="
-          $event.stopPropagation(); openAddItemsModal(selectedTab, $event)
-        ">
-        <lucide-angular [img]="Plus"></lucide-angular> Adicionar Itens
+    <div class="modal-footer-custom" *ngIf="selectedTab.status === 'OPEN'">
+      <button class="btn btn-secondary" (click)="$event.stopPropagation(); openAddItemsModal(selectedTab, $event)">
+        <lucide-angular [img]="Plus" [size]="18" [strokeWidth]="2"></lucide-angular>
+        Adicionar Itens
       </button>
       <button class="btn btn-success" (click)="closeTabAction(selectedTab, $event)">
-        ✔️ Fechar Comanda
+        Fechar Comanda
       </button>
     </div>
   </div>
 </div>
 
-<!-- Offcanvas Template: Detalhes da Comanda -->
+<!-- Offcanvas: Detalhes da Comanda -->
 <ng-template #orderDetailOffcanvas let-offcanvas>
   <div class="offcanvas-header">
     <h2 class="offcanvas-title">{{ selectedTab?.customer_name }}</h2>
     <button type="button" class="btn-close" (click)="closeOrderDetail()"></button>
   </div>
   <div class="offcanvas-body">
-    <div class="order-info" *ngIf="selectedTab">
-      <div class="info-row">
-        <span class="info-label">Mesa:</span>
-        <span class="info-value">{{
-          selectedTab.table_number || "Sem mesa"
-          }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Status:</span>
-        <span class="status-badge" [class.status-open]="selectedTab.status === 'OPEN'"
-          [class.status-closed]="selectedTab.status === 'CLOSED'">
+    <div class="detail-info-bar" *ngIf="selectedTab">
+      <div class="info-chip">
+        <span class="info-chip-label">Status</span>
+        <span class="badge" [class.badge-success]="selectedTab.status === 'OPEN'" [class.badge-neutral]="selectedTab.status === 'CLOSED'">
           {{ selectedTab.status === "OPEN" ? "Aberta" : "Fechada" }}
         </span>
       </div>
     </div>
 
-    <div class="items-section" *ngIf="selectedTab">
-      <h3 class="section-title">Itens</h3>
-      <div class="items-table">
-        <div *ngFor="let order of selectedTab.orders">
-          <div *ngFor="let item of order.products" class="table-row">
-            <span *ngIf="!item.isPricePerKg" class="item-qty">{{ item?.quantity }}x</span>
-            <span *ngIf="item.isPricePerKg" class="item-qty">{{ item?.quantity }} kg</span>
-            <span class="item-name">{{ item?.product_name }}</span>
-            <span class="item-price">R$
-              {{
-              ((item?.quantity || 0) * (item?.unit_price || 0)).toFixed(2)
-              }}</span>
-          </div>
+    <div class="detail-orders" *ngIf="selectedTab">
+      <h3 class="detail-section-title">Itens</h3>
+      <div *ngFor="let order of selectedTab.orders">
+        <div *ngFor="let item of order.products" class="order-item-row">
+          <span class="order-item-qty">{{ item?.isPricePerKg ? (item?.quantity + ' kg') : (item?.quantity + 'x') }}</span>
+          <span class="order-item-name">{{ item?.product_name }}</span>
+          <span class="order-item-price">R$ {{ ((item?.quantity || 0) * (item?.unit_price || 0)).toFixed(2) }}</span>
         </div>
       </div>
     </div>
 
-    <div class="order-total" *ngIf="selectedTab">
-      <span class="total-label">Total:</span>
-      <span class="total-value">R$ {{ selectedTab.total_price.toFixed(2) }}</span>
+    <div class="detail-total-bar" *ngIf="selectedTab">
+      <span>Total</span>
+      <span class="detail-total-value">R$ {{ selectedTab.total_price.toFixed(2) }}</span>
     </div>
 
-    <div class="offcanvas-actions" *ngIf="selectedTab && selectedTab.status === 'OPEN'">
-      <button class="btn btn-secondary btn-block" (click)="
-          $event.stopPropagation(); openAddItemsModal(selectedTab, $event)
-        ">
-        <lucide-angular [img]="Plus"></lucide-angular> Adicionar Itens
+    <div class="offcanvas-actions-group" *ngIf="selectedTab && selectedTab.status === 'OPEN'">
+      <button class="btn btn-secondary btn-lg" style="width: 100%;" (click)="$event.stopPropagation(); openAddItemsModal(selectedTab, $event)">
+        <lucide-angular [img]="Plus" [size]="18" [strokeWidth]="2"></lucide-angular>
+        Adicionar Itens
       </button>
-      <button class="btn btn-success btn-block" (click)="closeTabAction(selectedTab, $event)">
-        ✔️ Fechar Comanda
+      <button class="btn btn-success btn-lg" style="width: 100%;" (click)="closeTabAction(selectedTab, $event)">
+        Fechar Comanda
       </button>
     </div>
   </div>
@@ -319,100 +285,79 @@
 
 <!-- Modal Desktop: Adicionar Itens -->
 <div *ngIf="showAddItemsModal" class="modal-overlay modal-desktop-only" (click)="closeAddItemsModal()">
-  <div class="modal-content modal-xlarge" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2 class="modal-title">
-        Adicionar Itens - {{ selectedTab?.customer_name }}
-      </h2>
-      <button class="modal-close" (click)="closeAddItemsModal()">✕</button>
+  <div class="modal-content modal-xl" (click)="$event.stopPropagation()">
+    <div class="modal-header-custom">
+      <div>
+        <h2 class="modal-title-text">Adicionar Itens</h2>
+        <p class="modal-subtitle-text">{{ selectedTab?.customer_name }}</p>
+      </div>
+      <button class="btn-icon-close" (click)="closeAddItemsModal()">&times;</button>
     </div>
 
-    <div class="modal-body modal-body-flex">
-      <!-- Products Section -->
-      <div class="products-section">
-        <!-- Categories -->
-        <div class="categories-filter">
-          <button (click)="selectedCategory = ''" [class.active]="selectedCategory === ''" class="category-btn">
-            Todos
-          </button>
-          <button *ngFor="let category of categories" (click)="selectedCategory = category.id"
-            [class.active]="selectedCategory === category.id" class="category-btn">
+    <div class="modal-body-split">
+      <!-- Products -->
+      <div class="products-panel">
+        <div class="category-filter">
+          <button (click)="selectedCategory = ''" [class.active]="selectedCategory === ''" class="category-chip">Todos</button>
+          <button *ngFor="let category of categories" (click)="selectedCategory = category.id" [class.active]="selectedCategory === category.id" class="category-chip">
             <span [innerHTML]="category.icon"></span>
             {{ category.name }}
           </button>
         </div>
-
-        <!-- Products Grid -->
         <div class="products-grid">
-          <div *ngFor="let product of getFilteredProducts()" [attr.data-product-id]="product.id"
-            (click)="addToCart(product)" class="product-card">
-            <h4 class="product-name">{{ product.name }}</h4>
-            <p class="product-price">
-              R$ {{ product.price.toFixed(2)
-              }}{{ product.isPricePerKg ? "/kg" : "" }}
-            </p>
+          <div *ngFor="let product of getFilteredProducts()" [attr.data-product-id]="product.id" (click)="addToCart(product)" class="product-tile">
+            <h4 class="product-tile-name">{{ product.name }}</h4>
+            <p class="product-tile-price">R$ {{ product.price.toFixed(2) }}{{ product.isPricePerKg ? '/kg' : '' }}</p>
           </div>
-
-          <div *ngIf="getFilteredProducts().length === 0" class="empty-products">
+          <div *ngIf="getFilteredProducts().length === 0" class="products-empty">
             <p>Nenhum produto encontrado</p>
           </div>
         </div>
       </div>
 
-      <!-- Cart Section -->
-      <div class="cart-section">
-        <h3 class="cart-title">Carrinho</h3>
+      <!-- Cart -->
+      <div class="cart-panel">
+        <h3 class="cart-panel-title">Carrinho</h3>
 
-        <div *ngIf="cartItems.length === 0" class="empty-cart">
-          <div class="empty-cart-icon">🛒</div>
-          <p class="empty-cart-text">Carrinho vazio</p>
+        <div *ngIf="cartItems.length === 0" class="cart-empty">
+          <p>Selecione produtos ao lado</p>
         </div>
 
-        <div *ngIf="cartItems.length > 0" class="cart-items">
-          <div *ngFor="let item of cartItems" class="cart-item">
-            <div class="item-info">
-              <h4 class="item-name">{{ item.product_name }}</h4>
-              <p class="item-price">
-                R$ {{ item.unit_price.toFixed(2)
-                }}{{ item.isPricePerKg ? "/kg" : "" }}
-              </p>
+        <div *ngIf="cartItems.length > 0" class="cart-items-list">
+          <div *ngFor="let item of cartItems" class="cart-row">
+            <div class="cart-row-info">
+              <span class="cart-row-name">{{ item.product_name }}</span>
+              <span class="cart-row-price">R$ {{ item.unit_price.toFixed(2) }}{{ item.isPricePerKg ? '/kg' : '' }}</span>
             </div>
-            <div class="item-controls">
+            <div class="cart-row-controls">
               <ng-container *ngIf="item?.isPricePerKg">
                 <div class="per-kg-inputs">
                   <input type="text" mask="separator.2" thousandSeparator="," decimalMarker="." suffix=" kg"
                     [(ngModel)]="item.quantity" (ngModelChange)="onWeightChange(item, $event)"
-                    class="form-control qty-input" placeholder="Peso" />
+                    class="input input-sm" placeholder="Peso" />
                   <input type="text" mask="separator.2" thousandSeparator="," decimalMarker="." prefix="R$ "
                     [ngModel]="item.unit_price * item.quantity" (ngModelChange)="onPriceChange(item, $event)"
-                    class="form-control qty-input" placeholder="Preço" />
+                    class="input input-sm" placeholder="Preço" />
                 </div>
-                <button class="qty-btn last-item" (click)="removeFromCart(item.id)">
-                  🗑️
+                <button class="btn-icon-delete-sm" (click)="removeFromCart(item.id)">
+                  <lucide-angular [img]="Trash2" [size]="14" [strokeWidth]="1.75"></lucide-angular>
                 </button>
               </ng-container>
               <ng-container *ngIf="item?.isPricePerKg == false">
-                <button [ngClass]="{
-                    'qty-btn': true,
-                    'last-item': item.quantity === 1,
-                  }" (click)="decreaseQuantity(item)">
-                  −
-                </button>
-                <span class="qty-display">{{ item.quantity }}</span>
-                <button class="qty-btn" (click)="increaseQuantity(item)">
-                  +
-                </button>
+                <button class="qty-ctrl" [class.destructive]="item.quantity === 1" (click)="decreaseQuantity(item)">−</button>
+                <span class="qty-value">{{ item.quantity }}</span>
+                <button class="qty-ctrl" (click)="increaseQuantity(item)">+</button>
               </ng-container>
             </div>
           </div>
         </div>
 
-        <div *ngIf="cartItems.length > 0" class="cart-footer">
-          <div class="cart-total">
-            <span class="total-label">Total:</span>
-            <span class="total-value">R$ {{ cartTotal.toFixed(2) }}</span>
+        <div *ngIf="cartItems.length > 0" class="cart-summary">
+          <div class="cart-total-row">
+            <span>Total</span>
+            <span class="cart-total-value">R$ {{ cartTotal.toFixed(2) }}</span>
           </div>
-          <button (click)="submitAddItems()" class="submit-btn">
+          <button (click)="submitAddItems()" class="btn btn-primary btn-lg" style="width: 100%;">
             Adicionar à Comanda
           </button>
         </div>
@@ -421,77 +366,65 @@
   </div>
 </div>
 
-<!-- Offcanvas Template: Adicionar Itens -->
+<!-- Offcanvas: Adicionar Itens -->
 <ng-template #addItemsOffcanvas let-offcanvas>
   <div class="offcanvas-header">
     <h2 class="offcanvas-title">Adicionar Itens</h2>
     <button type="button" class="btn-close" (click)="closeAddItemsModal()"></button>
   </div>
   <div class="offcanvas-body offcanvas-add-items">
-    <!-- Categories with Navigation -->
-    <div class="categories-wrapper-mobile">
-      <div class="categories-filter-mobile" #categoriesContainerMobile>
-        <button (click)="selectedCategory = ''" [class.active]="selectedCategory === ''" class="category-btn">
-          Todos
-        </button>
-        <button *ngFor="let category of categories" (click)="selectedCategory = category.id"
-          [class.active]="selectedCategory === category.id" class="category-btn">
-          <span [innerHTML]="category.icon"></span>
-          {{ category.name }}
-        </button>
-      </div>
+    <div class="category-filter-mobile" #categoriesContainerMobile>
+      <button (click)="selectedCategory = ''" [class.active]="selectedCategory === ''" class="category-chip">Todos</button>
+      <button *ngFor="let category of categories" (click)="selectedCategory = category.id" [class.active]="selectedCategory === category.id" class="category-chip">
+        <span [innerHTML]="category.icon"></span>
+        {{ category.name }}
+      </button>
     </div>
 
-    <!-- Products Grid -->
     <div class="products-grid-mobile">
-      <div *ngFor="let product of getFilteredProducts()" [attr.data-product-id]="product.id"
-        (click)="addToCart(product)" class="product-card">
-        <h4 class="product-name">{{ product.name }}</h4>
-        <p class="product-price">R$ {{ product.price.toFixed(2) }}{{ product.isPricePerKg ? '/kg' : '' }}</p>
+      <div *ngFor="let product of getFilteredProducts()" [attr.data-product-id]="product.id" (click)="addToCart(product)" class="product-tile">
+        <h4 class="product-tile-name">{{ product.name }}</h4>
+        <p class="product-tile-price">R$ {{ product.price.toFixed(2) }}{{ product.isPricePerKg ? '/kg' : '' }}</p>
       </div>
-
-      <div *ngIf="getFilteredProducts().length === 0" class="empty-products">
+      <div *ngIf="getFilteredProducts().length === 0" class="products-empty">
         <p>Nenhum produto encontrado</p>
       </div>
     </div>
 
-    <!-- Cart Fixed Bottom -->
-    <div class="cart-fixed-bottom" *ngIf="cartItems.length > 0">
+    <!-- Cart Bottom -->
+    <div class="cart-bottom-sheet" *ngIf="cartItems.length > 0">
       <div class="cart-items-compact">
-        <div *ngFor="let item of cartItems" class="cart-item-compact" [ngClass]="{'align-items-baseline flex-column': item?.isPricePerKg}">
-          <span class="item-name">{{ item.product_name }}</span>
-          <div class="item-controls">
-          <ng-container *ngIf="item?.isPricePerKg">
-            <button class="qty-btn last-item" (click)="removeFromCart(item.id)">
-              🗑️
-            </button>
-            <div class="per-kg-inputs">
-              <input type="text" mask="separator.2" thousandSeparator="," decimalMarker="." suffix=" kg"
-                [(ngModel)]="item.quantity" (ngModelChange)="onWeightChange(item, $event)"
-                class="form-control qty-input" placeholder="Peso" />
-              <input type="text" mask="separator.2" thousandSeparator="," decimalMarker="." prefix="R$ "
-                [ngModel]="item.unit_price * item.quantity" (ngModelChange)="onPriceChange(item, $event)"
-                class="form-control qty-input" placeholder="Preço" />
-            </div>
-          </ng-container>
-          <ng-container *ngIf="!item?.isPricePerKg">
-            <button class="qty-btn" (click)="decreaseQuantity(item)" >−</button>
-            <span class="qty-display">{{ item.quantity }}</span>
-            <button class="qty-btn" (click)="increaseQuantity(item)" >+</button>
-          </ng-container>
-        </div>
-          <span class="item-total">R$
-            {{
-            ((item?.quantity || 0) * (item?.unit_price || 0)).toFixed(2)
-            }}</span>
+        <div *ngFor="let item of cartItems" class="cart-compact-row" [class.flex-col]="item?.isPricePerKg">
+          <span class="cart-compact-name">{{ item.product_name }}</span>
+          <div class="cart-compact-controls">
+            <ng-container *ngIf="item?.isPricePerKg">
+              <button class="btn-icon-delete-sm" (click)="removeFromCart(item.id)">
+                <lucide-angular [img]="Trash2" [size]="14" [strokeWidth]="1.75"></lucide-angular>
+              </button>
+              <div class="per-kg-inputs">
+                <input type="text" mask="separator.2" thousandSeparator="," decimalMarker="." suffix=" kg"
+                  [(ngModel)]="item.quantity" (ngModelChange)="onWeightChange(item, $event)"
+                  class="input input-sm" placeholder="Peso" />
+                <input type="text" mask="separator.2" thousandSeparator="," decimalMarker="." prefix="R$ "
+                  [ngModel]="item.unit_price * item.quantity" (ngModelChange)="onPriceChange(item, $event)"
+                  class="input input-sm" placeholder="Preço" />
+              </div>
+            </ng-container>
+            <ng-container *ngIf="!item?.isPricePerKg">
+              <button class="qty-ctrl qty-ctrl-sm" (click)="decreaseQuantity(item)">−</button>
+              <span class="qty-value-sm">{{ item.quantity }}</span>
+              <button class="qty-ctrl qty-ctrl-sm" (click)="increaseQuantity(item)">+</button>
+            </ng-container>
+          </div>
+          <span class="cart-compact-total">R$ {{ ((item?.quantity || 0) * (item?.unit_price || 0)).toFixed(2) }}</span>
         </div>
       </div>
-      <div class="cart-footer-mobile">
-        <div class="cart-total">
-          <span class="total-label">Total:</span>
-          <span class="total-value">R$ {{ cartTotal.toFixed(2) }}</span>
+      <div class="cart-bottom-footer">
+        <div class="cart-total-row">
+          <span>Total</span>
+          <span class="cart-total-value">R$ {{ cartTotal.toFixed(2) }}</span>
         </div>
-        <button (click)="submitAddItems()" class="submit-btn">
+        <button (click)="submitAddItems()" class="btn btn-primary btn-lg" style="width: 100%;">
           Adicionar à Comanda
         </button>
       </div>
@@ -499,6 +432,5 @@
   </div>
 </ng-template>
 
-<!-- Receipt Component -->
-<app-receipt *ngIf="selectedTabForReceipt" [tab]="selectedTabForReceipt" (close)="onReceiptClose()"
-  (finalize)="finalizeOrder($event)" (sendEmail)="onReceiptSendEmail()"></app-receipt>
+<!-- Receipt -->
+<app-receipt *ngIf="selectedTabForReceipt" [tab]="selectedTabForReceipt" (close)="onReceiptClose()" (finalize)="finalizeOrder($event)" (sendEmail)="onReceiptSendEmail()"></app-receipt>

@@ -1,97 +1,95 @@
-<div class="main-layout">
+<div class="app-layout">
   <!-- Mobile Header -->
-  <header class="mobile-header md:hidden">
-    <button class="menu-toggle" (click)="openOffcanvas(offcanvasMenu)">
-      <span class="hamburger-icon">☰</span>
+  <header class="mobile-header">
+    <button class="header-btn" (click)="openOffcanvas(offcanvasMenu)" aria-label="Menu">
+      <lucide-angular [img]="Menu" [size]="22" [strokeWidth]="2"></lucide-angular>
     </button>
-    <h1 class="app-title">ComandaX</h1>
-    <button class="logout-btn fs-6" (click)="logout()">
-      <span>Sair</span>
+    <div class="header-brand">
+      <img src="assets/logo/transparente.png" alt="ComandaX" class="header-logo" />
+    </div>
+    <button class="header-btn" (click)="logout()" aria-label="Sair">
+      <lucide-angular [img]="LogOut" [size]="20" [strokeWidth]="2"></lucide-angular>
     </button>
   </header>
 
   <!-- Desktop Sidebar -->
-  <aside class="sidebar hidden md:flex" [class.collapsed]="sidebarCollapsed">
-    <div class="sidebar-header">
-      <!-- <button class="sidebar-toggle" (click)="toggleSidebar()" title="Expandir/Recolher Menu">
-        <lucide-angular *ngIf="!sidebarCollapsed" [img]="ChevronLeft" [size]="20" [strokeWidth]="2"></lucide-angular>
-        <lucide-angular *ngIf="sidebarCollapsed" [img]="ChevronRight" [size]="20" [strokeWidth]="2"></lucide-angular>
-      </button> -->
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-brand">
       @if (!sidebarCollapsed) {
-      <div class="logo-container">
-        <!-- <div class="logo-icon">🍽️</div>
-        <div class="logo-text">
-          <h1 class="sidebar-title">ComandaX</h1>
-          <p class="sidebar-subtitle">Sistema Unificado</p>
-        </div> -->
-        <img src="assets/logo/transparente.png" alt="ComandaX Logo" class="logo-image" />
-      </div>
+        <img src="assets/logo/transparente.png" alt="ComandaX" class="sidebar-logo" />
       }
-      <!-- <div class="logo-icon-only" *ngIf="sidebarCollapsed">
-        🍽️
-      </div> -->
     </div>
 
     <nav class="sidebar-nav">
       @for (item of menuItems; track item.id) {
-        <!-- Separator -->
         @if (item.id === 'separator') {
-        <div class="menu-separator"></div>
+          <div class="nav-divider"></div>
         }
 
-        <!-- Menu Item with Children -->
         @if (item.id !== 'separator' && item.children) {
-        <div class="menu-group">
-          <button class="menu-item" (click)="toggleMenu(item.id)" [class.expanded]="isMenuExpanded(item.id)"
-            [title]="sidebarCollapsed ? item.label : ''">
-            <span class="menu-icon">{{ item.icon }}</span>
-            @if (!sidebarCollapsed) {
-            <span class="menu-label">{{ item.label }}</span>
-            }
-            @if (isMenuExpanded(item.id)) {
-            <lucide-angular [img]="ChevronLeft" [size]="20"
-              [strokeWidth]="2"></lucide-angular>
-            }
-            @if (!isMenuExpanded(item.id)) {
-            <lucide-angular [img]="ChevronRight" [size]="20"
-              [strokeWidth]="2"></lucide-angular>
-            }
-          </button>
-
-          @if (isMenuExpanded(item.id) && !sidebarCollapsed) {
-          <div class="submenu">
-            @for (child of item.children; track child.id) {
-            <button class="submenu-item" [class.active]="isActiveRoute(child.route)"
-              (click)="navigate(child.route!)">
-              <span class="menu-icon">{{ child.icon }}</span>
-              <span class="menu-label">{{ child.label }}</span>
+          <div class="nav-group">
+            <button
+              class="nav-item"
+              (click)="toggleMenu(item.id)"
+              [class.expanded]="isMenuExpanded(item.id)"
+              [title]="sidebarCollapsed ? item.label : ''"
+            >
+              <lucide-angular [img]="item.icon" [size]="20" [strokeWidth]="1.75" class="nav-icon"></lucide-angular>
+              @if (!sidebarCollapsed) {
+                <span class="nav-label">{{ item.label }}</span>
+                <lucide-angular
+                  [img]="ChevronDown"
+                  [size]="16"
+                  [strokeWidth]="2"
+                  class="nav-chevron"
+                  [class.rotated]="isMenuExpanded(item.id)"
+                ></lucide-angular>
+              }
             </button>
+
+            @if (isMenuExpanded(item.id) && !sidebarCollapsed) {
+              <div class="nav-submenu">
+                @for (child of item.children; track child.id) {
+                  <button
+                    class="nav-item nav-subitem"
+                    [class.active]="isActiveRoute(child.route)"
+                    (click)="navigate(child.route!)"
+                  >
+                    <lucide-angular [img]="child.icon" [size]="18" [strokeWidth]="1.75" class="nav-icon"></lucide-angular>
+                    <span class="nav-label">{{ child.label }}</span>
+                  </button>
+                }
+              </div>
             }
           </div>
-          }
-        </div>
         }
 
-        <!-- Simple Menu Item -->
         @if (item.id !== 'separator' && !item.children) {
-        <button class="menu-item"
-          [class.active]="isActiveRoute(item.route)" [class.disabled]="item.disabled"
-          [title]="item.tooltip || (sidebarCollapsed ? item.label : '')"
-          (click)="!item.disabled && navigate(item.route!)">
-          <span class="menu-icon">{{ item.icon }}</span>
-          <span class="menu-label" *ngIf="!sidebarCollapsed">{{ item.label }}</span>
-          @if (item.disabled && !sidebarCollapsed) {
-          <span class="badge-soon">Em Breve</span>
-          }
-        </button>
+          <button
+            class="nav-item"
+            [class.active]="isActiveRoute(item.route)"
+            [class.disabled]="item.disabled"
+            [title]="item.tooltip || (sidebarCollapsed ? item.label : '')"
+            (click)="!item.disabled && navigate(item.route!, item.external)"
+          >
+            <lucide-angular [img]="item.icon" [size]="20" [strokeWidth]="1.75" class="nav-icon"></lucide-angular>
+            @if (!sidebarCollapsed) {
+              <span class="nav-label">{{ item.label }}</span>
+              @if (item.disabled) {
+                <span class="nav-badge">Em breve</span>
+              }
+            }
+          </button>
         }
       }
     </nav>
 
     <div class="sidebar-footer">
-      <button class="logout-button" (click)="logout()">
-        <span class="menu-icon">🚪</span>
-        <span class="menu-label">Sair</span>
+      <button class="nav-item nav-logout" (click)="logout()">
+        <lucide-angular [img]="LogOut" [size]="20" [strokeWidth]="1.75" class="nav-icon"></lucide-angular>
+        @if (!sidebarCollapsed) {
+          <span class="nav-label">Sair</span>
+        }
       </button>
     </div>
   </aside>
@@ -104,64 +102,73 @@
 
 <!-- Mobile Offcanvas Menu -->
 <ng-template #offcanvasMenu let-offcanvas>
-  <div class="offcanvas-header">
-    <h2 class="offcanvas-title">ComandaX</h2>
-    <button type="button" class="close-btn" (click)="offcanvas.dismiss()">
-      ✕
-    </button>
-  </div>
+  <div class="mobile-menu">
+    <div class="mobile-menu-header">
+      <img src="assets/logo/branco-transparente.png" alt="ComandaX" class="mobile-menu-logo" />
+      <button class="mobile-menu-close" (click)="offcanvas.dismiss()">
+        <lucide-angular [img]="X" [size]="22" [strokeWidth]="2"></lucide-angular>
+      </button>
+    </div>
 
-  <div class="offcanvas-body">
-    <nav class="mobile-nav">
+    <nav class="mobile-menu-nav">
       @for (item of menuItems; track item.id) {
-        <!-- Separator -->
         @if (item.id === 'separator') {
-        <div class="menu-separator"></div>
+          <div class="mobile-nav-divider"></div>
         }
 
-        <!-- Menu Item with Children -->
         @if (item.id !== 'separator' && item.children) {
-        <div class="menu-group">
-          <button class="menu-item" (click)="toggleMenu(item.id)" [class.expanded]="isMenuExpanded(item.id)">
-            <span class="menu-icon">{{ item.icon }}</span>
-            <span class="menu-label">{{ item.label }}</span>
-            @if (isMenuExpanded(item.id)) {
-            <lucide-angular [img]="ChevronLeft" [size]="20"
-              [strokeWidth]="2"></lucide-angular>
-            }
-            @if (!isMenuExpanded(item.id)) {
-            <lucide-angular [img]="ChevronRight" [size]="20"
-              [strokeWidth]="2"></lucide-angular>
-            }
-          </button>
-
-          @if (isMenuExpanded(item.id)) {
-          <div class="submenu">
-            @for (child of item.children; track child.id) {
-            <button class="submenu-item" [class.active]="isActiveRoute(child.route)"
-              (click)="navigate(child.route!)">
-              <span class="menu-icon">{{ child.icon }}</span>
-              <span class="menu-label">{{ child.label }}</span>
+          <div class="mobile-nav-group">
+            <button class="mobile-nav-item" (click)="toggleMenu(item.id)" [class.expanded]="isMenuExpanded(item.id)">
+              <lucide-angular [img]="item.icon" [size]="20" [strokeWidth]="1.75" class="mobile-nav-icon"></lucide-angular>
+              <span class="mobile-nav-label">{{ item.label }}</span>
+              <lucide-angular
+                [img]="ChevronDown"
+                [size]="16"
+                [strokeWidth]="2"
+                class="mobile-nav-chevron"
+                [class.rotated]="isMenuExpanded(item.id)"
+              ></lucide-angular>
             </button>
+
+            @if (isMenuExpanded(item.id)) {
+              <div class="mobile-nav-submenu">
+                @for (child of item.children; track child.id) {
+                  <button
+                    class="mobile-nav-item mobile-nav-subitem"
+                    [class.active]="isActiveRoute(child.route)"
+                    (click)="navigate(child.route!)"
+                  >
+                    <lucide-angular [img]="child.icon" [size]="18" [strokeWidth]="1.75" class="mobile-nav-icon"></lucide-angular>
+                    <span class="mobile-nav-label">{{ child.label }}</span>
+                  </button>
+                }
+              </div>
             }
           </div>
-          }
-        </div>
         }
 
-        <!-- Simple Menu Item -->
         @if (item.id !== 'separator' && !item.children) {
-        <button class="menu-item"
-          [class.active]="isActiveRoute(item.route)" [class.disabled]="item.disabled" [title]="item.tooltip || ''"
-          (click)="!item.disabled && navigate(item.route!)">
-          <span class="menu-icon">{{ item.icon }}</span>
-          <span class="menu-label">{{ item.label }}</span>
-          @if (item.disabled) {
-          <span class="badge-soon">Em Breve</span>
-          }
-        </button>
+          <button
+            class="mobile-nav-item"
+            [class.active]="isActiveRoute(item.route)"
+            [class.disabled]="item.disabled"
+            (click)="!item.disabled && navigate(item.route!, item.external)"
+          >
+            <lucide-angular [img]="item.icon" [size]="20" [strokeWidth]="1.75" class="mobile-nav-icon"></lucide-angular>
+            <span class="mobile-nav-label">{{ item.label }}</span>
+            @if (item.disabled) {
+              <span class="mobile-nav-badge">Em breve</span>
+            }
+          </button>
         }
       }
     </nav>
+
+    <div class="mobile-menu-footer">
+      <button class="mobile-nav-item mobile-nav-logout" (click)="logout()">
+        <lucide-angular [img]="LogOut" [size]="20" [strokeWidth]="1.75" class="mobile-nav-icon"></lucide-angular>
+        <span class="mobile-nav-label">Sair da conta</span>
+      </button>
+    </div>
   </div>
 </ng-template>

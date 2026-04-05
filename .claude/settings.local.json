@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx ng:*)",
+      "Bash(ls -la /c/Users/jvpro/Workspace/ComandaX/comandax-front/src/*.xml)",
+      "Bash(ls -la /c/Users/jvpro/Workspace/ComandaX/comandax-front/src/*.json)",
+      "WebFetch(domain:www.consumer.com.br)",
+      "WebSearch",
+      "WebFetch(domain:consumer.com.br)"
+    ]
+  }
+}
