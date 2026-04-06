@@ -35,6 +35,7 @@ export interface OrderItem {
   unit_price: number;
   status: 'CREATED' | 'IN_PREPARATION' | 'CLOSED';
   isPricePerKg: boolean;
+  totalInput?: number;
 }
 
 export interface Tab {

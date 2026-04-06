@@ -170,6 +170,7 @@ export class NewCustomerTabComponent implements OnInit {
         unit_price: product.price,
         status: "CREATED",
         isPricePerKg: product.isPricePerKg,
+        totalInput: product.price,
       };
       this.cartItems.push(newItem);
       this.triggerCartAnimation();

@@ -4,7 +4,9 @@
     <div class="receipt-header">
       <h2 class="receipt-title">Recibo</h2>
       <p class="receipt-brand">ComandaX</p>
-      <p class="receipt-date">{{ tab.created_at | date : "dd/MM/yyyy HH:mm" }}</p>
+      <p class="receipt-date">
+        {{ tab.created_at | date: "dd/MM/yyyy HH:mm" }}
+      </p>
     </div>
 
     <!-- Content -->
@@ -13,7 +15,9 @@
       <div class="receipt-info">
         <div class="receipt-info-row">
           <span class="receipt-info-label">Cliente/Mesa</span>
-          <span class="receipt-info-value">{{ tab.customer_name || tab.table_number }}</span>
+          <span class="receipt-info-value">{{
+            tab.customer_name || tab.table_number
+          }}</span>
         </div>
         <div class="receipt-info-row">
           <span class="receipt-info-label">Comanda #</span>
@@ -26,12 +30,23 @@
         <h3 class="receipt-section-title">Itens</h3>
         <div class="receipt-items-list">
           <div *ngFor="let order of tab.orders">
-            <div *ngFor="let item of order.products" class="receipt-item">
+            <div
+              *ngFor="let item of order.products"
+              class="receipt-item"
+            >
               <div class="receipt-item-info">
                 <span class="receipt-item-name">{{ item.product_name }}</span>
-                <span class="receipt-item-qty">{{ item.quantity }}x R$ {{ item.unit_price.toFixed(2) }}</span>
+                <span *ngIf="!item.isPricePerKg" class="receipt-item-qty">
+                  {{ item.quantity }}x R$ {{ item.unit_price.toFixed(2) }}
+                </span>
+                <span *ngIf="item.isPricePerKg" class="receipt-item-qty">
+                  {{ item.quantity.toFixed(2) }}kg R$
+                  {{ item.unit_price.toFixed(2) }}
+                </span>
               </div>
-              <span class="receipt-item-total">R$ {{ (item.unit_price * item.quantity).toFixed(2) }}</span>
+              <span class="receipt-item-total"
+                >R$ {{ (item.unit_price * item.quantity).toFixed(2) }}</span
+              >
             </div>
           </div>
         </div>
@@ -45,10 +60,18 @@
 
       <!-- Actions -->
       <div class="receipt-actions">
-        <button (click)="onFinalize()" class="btn btn-success btn-lg" style="width: 100%;">
+        <button
+          (click)="onFinalize()"
+          class="btn btn-success btn-lg"
+          style="width: 100%"
+        >
           Finalizar Comanda
         </button>
-        <button (click)="onClose()" class="btn btn-secondary btn-lg" style="width: 100%;">
+        <button
+          (click)="onClose()"
+          class="btn btn-secondary btn-lg"
+          style="width: 100%"
+        >
           Fechar
         </button>
       </div>

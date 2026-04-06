@@ -256,7 +256,8 @@ export class CustomerTabListComponent implements OnInit, AfterViewInit {
         product_name: product.name,
         quantity: 1,
         unit_price: product.price,
-        isPricePerKg: product.isPricePerKg
+        isPricePerKg: product.isPricePerKg,
+        totalInput: product.price
       });
     }
 
